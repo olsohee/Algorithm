@@ -1,18 +1,17 @@
+
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int[] arr = new int[4];
 
         for(int i = 0; i < 3; i++) {
-
             int count = 0; //등(1)의 갯수
 
             //입력받기
-            for(int j = 0; j < arr.length; j++) {
-                arr[i] = sc.nextInt();
-                if(arr[i] == 1) count++;
+            for(int j = 0; j < 4; j++) {
+                int input = sc.nextInt();
+                if(input == 1) count++;
             }
 
             switch (count) {
