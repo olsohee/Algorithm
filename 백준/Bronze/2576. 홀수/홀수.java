@@ -1,20 +1,21 @@
-import java.util.Scanner;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int[] arr = new int[7];
         int min = 100;
         int sum = 0;
 
         for(int i = 0; i < 7; i++) {
-            arr[i] = sc.nextInt();
-        }
+            int num = Integer.parseInt(br.readLine());
 
-        for(int i = 0; i < 7; i++) {
-            if(arr[i] % 2 != 0) {
-                sum += arr[i];
-                if(arr[i] < min) min = arr[i];
+            if(num % 2 != 0) {
+                sum += num;
+                min = Math.min(num, min);
             }
         }
 
