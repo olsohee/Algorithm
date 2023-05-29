@@ -1,0 +1,53 @@
+
+import java.io.*;
+import java.util.*;
+
+public class Main {
+
+    static int n;
+    static int m;
+    static int[] num;
+    static int[] outputArr;
+    static LinkedHashSet<String> outputSet;
+
+    public static void main(String[] args) throws IOException {
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+
+        outputArr = new int[m];
+        outputSet = new LinkedHashSet<>();
+        num = new int[n];
+
+        st = new StringTokenizer(br.readLine());
+        for(int i = 0; i < n; i++) {
+            num[i] = Integer.parseInt(st.nextToken());
+        }
+        Arrays.sort(num);
+
+        func(0, 0);
+        for (String set:outputSet) {
+            System.out.println(set.toString());
+        }
+    }
+
+    public static void func(int k, int start) {
+
+        if(k == m) {
+            StringBuilder sb = new StringBuilder();
+            for(int i = 0; i < m; i++) {
+                sb.append(outputArr[i]).append(" ");
+            }
+            outputSet.add(sb.toString());
+            return;
+        }
+
+        for(int i = start; i < n; i++) {
+            outputArr[k] = num[i];
+            func(k + 1, i);
+        }
+    }
+}
