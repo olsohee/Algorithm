@@ -11,46 +11,41 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        Pair[] inputArr = new Pair[N]; // 입력받은 값을 저장할 배열
-        int maxDay = 0;
+        int[][] inputArr = new int[N][2];
 
-        for(int i = 0; i < inputArr.length; i++) {
+        for(int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            int d = Integer.parseInt(st.nextToken());
-            int w = Integer.parseInt(st.nextToken());
-            Pair pair = new Pair(d, w);
-            inputArr[i] = pair;
-            maxDay = Math.max(maxDay, d);
+            int n1 = Integer.parseInt(st.nextToken());
+            int n2 = Integer.parseInt(st.nextToken());
+
+            inputArr[i][0] = n1;
+            inputArr[i][1] = n2;
         }
 
-        Arrays.sort(inputArr, new Comparator<Pair>() {
+        // 배점이 높은 순으로 정렬
+        Arrays.sort(inputArr, new Comparator<int[]>() {
             @Override
-            public int compare(Pair o1, Pair o2) {
-                return o2.w - o1.w;
+            public int compare(int[] o1, int[] o2) {
+                return o2[1] - o1[1];
             }
         });
 
-        int[] resultArr = new int[maxDay]; // 과제 순서를 저장할 배열
-        int resultSum = 0;
+        int[] result = new int[10001];
 
-        for(int i = 0; i < inputArr.length; i++) {
-            for(int j = inputArr[i].d - 1; j >= 0; j--) {
-                if(resultArr[j] == 0) {
-                    resultArr[j] = inputArr[i].w;
-                    resultSum += inputArr[i].w;
+        for(int i = 0; i < N; i++) {
+            for(int j = inputArr[i][0]; j > 0; j--) {
+                if(result[j] == 0) {
+                    result[j] = inputArr[i][1];
                     break;
                 }
             }
         }
-        System.out.println(resultSum);
-    }
 
-    public static class Pair {
-        int d;
-        int w;
-        public Pair(int d, int w) {
-            this.d = d;
-            this.w = w;
+        int sum = 0;
+        for(int i = 0; i < result.length; i++) {
+            sum += result[i];
         }
+
+        System.out.println(sum);
     }
 }
