@@ -9,7 +9,7 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-    static int[] arr = new int[100001]; //수빈이가 움직일 수 있는 거리는 0 <= n <= 100000이므로 배열의 길이를 100001로 선언해야 함
+    static int[] arr = new int[100001];
     static boolean[] visited = new boolean[100001];
     static int N;
     static int K;
