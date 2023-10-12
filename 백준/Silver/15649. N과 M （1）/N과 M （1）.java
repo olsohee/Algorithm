@@ -1,42 +1,65 @@
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
 
-    static int n;
-    static int m;
+    /**
+     * 1. 아이디어
+     * - 백트래킹
+     *
+     * 2. 시간 복잡도
+     * - 중복 불가: N!
+     *
+     * 3. 자료구조
+     * - 결과값 저장 int[]
+     * - 방문 여부 체크 boolean[]
+     */
+
+    static int N;
+    static int M;
+    static StringTokenizer st;
+    static BufferedReader br;
     static int[] arr;
-    static boolean[] isUsed;
+    static boolean[] visited;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m =Integer.parseInt(st.nextToken());
-        arr = new int[m];
-        isUsed = new boolean[n + 1];
 
+        // 입력
+        br = new BufferedReader(new InputStreamReader(System.in));
+        st = new StringTokenizer(br.readLine());
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        arr = new int[M];
+        visited = new boolean[N+1];
+
+        // 백트래킹
         func(0);
     }
 
     public static void func(int k) {
-        if(k == m) {
-            for(int i = 0; i < m; i++) {
+
+        // M개 골랐으면 출력후 종료
+        if(k == M) {
+            for(int i = 0; i < M; i++) {
                 System.out.print(arr[i] + " ");
             }
             System.out.println();
             return;
         }
 
-        for(int i = 1; i <= n; i++) {
-            if(!isUsed[i]) {
+        // 재귀 호출
+        for(int i = 1; i <= N; i++) {
+            if(!visited[i]) {
                 arr[k] = i;
-                isUsed[i] = true;
+                visited[i] = true;
                 func(k + 1);
-                isUsed[i] = false;
+
+                // 재귀가 끝난 후에는 방문 처리 false
+                visited[i] = false;
             }
         }
     }
 }
-
