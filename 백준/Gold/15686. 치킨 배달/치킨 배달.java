@@ -1,75 +1,88 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
+
+import java.io.*;
+import java.util.*;
 import java.util.List;
-import java.util.StringTokenizer;
+
+/*
+    재귀
+    집, 치킨을 각 리스트에 저장
+    치킨 리스트들을 M개 고르기 (방문처리로 표시)
+    M개 다 고른 후에는, 방문처리 True인 치킨집들과 집들을 통해 도시의 치킨거리 구한 후 최소값 출력
+ */
+
 
 public class Main {
 
     static int N;
     static int M;
-    static int[][] map;
-    static List<Point> person;
-    static List<Point> chicken;
-    static int answer;
+    static List<Point> homeList = new ArrayList<>();
+    static List<Point> chickenList = new ArrayList<>();
     static boolean[] visited;
-    
+    static int result = Integer.MAX_VALUE;
+
     public static void main(String[] args) throws IOException {
+
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
-
-        map = new int[N][N];
-        person = new ArrayList<>();
-        chicken = new ArrayList<>();
-
-        for(int i = 0; i < N; i++) {
+        for (int i = 0; i < N; i++) {
             st = new StringTokenizer(br.readLine());
-            for(int j = 0; j < N; j++) {
-                map[i][j] = Integer.parseInt(st.nextToken());
-                if(map[i][j] == 1) { //집인 경우
-                    person.add(new Point(i, j));
-                } else if (map[i][j] == 2) { //치킨집인 경우
-                    chicken.add(new Point(i, j));
+            for (int j = 0; j < N; j++) {
+                int num = Integer.parseInt(st.nextToken());
+                if(num == 1) {
+                    homeList.add(new Point(j, i));
+                } else if(num == 2) {
+                    chickenList.add(new Point(j, i));
                 }
             }
         }
 
-        visited = new boolean[chicken.size()];
-        answer = Integer.MAX_VALUE;
+        visited = new boolean[chickenList.size()];
 
-        dfs(0, 0);
-        System.out.println(answer);
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        func(0, 0);
+
+        System.out.println(result);
     }
 
-    public static void dfs(int start, int count) {
-        if(count == M) {
-            int sum = 0; //sum: 모든 집들의 치킨거리의 합
-            for(int i = 0; i < person.size(); i++) {
-                int temp = Integer.MAX_VALUE; //temp: 각각의 집의 치킨거리
-                for(int j = 0; j < chicken.size(); j++) {
-                    if(visited[j]) { //M개의 치킨집만
-                        int distance = Math.abs(person.get(i).x - chicken.get(j).x) +
-                                Math.abs(person.get(i).y - chicken.get(j).y);
-                        temp = Math.min(temp, distance);
+    public static void func(int start, int cnt) {
+
+        if(cnt == M) {
+            int sum = 0;
+            // 집들과 치킨집들 간의 거리 계산
+            for(int i = 0; i < homeList.size(); i++) {
+
+                int min = Integer.MAX_VALUE;
+                Point homePoint = homeList.get(i);
+                for(int j = 0; j < visited.length; j++) {
+                    if(visited[j]) {
+                        Point chickenPoint = chickenList.get(j);
+                        min = Math.min(min, Math.abs(chickenPoint.x - homePoint.x) + Math.abs(chickenPoint.y - homePoint.y));
                     }
                 }
-                sum += temp;
+                sum += min;
             }
-            answer = Math.min(answer, sum);
+            result = Math.min(result, sum);
             return;
         }
 
-        for(int i = start; i < chicken.size(); i++) {
+        // 치킨집 고르기 (총 M개)
+//        for(int i = start; i < chickenList.size(); i++) {
+//            if(!visited[i]) {
+//                visited[i] = true;
+//                func(start + 1, cnt + 1);
+//                visited[i] = false;
+//            }
+//        }
+        for(int i = start; i < chickenList.size(); i++) {
             visited[i] = true;
-            dfs(i + 1, count + 1);
+            func(i + 1, cnt + 1);
             visited[i] = false;
         }
     }
-    
-    static class Point {
+
+     static class Point {
         int x, y;
         public Point(int x, int y) {
             this.x = x;
