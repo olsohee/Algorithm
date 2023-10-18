@@ -1,25 +1,27 @@
 class Solution {
-    int answer = 0;
-    public int solution(int[] numbers, int target) {
-        
-        func(0, 0, numbers, target);
-        return answer;
-    }
-    
-    private void func(int cnt, int sum, int[] numbers, int target) {
-        
-        if(cnt == numbers.length) {
-            if(sum == target) {
-                answer++;
-            }
-            return;
-        }
-        
-        sum += numbers[cnt];
-        func(cnt + 1, sum, numbers, target);
+        int answer = 0;
+        int[] numbers;
+        int target = 0;
 
-        sum -= numbers[cnt];
-        sum -= numbers[cnt];
-        func(cnt + 1, sum, numbers, target);
+        public int solution(int[] numbers, int target) {
+
+            this.numbers = numbers;
+            this.target = target;
+
+            dfs(0, 0);
+            return answer;
+        }
+
+        private void dfs(int cnt, int sum) {
+
+            if(cnt == numbers.length) {
+                if(sum == target) {
+                    answer++;
+                }
+                return;
+            }
+
+            dfs(cnt + 1, sum + numbers[cnt]);
+            dfs(cnt + 1, sum - numbers[cnt]);
+        }
     }
-}
