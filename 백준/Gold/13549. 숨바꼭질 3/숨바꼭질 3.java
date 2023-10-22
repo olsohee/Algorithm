@@ -3,6 +3,9 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
+/*
+    순간이동 하는 경우를 먼저 큐에 넣어줘야 큐에서 먼저 나오게 되고, 시간이 더 적은 경우가 먼저 나와서 최소시간을 구할 수 있음
+ */
 
 public class Main {
 
