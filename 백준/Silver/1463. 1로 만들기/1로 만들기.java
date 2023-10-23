@@ -1,40 +1,24 @@
-import java.io.*;
-import java.util.Arrays;
-import java.util.StringTokenizer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
+// 1463번 1로 만들기
 public class Main {
-
-    static int[] dp;
-
     public static void main(String[] args) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine());
-        dp = new int[n+1];
-        Arrays.fill(dp, -1);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(func(n));
-        System.out.println(sb);
-    }
+        int x = Integer.parseInt(br.readLine());
 
-    public static int func(int n) {
+        int dp[] = new int[x + 1];
 
-        if(n == 1) return 0;
+        dp[0] = dp[1] = 0;
 
-        // 이전에 계산한 적이 있는 경우
-        if(dp[n] != -1) return dp[n];
-
-        if(n % 6 == 0) {
-            dp[n] = Math.min(Math.min(func(n/2) + 1, func(n/3) + 1), func(n-1) + 1);
-        } else if(n % 3 == 0) {
-            dp[n] = Math.min(func(n-1) + 1, func(n/3) + 1);
-        } else if(n % 2 == 0) {
-            dp[n] = Math.min(func(n-1) + 1, func(n/2) + 1);
-        } else {
-            dp[n] = func(n-1) + 1;
+        for (int i = 2; i <= x; i++) {
+            dp[i] = dp[i - 1] + 1; // 먼저 1을 빼준다 
+            if (i % 2 == 0) dp[i] = Math.min(dp[i], dp[i / 2] + 1); // 1을 뺀 값과 2로 나눈 값 중 최솟값을 dp[i]에 저장한다 
+            if (i % 3 == 0) dp[i] = Math.min(dp[i], dp[i / 3] + 1); // 1을 뺀 값과 2로 나눈 값 중 최소값인 dp[i] 와 3으로 나눈 값 중 최솟값을 dp[i]에 저장한다 
         }
 
-        return dp[n];
+        System.out.println(dp[x]);
     }
 }
