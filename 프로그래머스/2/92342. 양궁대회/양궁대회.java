@@ -1,9 +1,21 @@
 import java.util.*;
 
-// n개를 0~10점 어떻게 나눌지 조합 만들기
-// 조합별로, 어피치 점수 - 라이언 점수 계산하기
-// 어피치 점수 - 라이언 점수의 값이 가장 큰 조합이 정답 조합
-// 어피치 점수 - 라이언 점수의 값이 0이거나 음수이면 -1리턴 (라이언 우승 불가)
+/*
+주의
+- 라이언 점수 == 어피치 점수 -> 어피치가 k점 획득
+- 라이언 점수 == 어피치 점수 == 0 -> 둘 다 0점
+- 최종 점수가 라이언 == 어피치 -> 어피치 승리
+- 라이언이 지거나 비기면 -1 반환
+- 우승 방법이 여러개이면, 가장 낮은 점수를 많이 획득한 방법으로
+ */
+
+/*
+1. n개의 화살을 0 ~ 10점으로 나누는 조합 만들기
+    - 어피치보다 2개 이상 맞추는 경우는 탐색할 필요 없음
+2. 조합별로, 어피치-라이언 점수 계산해서 diff 만들기
+3. diff가 가장 큰 조합이 답
+4. diff가 0이거나 음수이면 -1 반환
+ */
 
 class Solution {
     int n;
@@ -14,10 +26,10 @@ class Solution {
         this.n = n;
         this.info = info;
 
-        // n개를 0~10점에 어떻게 나눌지 조합 만들기
+        // 1. n개의 화살을 0 ~ 10점으로 나누는 조합 만들기
         dfs(0, new int[11], n);
 
-        // 조합별로, 어피치 점수 - 라이언 점수 계산하기
+        // 2. 조합별로, 어피치-라이언 점수 계산해서 diff 만들기
         int maxDiff = 0;
         int[] answerArr = new int[11];
         for(int i = 0; i < list.size(); i++) {
@@ -43,6 +55,8 @@ class Solution {
             }
         }
 
+        // 3. diff가 가장 큰 조합이 답
+        // 4. diff가 0이거나 음수이면 -1 반환
         if(maxDiff <= 0) {
             return new int[] {-1};
         } else {
@@ -68,6 +82,8 @@ class Solution {
         return lionScore - apeachScore;
     }
 
+    // index 0부터 10까지 탐색하며, 하나씩 값 채우기
+    // index가 11이 되었을 때, 총 합이 n이면 리스트에 담고 끝내기
     private void dfs(int index, int[] arr, int remain) {
         if(index == 11) {
             if(remain == 0) {
@@ -85,7 +101,5 @@ class Solution {
                 break;
             }
         }
-
     }
 }
-
