@@ -1,48 +1,45 @@
-import java.time.LocalDate;
 import java.util.*;
+
+/*
+- 파기해야 할 개인정보의 번호를 "오름차순"으로
+ */
 
 class Solution {
     public int[] solution(String today, String[] terms, String[] privacies) {
 
+        Map<String, Integer> termsMap = new HashMap<>();
         List<Integer> answerList = new ArrayList<>();
 
-        // 유효 기간 map에 저장
-        Map<String, Integer> map = new HashMap<>();
-        for(int i = 0; i < terms.length; i++) {
-            String[] split = terms[i].split(" ");
-            map.put(split[0], Integer.parseInt(split[1]));
+        for (int i = 0; i < terms.length; i++) {
+            String term = terms[i].split(" ")[0];
+            Integer date = Integer.parseInt(terms[i].split(" ")[1]);
+            termsMap.put(term, date);
         }
 
-        // 현재 날짜 생성
-        String[] split = today.split("\\.");
-        LocalDate currentDate = LocalDate.of(Integer.parseInt(split[0]), Integer.parseInt(split[1]), Integer.parseInt(split[2]));
+        // 파기 날짜 계산 + 오늘 날짜와 비교
+        int todayDate = 0;
+        todayDate += Integer.parseInt(today.split("\\.")[0]) * 12 * 28;
+        todayDate += Integer.parseInt(today.split("\\.")[1]) * 28;
+        todayDate += Integer.parseInt(today.split("\\.")[2]);
 
-        // 개인정보 for문으로 돌면서 오늘 날짜와 폐기 날짜 비교
-        for(int i = 0; i < privacies.length; i++) {
-            String pri = privacies[i];
-            split = pri.split("\\.");
-            int year = Integer.parseInt(split[0]);
-            int month = Integer.parseInt(split[1]);
-            String[] split2 = split[2].split(" ");
-            int date = Integer.parseInt(split2[0]);
-            String term = split2[1];
+        for (int i = 0; i < privacies.length; i++) {
+            String createDate = privacies[i].split(" ")[0];
+            String term = privacies[i].split(" ")[1];
 
-            LocalDate createDate = LocalDate.of(year, month, date);
+            int createDateInt = 0;
+            createDateInt += Integer.parseInt(createDate.split("\\.")[0]) * 12 * 28;
+            createDateInt += Integer.parseInt(createDate.split("\\.")[1]) * 28;
+            createDateInt += Integer.parseInt(createDate.split("\\.")[2]);
 
-            // 폐기 날짜 생성
-            Integer termMonth = map.get(term);
-            LocalDate deleteDate = createDate.plusMonths(termMonth);
+            int deleteDate = createDateInt + termsMap.get(term) * 28;
 
-            // 폐기 날짜와 현재 날짜 비교해서 폐기되어야 할 것 분류하기 (현재 날짜보다 폐기 날짜가 더 작거나 같을 때)
-            if(deleteDate.isBefore(currentDate) || deleteDate.compareTo(currentDate) == 0) {
+            if (deleteDate <= todayDate) {
                 answerList.add(i + 1);
             }
         }
 
-        // 정답 리스트 정렬 후 배열로 옮기기
-        Collections.sort(answerList);
         int[] answer = new int[answerList.size()];
-        for(int i = 0; i < answerList.size(); i++) {
+        for (int i = 0; i < answerList.size(); i++) {
             answer[i] = answerList.get(i);
         }
         return answer;
