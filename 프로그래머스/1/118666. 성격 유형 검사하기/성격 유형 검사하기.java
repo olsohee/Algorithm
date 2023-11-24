@@ -1,59 +1,48 @@
+
 import java.util.*;
 
 class Solution {
     public String solution(String[] survey, int[] choices) {
-        String answer = "";
-        Map<String, Integer> map = new HashMap<>();
-        map.put("R", 0);
-        map.put("T", 0);
-        map.put("C", 0);
-        map.put("F", 0);
-        map.put("J", 0);
-        map.put("M", 0);
-        map.put("A", 0);
-        map.put("N", 0);
 
-        for (int i = 0; i < survey.length; i++) {
-            // 점수를 부여할 타입과 점수 계산
-            int choice = choices[i];
-            int score;
-            String type;
-            String[] split = survey[i].split("");
-            if(choice >= 1 && choice <= 3) {
-                type = split[0];
-                score = 4 - choice;
-            } else {
-                type = split[1];
-                score = choice - 4;
+        Map<Character, Integer> map = new HashMap<>();
+        map.put('R', 0); map.put('T', 0);
+        map.put('C', 0); map.put('F', 0);
+        map.put('J', 0); map.put('M', 0);
+        map.put('A', 0); map.put('N', 0);
+
+        for (int i = 0; i < choices.length; i++) {
+            char c1 = survey[i].charAt(0);
+            char c2 = survey[i].charAt(1);
+            int answer = choices[i];
+            switch (answer) {
+                case 1:
+                    map.put(c1, map.get(c1) + 3);
+                    break;
+                case 2:
+                    map.put(c1, map.get(c1) + 2);
+                    break;
+                case 3:
+                    map.put(c1, map.get(c1) + 1);
+                    break;
+                case 5:
+                    map.put(c2, map.get(c2) + 1);
+                    break;
+                case 6:
+                    map.put(c2, map.get(c2) + 2);
+                    break;
+                case 7:
+                    map.put(c2, map.get(c2) + 3);
+                    break;
             }
-            map.put(type, map.get(type) + score);
         }
 
-        // 결과 계산
-        if(map.get("R") >= map.get("T")) {
-            answer += "R";
-        } else {
-            answer += "T";
-        }
+        String answer = "";
 
-        if(map.get("C") >= map.get("F")) {
-            answer += "C";
-        } else {
-            answer += "F";
-        }
-
-        if(map.get("J") >= map.get("M")) {
-            answer += "J";
-        } else {
-            answer += "M";
-        }
-
-        if(map.get("A") >= map.get("N")) {
-            answer += "A";
-        } else {
-            answer += "N";
-        }
-
+        answer += (map.get('R') >= map.get('T')) ? 'R' : 'T';
+        answer += (map.get('C') >= map.get('F')) ? 'C' : 'F';
+        answer += (map.get('J') >= map.get('M')) ? 'J' : 'M';
+        answer += (map.get('A') >= map.get('N')) ? 'A' : 'N';
+        
         return answer;
     }
 }
