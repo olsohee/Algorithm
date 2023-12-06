@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -14,10 +13,10 @@ public class Main {
         List<Integer> minusNumbers = new ArrayList<>();
         List<Integer> plusNumbers = new ArrayList<>();
 
-        // 음수 + 0 / 양수 각 배열로 나누기
+        // 음수, 0이 담긴 배열과 양수가 담긴 배열로 나누기
         for (int i = 0; i < n; i++) {
             int num = Integer.parseInt(br.readLine());
-            if(num <= 0) {
+            if (num <= 0) {
                 minusNumbers.add(num);
             } else {
                 plusNumbers.add(num);
@@ -29,30 +28,26 @@ public class Main {
         Collections.sort(plusNumbers, Collections.reverseOrder());
 
         int answer = 0;
+        // 음수 배열 계산
         for (int i = 0; i < minusNumbers.size(); i += 2) {
-            if(i == minusNumbers.size() - 1) {
+            if (i == minusNumbers.size() - 1) {
                 answer += minusNumbers.get(i);
                 break;
             }
             answer += minusNumbers.get(i) * minusNumbers.get(i + 1);
         }
 
+        // 양수 배열 계산
         for (int i = 0; i < plusNumbers.size(); i += 2) {
-//            System.out.println("i = " + i);
-            if(i == plusNumbers.size() - 1) {
-//                System.out.println("==");
+            if (i == plusNumbers.size() - 1) {
                 answer += plusNumbers.get(i);
-//                System.out.println(plusNumbers.get(i));
                 break;
             }
-
-            if(plusNumbers.get(i) == 1 || plusNumbers.get(i + 1) == 1) {
+            // 두 값 중 하나라도 1이면 두 값을 곱하지 않고 더한다.
+            if (plusNumbers.get(i) == 1 || plusNumbers.get(i + 1) == 1) {
                 answer += plusNumbers.get(i) + plusNumbers.get(i + 1);
-//                System.out.println("!!");
-//                System.out.println(plusNumbers.get(i) + plusNumbers.get(i + 1));
                 continue;
             }
-
             answer += plusNumbers.get(i) * plusNumbers.get(i + 1);
         }
 
