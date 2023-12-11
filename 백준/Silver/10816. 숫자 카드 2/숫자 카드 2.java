@@ -9,59 +9,26 @@ public class Main {
 
     static int n;
     static int m;
-    static int[] arr;
+    static Map<Integer, Integer> map = new HashMap();
     static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(br.readLine());
-        arr = new int[n];
         StringTokenizer st = new StringTokenizer(br.readLine());
         for (int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
+            int key = Integer.parseInt(st.nextToken());
+            map.put(key, map.getOrDefault(key, 0) + 1);
         }
-        Arrays.sort(arr);
 
         m = Integer.parseInt(br.readLine());
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < m; i++) {
-            int num = Integer.parseInt(st.nextToken());
-            sb.append(upperBound(num) - lowerBound(num) + " ");
+            int key = Integer.parseInt(st.nextToken());
+            sb.append(map.getOrDefault(key, 0) + " ");
         }
+
         System.out.println(sb);
-    }
-
-    private static int upperBound(int num) {
-
-        int min = 0;
-        int max = n;
-        while (min < max) {
-            int mid = (min + max) / 2;
-            if (arr[mid] > num) {
-                max = mid;
-            }
-
-            else {
-                min = mid + 1;
-            }
-        }
-        return max;
-    }
-
-    private static int lowerBound(int num) {
-        int min = 0;
-        int max = n;
-        while (min < max) {
-            int mid = (min + max) / 2;
-            if (arr[mid] >= num) {
-                max = mid;
-            }
-
-            else {
-                min = mid + 1;
-            }
-        }
-        return min;
     }
 }
