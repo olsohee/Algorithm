@@ -1,60 +1,55 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.Buffer;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
-import java.util.StringTokenizer;
 
+import java.io.InputStreamReader;
+import java.util.*;
+
+// 시간복잡도: O(V+E) = 100,000 + 300,000 = 400,000
 public class Main {
 
-    static int[] arr = new int[100001]; //수빈이가 움직일 수 있는 거리는 0 <= n <= 100000이므로 배열의 길이를 100001로 선언해야 함
-    static boolean[] visited = new boolean[100001];
-    static int N;
-    static int K;
+    static int n; // 수빈 위치
+    static int k; // 동생 위치
+    static int[] map = new int[100001];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(st.nextToken());
+        k = Integer.parseInt(st.nextToken());
 
-        System.out.println(bfs(N));
+        bfs();
+        System.out.println(map[k] - 1);
     }
 
-    static int bfs(int n) {
+    private static void bfs() {
         Queue<Integer> que = new LinkedList<>();
-
+        map[n] = 1; // 수빈이 위치에 1 저장
         que.add(n);
-        visited[n] = true;
-        arr[n] = 1;
 
-        while(!que.isEmpty()) {
-            Integer p = que.poll();
+        while (!que.isEmpty()) {
+            Integer idx = que.poll();
 
-            if(p == K) {
-                return arr[p] - 1;
+            if (idx == k) {
+                return;
             }
 
-            if(p-1 >= 0  && !visited[p-1]) {
-                arr[p-1] = arr[p] + 1;
-                visited[p-1] = true;
-                que.add(p-1);
+            // 뒤로
+            if (idx - 1 >= 0 && map[idx - 1] == 0) {
+                map[idx - 1] = map[idx] + 1;
+                que.add(idx - 1);
             }
 
-            if(p+1 <= 100000 && !visited[p+1]) {
-                arr[p+1] = arr[p] + 1;
-                visited[p+1] = true;
-                que.add(p+1);
+            // 앞으로
+            if (idx + 1 <= 100000 && map[idx + 1] == 0) {
+                map[idx + 1] = map[idx] + 1;
+                que.add(idx + 1);
             }
 
-            if(2 * p <= 100000 && !visited[2 * p]) {
-                arr[2 * p] = arr[p] + 1;
-                visited[2*p] = true;
-                que.add(2 * p);
+            // 순간이동
+            if (2 * idx <= 100000 && map[2 * idx] == 0) {
+                map[2 * idx] = map[idx] + 1;
+                que.add(2 * idx);
             }
         }
-        return 0;
     }
 }
