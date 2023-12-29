@@ -5,13 +5,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
+// 시간복잡도: O(N) = 100,000
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    static int n;
+    static List<Flower> flowers = new ArrayList<>();
+    static int answer = 0; // 꽃의 최소 개수
 
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine());
-        List<Flower> flowers = new ArrayList<>();
+        n = Integer.parseInt(br.readLine());
 
         for (int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
@@ -20,39 +23,42 @@ public class Main {
             flowers.add(new Flower(start, end));
         }
 
-        // 꽃이 피는 닐짜가 빠른 순으로 정렬 (만약 피는 날짜가 같으면 늦게 지는 순으로 정렬)
         Collections.sort(flowers);
 
-        int maxEndDay = 301;
-        int start = 301;
-        int idx = 0;
-        int flowerCount = 0;
+        int preEnd = 301;
+        int tempEnd = 0;
+        int tempStart = 0;
+        boolean flag = false;
 
-        while (start <= 1130) { // 탈출 조건: 1130이어도 안되고 1130보다 커야 함
-            boolean flag = false;
-            for (int i = idx; i < n; i++) {
-                if (flowers.get(i).start > start) {
-                    break;
-                }
-                if (flowers.get(i).end > maxEndDay) {
-                    maxEndDay = flowers.get(i).end;
-                    idx = i + 1; // 다음 꽃을 찾을 때 굳이 i와 그 이전 인덱스의 꽃을 탐색할 필요가 없음
+        for (int i = 0; i < n; i++) {
+            Flower now = flowers.get(i);
+            if (now.start == tempStart) {
+                continue;
+            }
+            if (now.start <= preEnd) {
+                if (now.end > tempEnd) {
+                    tempEnd = now.end;
+                    tempStart = now.start;
                     flag = true;
                 }
-            }
-            if (flag) {
-                start = maxEndDay;
-                flowerCount++;
             } else {
-                break; // 해당하는 꽃이 한 개도 없는 경우
+                if (!flag) {
+                    break;
+                } else {
+                    preEnd = tempEnd; // i - 1번째 꽃 선택
+                    answer++; // 꽃을 선택했으므로 카운트
+                    flag = false;
+                    i--; // i - 1번째 꽃을 선택한 후에 i번째부터 탐색을 다시 해야 하므로
+                }
+            }
+
+            if (tempEnd > 1130) {
+                System.out.println(++answer);
+                return;
             }
         }
 
-        if (maxEndDay <= 1130) {
-            System.out.println(0);
-        } else {
-            System.out.println(flowerCount);
-        }
+        System.out.println(0);
     }
 
     static class Flower implements Comparable<Flower> {
