@@ -1,14 +1,13 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간복잡도: 4^5 + O(N^2) = 4^5 + 400
+// 시간복잡도: 4^5 + O(N^2) (dfs + 그래프 탐색) = 4^5 + 400
 public class Main {
 
-    static int n; 
+    static int n;
     static int[][] map;
     static int answer = 0;
 
@@ -16,7 +15,7 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(br.readLine());
         map = new int[n][n];
-        
+
         for (int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
@@ -33,7 +32,6 @@ public class Main {
 //        }
 
         dfs(0, copyMap(map));
-
         System.out.println(answer);
     }
 
@@ -64,17 +62,19 @@ public class Main {
             for (int j = 0; j < n; j++) {
                 int num = map[j][i];
                 if (num == 0) continue;
+                // 합치는 경우
                 if (newMap[checkIdx][i] == num) {
                     newMap[checkIdx][i] = num * 2;
                     checkIdx++;
-                } else {
+                }
+                // 합치지 않는 경우
+                else {
                     newMap[lastIdx][i] = num;
                     lastIdx++;
                     checkIdx = lastIdx - 1;
                 }
             }
         }
-
         return newMap;
     }
 
@@ -96,7 +96,6 @@ public class Main {
                 }
             }
         }
-
         return newMap;
     }
 
@@ -139,7 +138,6 @@ public class Main {
                 }
             }
         }
-
         return newMap;
     }
 
