@@ -1,55 +1,60 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+// 시간복잡도: O(N) = 50
 public class Main {
 
+    static int n;
+    static List<Integer> plus = new ArrayList<>();
+    static List<Integer> minus = new ArrayList<>();
+    static int oneCount = 0;
+    static int answer = 0;
+
     public static void main(String[] args) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int n = Integer.parseInt(br.readLine());
-        List<Integer> minusNumbers = new ArrayList<>();
-        List<Integer> plusNumbers = new ArrayList<>();
-
-        // 음수, 0이 담긴 배열과 양수가 담긴 배열로 나누기
+        n = Integer.parseInt(br.readLine());
         for (int i = 0; i < n; i++) {
             int num = Integer.parseInt(br.readLine());
             if (num <= 0) {
-                minusNumbers.add(num);
+                minus.add(num);
+            } else if (num == 1) {
+                oneCount++;
             } else {
-                plusNumbers.add(num);
+                plus.add(num);
             }
         }
 
-        // 정렬 (음수: 오름차순, 양수: 내림차순)
-        Collections.sort(minusNumbers);
-        Collections.sort(plusNumbers, Collections.reverseOrder());
-
-        int answer = 0;
-        // 음수 배열 계산
-        for (int i = 0; i < minusNumbers.size(); i += 2) {
-            if (i == minusNumbers.size() - 1) {
-                answer += minusNumbers.get(i);
+        // 음수 오름차순
+        Collections.sort(minus);
+        // 1. 절댓값 큰 음수끼리 묶기
+        // 2. 2개로 묶이지 않은 하나의 수는 음수 또는 0, 이 수는 묶지 말고 더하기
+        for (int i = 0; i < minus.size(); i += 2) {
+            if (i == minus.size() - 1) {
+                answer += minus.get(i);
                 break;
             }
-            answer += minusNumbers.get(i) * minusNumbers.get(i + 1);
+            answer += minus.get(i) * minus.get(i + 1);
         }
 
-        // 양수 배열 계산
-        for (int i = 0; i < plusNumbers.size(); i += 2) {
-            if (i == plusNumbers.size() - 1) {
-                answer += plusNumbers.get(i);
+        // 양수 내림차순: 절댓값 큰 양수끼리 묶기
+        Collections.sort(plus, Collections.reverseOrder());
+        for (int i = 0; i < plus.size(); i += 2) {
+            if (i == plus.size() - 1) {
+                answer += plus.get(i);
                 break;
             }
-            // 두 값 중 하나라도 1이면 두 값을 곱하지 않고 더한다.
-            if (plusNumbers.get(i) == 1 || plusNumbers.get(i + 1) == 1) {
-                answer += plusNumbers.get(i) + plusNumbers.get(i + 1);
-                continue;
-            }
-            answer += plusNumbers.get(i) * plusNumbers.get(i + 1);
+            answer += plus.get(i) * plus.get(i + 1);
         }
+
+        // 1인 경우에는 묶지 말고 더하기
+        answer += oneCount;
 
         System.out.println(answer);
     }
