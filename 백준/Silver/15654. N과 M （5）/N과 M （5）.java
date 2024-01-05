@@ -1,51 +1,51 @@
+import java.io.BufferedReader;
+import java.io.IOException;
 
-import java.io.*;
+import java.io.InputStreamReader;
 import java.util.*;
 
+// 시간복잡도: O(N^2) = 64
 public class Main {
 
     static int n;
     static int m;
-    static int[] savedNum;
-    static int[] outputNum;
-
+    static int[] numbers;
     static boolean[] visited;
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         StringTokenizer st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
-        savedNum = new int[n];
+        numbers = new int[n];
         visited = new boolean[n];
-        outputNum = new int[m];
 
         st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < n; i++) {
-            savedNum[i] = Integer.parseInt(st.nextToken());
+        for (int i = 0; i < n; i++) {
+            numbers[i] = Integer.parseInt(st.nextToken());
         }
+        Arrays.sort(numbers);
 
-        Arrays.sort(savedNum);
-        func(0);
+        dfs(0, new int[m]);
+        System.out.println(sb);
     }
 
-    public static void func(int k) {
-
-        if(k == m) {
-            for(int i = 0; i < m; i++) {
-                System.out.print(outputNum[i] + " ");
+    private static void dfs(int cnt, int[] arr) {
+        if (cnt == m) {
+            for (int i : arr) {
+                sb.append(i + " ");
             }
-            System.out.println();
+            sb.append('\n');
             return;
         }
 
-        for(int i = 0; i < n; i++) {
-            if(!visited[i]) {
+        for (int i = 0; i < n; i++) {
+            if (!visited[i]) {
+                int[] cloneArr = arr.clone();
+                cloneArr[cnt] = numbers[i];
                 visited[i] = true;
-                outputNum[k] = savedNum[i];
-                func(k + 1);
+                dfs(cnt + 1, cloneArr);
                 visited[i] = false;
             }
         }
