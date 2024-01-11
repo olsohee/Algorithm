@@ -1,92 +1,88 @@
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-/*
-    재귀
-    집, 치킨을 각 리스트에 저장
-    치킨 리스트들을 M개 고르기 (방문처리로 표시)
-    M개 다 고른 후에는, 방문처리 True인 치킨집들과 집들을 통해 도시의 치킨거리 구한 후 최소값 출력
- */
-
+import java.util.StringTokenizer;
 
 public class Main {
 
-    static int N;
-    static int M;
-    static List<Point> homeList = new ArrayList<>();
-    static List<Point> chickenList = new ArrayList<>();
-    static boolean[] visited;
-    static int result = Integer.MAX_VALUE;
+    static int n;
+    static int m;
+    static int[][] map;
+    static List<Point> chickens = new ArrayList<>();
+    static List<Point> homes = new ArrayList<>();
+    static int answer = Integer.MAX_VALUE; // 치킨 거리의 최솟값
 
     public static void main(String[] args) throws IOException {
-
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        for (int i = 0; i < N; i++) {
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        map = new int[n + 1][n + 1];
+        for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < N; j++) {
-                int num = Integer.parseInt(st.nextToken());
-                if(num == 1) {
-                    homeList.add(new Point(j, i));
-                } else if(num == 2) {
-                    chickenList.add(new Point(j, i));
+            for (int j = 0; j < n; j++) {
+                map[i + 1][j + 1] = Integer.parseInt(st.nextToken());
+                if (map[i + 1][j + 1] == 2) {
+                    chickens.add(new Point(i + 1, j + 1));
+                }
+                if (map[i + 1][j + 1] == 1) {
+                    homes.add(new Point(i + 1, j + 1));
                 }
             }
         }
 
-        visited = new boolean[chickenList.size()];
+        dfs(0, new ArrayList<>());
 
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        func(0, 0);
-
-        System.out.println(result);
+        System.out.println(answer);
     }
 
-    public static void func(int start, int cnt) {
-
-        if(cnt == M) {
-            int sum = 0;
-            // 집들과 치킨집들 간의 거리 계산
-            for(int i = 0; i < homeList.size(); i++) {
-
-                int min = Integer.MAX_VALUE;
-                Point homePoint = homeList.get(i);
-                for(int j = 0; j < visited.length; j++) {
-                    if(visited[j]) {
-                        Point chickenPoint = chickenList.get(j);
-                        min = Math.min(min, Math.abs(chickenPoint.x - homePoint.x) + Math.abs(chickenPoint.y - homePoint.y));
-                    }
-                }
-                sum += min;
+    private static void dfs(int depth, List<Point> selectedChickens) {
+        // 다 돌았으면 끝
+        if (depth == chickens.size()) {
+            // m개 골랐으면 계산하기
+            if (selectedChickens.size() == m) {
+                answer = Math.min(answer, getChickenDist(selectedChickens));
             }
-            result = Math.min(result, sum);
             return;
         }
 
-        // 치킨집 고르기 (총 M개)
-//        for(int i = start; i < chickenList.size(); i++) {
-//            if(!visited[i]) {
-//                visited[i] = true;
-//                func(start + 1, cnt + 1);
-//                visited[i] = false;
-//            }
-//        }
-        for(int i = start; i < chickenList.size(); i++) {
-            visited[i] = true;
-            func(i + 1, cnt + 1);
-            visited[i] = false;
-        }
+        // 해당 인덱스 치킨 포함 O
+        List<Point> copyList1 = new ArrayList<>(selectedChickens);
+        copyList1.add(chickens.get(depth));
+        dfs(depth + 1, copyList1);
+
+        // 해당 인덱스 치킨 포함 X
+        List<Point> copyList2 = new ArrayList<>(selectedChickens);
+        dfs(depth + 1, copyList2);
     }
 
-     static class Point {
-        int x, y;
-        public Point(int x, int y) {
-            this.x = x;
+    private static int getChickenDist(List<Point> selectedChickens) {
+        int totalDist = 0;
+        for (int i = 0; i < homes.size(); i++) {
+            Point home = homes.get(i);
+            int minDist = Integer.MAX_VALUE;
+            // 해당 집과 가장 가까운 치킨 집의 거리 찾기(minDist)
+            for (int j = 0; j < selectedChickens.size(); j++) {
+                Point chicken = selectedChickens.get(j);
+                int dist = Math.abs(chicken.x - home.x) + Math.abs(chicken.y - home.y);
+                minDist = Math.min(minDist, dist);
+            }
+            totalDist += minDist;
+        }
+        return totalDist;
+    }
+
+    static class Point {
+        int y, x;
+
+        public Point(int y, int x) {
             this.y = y;
+            this.x = x;
         }
     }
 }
