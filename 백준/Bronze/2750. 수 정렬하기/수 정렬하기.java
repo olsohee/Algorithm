@@ -18,18 +18,18 @@ public class Main {
             input[i] = Integer.parseInt(br.readLine());
         }
 
-        // 선택 정렬
-        for (int i = 0; i < n; i++) {
-            int minIndex = i;
-            for (int j = i; j < n; j++) {
-                if (input[minIndex] > input[j]) {
-                    minIndex = j;
+        // 삽입 정렬
+        for (int i = 1; i < n; i++) {
+            for (int j = i; j > 0; j--) {
+                if (input[j] < input[j - 1]) {
+                    int temp = input[j];
+                    input[j] = input[j - 1];
+                    input[j - 1] = temp;
+                }
+                else {
+                    break;
                 }
             }
-            // i번째 자리의 수와 minIndex의 수를 바꾸기
-            int temp = input[i];
-            input[i] = input[minIndex];
-            input[minIndex] = temp;
         }
 
         for (int i = 0; i < n; i++) {
