@@ -10,8 +10,6 @@ public class Main {
     static int m; // 우주 개수
     static int n; // 행성 개수
     static List<int[]> arrList = new ArrayList<>();
-    static List<int[]> sortedArrList = new ArrayList<>();
-    static Map<String, Integer> map = new HashMap<>();
 
     public static void main(String[] args) throws IOException {
 
@@ -37,22 +35,12 @@ public class Main {
             for (int j = 0; j < arr.length; j++) {
                 arr[j] = calculateIdx(sortedArr, arr[j]);
             }
-            sortedArrList.add(arr);
         }
 
-//        for (int i = 0; i < sortedArrList.size(); i++) {
-//            int[] arr = sortedArrList.get(i);
-//            // log
-////            for (int i1 : arr) {
-////                System.out.print(i1 + " ");
-////            }
-////            System.out.println();
-//        }
-
         int answer = 0;
-        for (int i = 0; i < sortedArrList.size(); i++) {
-            for (int j = i + 1; j < sortedArrList.size(); j++) {
-                if (Arrays.equals(sortedArrList.get(i), sortedArrList.get(j))) {
+        for (int i = 0; i < arrList.size(); i++) {
+            for (int j = i + 1; j < arrList.size(); j++) {
+                if (Arrays.equals(arrList.get(i), arrList.get(j))) {
                     answer++;
                 }
             }
