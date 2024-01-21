@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,18 +27,17 @@ public class Main {
         int end = 0;
         long sum = 0;
         while (end <= n) {
-
             if (sum == m) {
                 answer++;
             }
 
             if (sum <= m) {
                 sum += arr[end++];
-            }
-            else {
+            } else {
                 sum -= arr[start++];
             }
         }
+
         System.out.println(answer);
     }
 }
