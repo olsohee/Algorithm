@@ -4,41 +4,46 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
+// 시간 복잡도: 
 public class Main {
 
-    static int V;
-    static int E;
-    static int K;
-    static ArrayList<List<Node>> list = new ArrayList<>();
+    static int v;
+    static int e;
+    static int start;
+    static List<Node>[] list;
     static int[] dist;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
-        V = Integer.parseInt(st.nextToken());
-        E = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(br.readLine());
+        v = Integer.parseInt(st.nextToken());
+        e = Integer.parseInt(st.nextToken());
+        start = Integer.parseInt(br.readLine());
+        list = new ArrayList[v + 1];
+        dist = new int[v + 1];
 
-        dist = new int[V + 1];
-        for(int i = 0; i <= V; i++) {
-            list.add(new ArrayList<>());
-            dist[i] = Integer.MAX_VALUE;
+        // 초기 셋팅
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        for (int i = 1; i <= v; i++) {
+            list[i] = new ArrayList<>();
         }
 
-        for(int i = 0; i < E; i++) {
+        // 값 초기화
+        for (int i = 0; i < e; i++) {
             st = new StringTokenizer(br.readLine());
             int start = Integer.parseInt(st.nextToken());
             int end = Integer.parseInt(st.nextToken());
-            int dist = Integer.parseInt(st.nextToken());
-
-            list.get(start).add(new Node(end, dist));
+            int weight = Integer.parseInt(st.nextToken());
+            list[start].add(new Node(end, weight));
         }
 
-        dijkstra(K);
+        // 다익스트라
+        dijkstra(start);
 
-        for(int i = 1; i < dist.length; i++) {
-            if(dist[i] == Integer.MAX_VALUE) {
+        // 출력
+        for (int i = 1; i <= v; i++) {
+            if (dist[i] == Integer.MAX_VALUE) {
                 System.out.println("INF");
             } else {
                 System.out.println(dist[i]);
@@ -48,29 +53,33 @@ public class Main {
 
     private static void dijkstra(int start) {
         PriorityQueue<Node> que = new PriorityQueue<>();
+        boolean[] visited = new boolean[v + 1];
+        que.add(new Node(start, 0)); // start에서 start까지 가는데 거리는 0
         dist[start] = 0;
-        que.add(new Node(start, 0));
 
-        while(!que.isEmpty()) {
+        while (!que.isEmpty()) {
             Node node = que.poll();
 
-            int len = list.get(node.v).size();
-            for(int i = 0; i < len; i++) {
-                Node newNode = list.get(node.v).get(i);
-                if(dist[newNode.v] > node.w + newNode.w) {
-                    dist[newNode.v] = node.w + newNode.w;
-                    que.add(new Node(newNode.v, dist[newNode.v]));
+            // 이미 해당 위치를 시작점으로 방문했으면 패스
+            if (visited[node.e]) {
+                continue;
+            }
+            visited[node.e] = true;
+
+            for (Node n : list[node.e]) {
+                if (dist[n.e] > dist[node.e] + n.w) {
+                     dist[n.e] = dist[node.e] + n.w;
+                     que.add(new Node(n.e, dist[n.e])); // 갱신할 경우 큐에 넣기
                 }
             }
         }
     }
 
     static class Node implements Comparable<Node> {
-        int v; // 도착지
-        int w; // 가중치
+        int e, w;
 
-        public Node(int v, int w) {
-            this.v = v;
+        public Node(int e, int w) {
+            this.e = e;
             this.w = w;
         }
 
