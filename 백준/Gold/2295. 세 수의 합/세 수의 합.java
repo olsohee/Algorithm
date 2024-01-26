@@ -7,7 +7,6 @@ import java.util.*;
 public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static StringTokenizer st;
     static int n;
     static int[] arr;
     static List<Integer> list = new ArrayList<>();
@@ -22,8 +21,6 @@ public class Main {
         }
         Arrays.sort(arr);
 
-        // a + b = x - c
-
         // 이중 반복문으로 a + b의 집합 만들기
         for (int i = 0; i < n; i++) {
             for (int j = i; j < n; j++) {
@@ -35,6 +32,7 @@ public class Main {
         // 이분 탐색으로 x - c를 찾고, a + b 집합에 있는지 확인하기
         for (int i = 0; i < n; i++) {
             for (int j = i; j < n; j++) {
+//                Collections.binarySearch() 메소드를 사용하는 경우
 //                if (Collections.binarySearch(list, arr[j] - arr[i]) >= 0) {
 //                    answer = Math.max(answer, arr[j]);
 //                }
@@ -43,7 +41,6 @@ public class Main {
         }
 
         System.out.println(answer);
-
     }
 
     private static void binarySearch(int max, int min) {
