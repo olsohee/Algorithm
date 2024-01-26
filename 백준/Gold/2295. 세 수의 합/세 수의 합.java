@@ -35,10 +35,10 @@ public class Main {
         // 이분 탐색으로 x - c를 찾고, a + b 집합에 있는지 확인하기
         for (int i = 0; i < n; i++) {
             for (int j = i; j < n; j++) {
-                if (Collections.binarySearch(list, arr[j] - arr[i]) >= 0) {
-                    answer = Math.max(answer, arr[j]);
-                }
-//                binarySearch(arr[j], arr[i]);
+//                if (Collections.binarySearch(list, arr[j] - arr[i]) >= 0) {
+//                    answer = Math.max(answer, arr[j]);
+//                }
+                binarySearch(arr[j], arr[i]);
             }
         }
 
@@ -53,11 +53,11 @@ public class Main {
         while (start <= end) {
             int mid = (start + end) / 2;
             // 있는 경우
-            if (mid == diff) {
+            if (list.get(mid) == diff) {
                 answer = Math.max(answer, max);
                 return;
             }
-            if (mid > diff) {
+            if (list.get(mid) > diff) {
                 end = mid - 1;
             } else {
                 start = mid + 1;
