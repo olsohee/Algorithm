@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -30,8 +31,7 @@ public class Main {
             // 회전할 톱니 판단하기
             Arrays.fill(rotateArr, 0);
             rotateArr[point] = direction;
-            findIsLeftRotate(point, direction);
-            findIsRightRotate(point, direction);
+            checkRotate(point);
 
             // 회전해야 하는 톱니 회전
             for (int j = 0; j < 4; j++) {
@@ -44,29 +44,26 @@ public class Main {
             }
         }
 
-        calculateScore();
+        System.out.println(calculateScore());
     }
 
-    // 기준 톱니의 오른쪽 판단
-    private static void findIsRightRotate(int point, int direction) {
-        if (point > 2) {
-            return;
-        }
-        if (arr[point][2] != arr[point + 1][6]) {
-            rotateArr[point + 1] = direction * -1;
-            findIsRightRotate(point + 1, direction * -1);
-        }
-    }
-
-    // 기준 톱니의 왼쪽 판단
-    private static void findIsLeftRotate(int point, int direction) {
-        if (point < 1) {
-            return;
+    private static void checkRotate(int point) {
+        // 오른쪽에 있는 톱니 판단
+        for (int i = point; i < 3; i++) {
+            if (arr[i][2] != arr[i + 1][6]) {
+                rotateArr[i + 1] = -1 * rotateArr[i];
+            } else {
+                break;
+            }
         }
 
-        if (arr[point][6] != arr[point - 1][2]) {
-            rotateArr[point - 1] = direction * -1;
-            findIsLeftRotate(point - 1, direction * -1);
+        // 왼쪽에 있는 톱니 판단
+        for (int i = point; i > 0; i--) {
+            if (arr[i][6] != arr[i - 1][2]) {
+                rotateArr[i - 1] = -1 * rotateArr[i];
+            } else {
+                break;
+            }
         }
     }
 
@@ -88,20 +85,12 @@ public class Main {
         target[7] = temp;
     }
 
-    private static void calculateScore() {
+    private static int calculateScore() {
         int score = 0;
-        if (arr[0][0] == 1) {
-            score += 1;
-        }
-        if (arr[1][0] == 1) {
-            score += 2;
-        }
-        if (arr[2][0] == 1) {
-            score += 4;
-        }
-        if (arr[3][0] == 1) {
-            score += 8;
-        }
-        System.out.println(score);
+        if (arr[0][0] == 1) score += 1;
+        if (arr[1][0] == 1) score += 2;
+        if (arr[2][0] == 1) score += 4;
+        if (arr[3][0] == 1) score += 8;
+        return score;
     }
 }
