@@ -3,48 +3,46 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간 복잡도: log1,000,000,000 * n
+// 시간 복잡도 = O(N * logN)
 public class Main {
 
-    static int m; // 조카의 수
-    static int n; // 과자의 수
-    static int[] snack;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int m;
+    static int n;
+    static int[] arr;
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         m = Integer.parseInt(st.nextToken());
         n = Integer.parseInt(st.nextToken());
-        snack = new int[n];
-
+        arr = new int[n];
         st = new StringTokenizer(br.readLine());
+        long max = 0;
         for (int i = 0; i < n; i++) {
-            snack[i] = Integer.parseInt(st.nextToken());
+            arr[i] = Integer.parseInt(st.nextToken());
+            max = Math.max(max, arr[i]);
         }
 
-        Arrays.sort(snack);
-        int minLen = 1;
-        int maxLen = snack[n - 1];
-        int midLen = 0;
-        int result = 0;
-        while (minLen <= maxLen) {
-            midLen = (minLen + maxLen) / 2;
+        // 이분 탐색
+        long min = 1;
+        max++;
 
+        while (min < max) {
 
-            int cnt = 0;
+            long mid = (min + max) / 2;
+            long count = 0;
             for (int i = 0; i < n; i++) {
-                cnt += snack[i] / midLen;
+                count += arr[i] / mid;
             }
 
-            if (cnt >= m) {
-                minLen = midLen + 1;
-                result = midLen;
+            // 더 크게 자르기 (같은 경우에도 더 크게 자르기) (자르는 길이의 upper bound)
+            if (count >= m) {
+                min = mid + 1;
             } else {
-                maxLen = midLen - 1;
+                max = mid;
             }
         }
-
-        System.out.println(result);
+        System.out.println(max - 1);
     }
 }
