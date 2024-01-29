@@ -1,31 +1,34 @@
-import java.io.*;
-import java.util.StringTokenizer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
+// 시간 복잡도:
 public class Main {
 
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int l;
+    static int p;
+    static int v;
+
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+
         StringBuilder sb = new StringBuilder();
+        int count = 0;
 
-        int cnt = 0;
-
-        while(true) {
-            cnt++;
-
+        while (true) {
+            count++;
             StringTokenizer st = new StringTokenizer(br.readLine());
-            int L = Integer.parseInt(st.nextToken());
-            int P = Integer.parseInt(st.nextToken());
-            int V = Integer.parseInt(st.nextToken());
-
-            if(L == 0 && P == 0 && V == 0) {
+            l = Integer.parseInt(st.nextToken());
+            p = Integer.parseInt(st.nextToken());
+            v = Integer.parseInt(st.nextToken());
+            if (l == 0 && p == 0 && v == 0) {
                 break;
             }
-
-            int result = V / P * L + Math.min(L, V % P);
-
-            System.out.println("Case " + cnt + ": " + result);
+            int answer = (v / p * l) + Math.min(v % p, l);
+            sb.append("Case " + count + ": " + answer).append('\n');
         }
 
+        System.out.println(sb);
     }
 }
