@@ -1,75 +1,77 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
+// 시간 복잡도:
 public class Main {
-	static int N,M,K,ans,cnt;
-	static int dx[]= {-1,1,0,0};
-	static int dy[]= {0,0,-1,1};
-	static boolean[][] map;
-	static boolean[][] visited;
-	
-	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		K = Integer.parseInt(st.nextToken());
-		
-		map = new boolean[N][M];
-		visited = new boolean[N][M];
-		
-		for (int i = 0; i < K; i++) {
-			st = new StringTokenizer(br.readLine());
-			int r = Integer.parseInt(st.nextToken());
-			int c = Integer.parseInt(st.nextToken());
-			map[r-1][c-1]=true;
-		}
-		
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				if(!visited[i][j] && map[i][j]) {
-					cnt=0;
-					bfs(i,j);
-					ans = Math.max(ans, cnt);
-				}
-			}
-		}
-		System.out.println(ans);
-		
-	}
 
-	private static void bfs(int x, int y) {
-		Queue<point> q = new LinkedList<>();
-		q.add(new point(x, y));
-		visited[x][y] = true;
-		cnt++;
-		while(!q.isEmpty()) {
-			point temp = q.poll();
-			
-			for (int k = 0; k < 4; k++) {
-				int xx = temp.x +dx[k];
-				int yy = temp.y +dy[k];
-				if(xx<0 || yy<0 || xx>=N || yy>=M)continue;
-				if(!visited[xx][yy] && map[xx][yy]) {
-					q.add(new point(xx, yy));
-					visited[xx][yy]=true;
-					cnt++;
-				}
-			}
-		}
-	}
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int m;
+    static int n;
+    static int k;
+    static int[][] map;
+    static boolean[][] visited;
+    static int[] dx = {1, -1, 0, 0};
+    static int[] dy = {0, 0, 1, -1};
 
-	static class point{
-		int x;
-		int y;
-		public point(int x, int y) {
-			super();
-			this.x = x;
-			this.y = y;
-		}
-	}
+    public static void main(String[] args) throws IOException {
+
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        k = Integer.parseInt(st.nextToken());
+        map = new int[n][m];
+        visited = new boolean[n][m];
+        for (int i = 0; i < k; i++) {
+            st = new StringTokenizer(br.readLine());
+            map[Integer.parseInt(st.nextToken()) - 1][Integer.parseInt(st.nextToken()) - 1] = 1;
+        }
+
+        int answer = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (map[i][j] == 1 && !visited[i][j]) {
+                    answer = Math.max(answer, dfs(i, j));
+                }
+            }
+        }
+        System.out.println(answer);
+    }
+
+    private static int dfs(int y, int x) {
+
+        int count = 0;
+        Stack<Point> stack = new Stack<>();
+        stack.add(new Point(y, x));
+        visited[y][x] = true;
+        count++;
+
+        while (!stack.isEmpty()) {
+            Point p = stack.pop();
+            for (int i = 0; i < 4; i++) {
+                int nx = p.x + dx[i];
+                int ny = p.y + dy[i];
+                if (nx < 0 || nx >= m || ny < 0 || ny >= n || visited[ny][nx]) {
+                    continue;
+                }
+                if (map[ny][nx] == 1) {
+                    visited[ny][nx] = true;
+                    stack.add(new Point(ny, nx));
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    static class Point {
+        int y, x;
+
+        public Point(int y, int x) {
+            this.y = y;
+            this.x = x;
+        }
+    }
 }
