@@ -1,66 +1,65 @@
-import java.io.*;
-import java.util.Arrays;
-import java.util.StringTokenizer;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
+
+// 시간 복잡도: O(N!)
 public class Main {
 
-    static int L;
-    static int C;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int l;
+    static int c;
     static char[] input;
-    static char[] pwd;
+    static char[] result;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        L = Integer.parseInt(st.nextToken());
-        C = Integer.parseInt(st.nextToken());
-        input = new char[C];
-        pwd = new char[L];
 
+        StringTokenizer st = new StringTokenizer(br.readLine());
+        l = Integer.parseInt(st.nextToken());
+        c = Integer.parseInt(st.nextToken());
+        input = new char[c];
+        result = new char[l];
         st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < C; i++) {
+        for (int i = 0; i < c; i++) {
             input[i] = st.nextToken().charAt(0);
         }
-
         Arrays.sort(input);
 
-        func(0, 0);
+        dfs(0, 0);
     }
 
-    static void func(int count, int start) {
-
-        if(count == L) {
-            if(check(pwd)) {
-                for(int i = 0; i < L; i++) {
-                    System.out.print(pwd[i]);
+    private static void dfs(int depth, int start) {
+        // l개를 다 고른 경우
+        if (depth == l) {
+            if (checkCondition(result)) {
+                for (char c : result) {
+                    System.out.print(c);
                 }
                 System.out.println();
             }
             return;
         }
 
-        for(int i = start; i < C; i++) {
-            pwd[count] = input[i];
-            func(count + 1, i + 1);
+        for (int i = start; i < c; i++) {
+            // 포함 O
+            result[depth] = input[i];
+            dfs(depth + 1, i + 1);
         }
     }
 
-    static boolean check(char[] pwd) {
-        int n1 = 0; // 자음 개수
-        int n2 = 0; // 모음 개수
-
-        for(int i = 0; i < pwd.length; i++) {
-            if(pwd[i] == 'a' || pwd[i] == 'e' || pwd[i] == 'i' || pwd[i] == 'o' || pwd[i] == 'u') {
-                n1++;
+    private static boolean checkCondition(char[] result) {
+        // 최소 2개의 자음, 1개의 모음
+        int consonant = 0; // 자음
+        int vowel = 0; // 모음
+        for (int i = 0; i < result.length; i++) {
+            char c = result[i];
+            if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
+                vowel++;
             } else {
-                n2++;
+                consonant++;
             }
         }
-
-        if(n1 >= 1 && n2 >= 2) {
-            return true;
-        } else {
-            return false;
-        }
+        return consonant >= 2 && vowel >= 1;
     }
 }
