@@ -1,49 +1,50 @@
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
-
+// 시간 복잡도:
 public class Main {
 
-    static Queue<Integer> truckQue = new LinkedList<>();
-    static Queue<Integer> bridgeQue = new LinkedList<>();
-    static int sum;
-    static int cnt;
-    static int n; // 트럭 수
-    static int w; // 다리 길이
-    static int L; // 다리 하중
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int n;
+    static int w;
+    static int l;
+    static Queue<Integer> truck = new LinkedList<>();
+    static Queue<Integer> bridge = new LinkedList<>();
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         w = Integer.parseInt(st.nextToken());
-        L = Integer.parseInt(st.nextToken());
-
+        l = Integer.parseInt(st.nextToken());
         st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < n; i++) {
-            truckQue.offer(Integer.parseInt(st.nextToken()));
+        for (int i = 0; i < n; i++) {
+            truck.add(Integer.parseInt(st.nextToken()));
         }
 
-        for(int i = 0; i < w; i++) {
-            bridgeQue.offer(0);
+        for (int i = 0; i < w; i++) {
+            bridge.add(0);
         }
 
-        while (!bridgeQue.isEmpty()) {
-            sum -= bridgeQue.poll();
+        int sum = 0;
+        int time = 0;
 
-            if(!truckQue.isEmpty()) {
-                if(sum + truckQue.peek() <= L) {
-                    Integer truck = truckQue.poll();
-                    bridgeQue.offer(truck);
-                    sum += truck;
+        while (!bridge.isEmpty()) {
+            time++;
+            sum -= bridge.poll(); // 다리에서 트럭 내리기
+            if (!truck.isEmpty()) {
+                if (truck.peek() + sum <= l) {
+                    sum += truck.peek();
+                    bridge.add(truck.poll()); // 다리로 트럭 올리
                 } else {
-                    bridgeQue.offer(0);
+                    bridge.add(0);
                 }
             }
-            cnt++;
         }
-        System.out.println(cnt);
+
+        System.out.println(time);
     }
 }
