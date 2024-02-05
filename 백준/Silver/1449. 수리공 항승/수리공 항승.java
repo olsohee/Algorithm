@@ -1,34 +1,36 @@
-import java.io.*;
-import java.util.StringTokenizer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
+// 시간 복잡도: O(N)
 public class Main {
 
-    static int N;
-    static int L;
-    static int result = 0;
-    static int[] arr = new int[1001];
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static int n;
+    static int l;
+    static int[] arr;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
         StringTokenizer st = new StringTokenizer(br.readLine());
-
-        N = Integer.parseInt(st.nextToken());
-        L = Integer.parseInt(st.nextToken());
-
-        // 물 새는 위치 입력받기
+        n = Integer.parseInt(st.nextToken());
+        l = Integer.parseInt(st.nextToken());
+        arr = new int[1001];
         st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < N; i++) {
+        for (int i = 0; i < n; i++) {
             int num = Integer.parseInt(st.nextToken());
             arr[num] = 1;
         }
 
-        for(int i = 1; i < arr.length; i++) {
-            if(arr[i] == 1) {
-                i = i + L - 1;
-                result++;
+        int answer = 0;
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] == 1) {
+                i = i + l - 1;
+                answer++;
             }
         }
 
-        System.out.println(result);
+        System.out.println(answer);
     }
 }
