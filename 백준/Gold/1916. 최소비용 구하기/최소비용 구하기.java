@@ -3,28 +3,29 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간 복잡도: ElogV = 100,000 * log1,000
+// 시간 복잡도:
 public class Main {
 
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
     static int n;
     static int m;
+    static int start;
+    static int end;
     static List<List<Node>> list = new ArrayList<>();
-    static int dist[];
-    static boolean visited[];
-    static StringBuilder sb = new StringBuilder();
+    static int[] dist;
+    static boolean[] visited;
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         n = Integer.parseInt(br.readLine());
-        m = Integer.parseInt(br.readLine());
         for (int i = 0; i <= n; i++) {
             list.add(new ArrayList<>());
         }
         dist = new int[n + 1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
         visited = new boolean[n + 1];
-        StringTokenizer st;
+
+        m = Integer.parseInt(br.readLine());
         for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
             int start = Integer.parseInt(st.nextToken());
@@ -34,44 +35,47 @@ public class Main {
         }
 
         st = new StringTokenizer(br.readLine());
-        int startingPoint = Integer.parseInt(st.nextToken());
-        int destination = Integer.parseInt(st.nextToken());
-        dijkstra(startingPoint);
-        System.out.println(dist[destination]);
-    }
+        start = Integer.parseInt(st.nextToken());
+        end = Integer.parseInt(st.nextToken());
+        for (int i = 1; i <= n; i++) {
+            if (i != start) {
+                dist[i] = Integer.MAX_VALUE;
+            }
+        }
 
-    private static void dijkstra(int startingPoint) {
+        // 다익스트라
         PriorityQueue<Node> que = new PriorityQueue<>();
-        dist[startingPoint] = 0;
-        que.add(new Node(startingPoint, 0));
-
+        que.add(new Node(start, 0));
         while (!que.isEmpty()) {
-            int now = que.poll().end;
-            if (visited[now]) continue;
-            visited[now] = true;
+            Node now = que.poll();
+            if (visited[now.end]) {
+                continue;
+            }
 
-            for (Node node : list.get(now)) {
-                if (dist[node.end] > dist[now] + node.cost) {
-                    dist[node.end] = dist[now] + node.cost;
+            visited[now.end] = true;
+            for (Node node : list.get(now.end)) {
+                if (dist[node.end] > now.cost + node.cost) {
+                    dist[node.end] = now.cost + node.cost;
                     que.add(new Node(node.end, dist[node.end]));
                 }
             }
         }
+
+        // 출력
+        System.out.println(dist[end]);
     }
 
-    public static class Node implements Comparable<Node> {
-        int end;
-        int cost;
+    static class Node implements Comparable<Node> {
+        int end, cost;
 
         public Node(int end, int cost) {
             this.end = end;
             this.cost = cost;
         }
 
-
         @Override
         public int compareTo(Node o) {
-            return this.cost - o.cost;
+            return cost - o.cost;
         }
     }
 }
