@@ -13,7 +13,7 @@ public class Main {
     static int[][] map;
     static int time;
     static Map<Integer, String> turnMap = new HashMap<>();
-    static List<Position> positions = new ArrayList<>();
+    static Queue<Position> que = new LinkedList<>();
     static int[] dx = {1, 0, -1, 0}; // dir: 0(오), 1(아래), 2(왼), 3(위)
     static int[] dy = {0, 1, 0, -1};
 
@@ -33,28 +33,29 @@ public class Main {
             turnMap.put(Integer.parseInt(st.nextToken()), st.nextToken());
         }
 
-        positions.add(new Position(1, 1));
+        que.add(new Position(1, 1));
         time = 0;
         int dir = 0;
+        int headY = 1;
+        int headX = 1;
         while (true) {
-            int nx = positions.get(0).x + dx[dir];
-            int ny = positions.get(0).y + dy[dir];
+            int nx = headX + dx[dir];
+            int ny = headY + dy[dir];
 
             // 이동 가능한지 검증
-            if (isFinish(ny, nx)) {
+            if (nx <= 0 || nx > n || ny <= 0 || ny > n || map[ny][nx] == -1) {
                 break;
             }
 
             // 이동
-            if (map[ny][nx] == 1) {
-                // 사과가 있는 경우
-                positions.add(0, new Position(ny, nx)); // 앞머리 추가
-                map[ny][nx] = 0;
-            } else {
-                // 사과가 없는 경우
-                positions.remove(positions.size() - 1); // 꼬리 제거
-                positions.add(0, new Position(ny, nx)); // 앞머리 추가
+            if (map[ny][nx] == 0) { // 사과가 없으면 하나 빼기
+                Position p = que.poll();
+                map[p.y][p.x] = 0;
             }
+            que.add(new Position(ny, nx)); // 하나 추가
+            map[ny][nx] = -1;
+            headY = ny;
+            headX = nx;
 
             // 시간 추가
             time++;
@@ -72,22 +73,6 @@ public class Main {
         }
 
         System.out.println(time + 1);
-    }
-
-    private static boolean isFinish(int ny, int nx) {
-        // 그래프 범위 확인
-        if (nx <= 0 || nx > n || ny <= 0 || ny > n) {
-            return true;
-        }
-
-        for (int i = 0; i < positions.size(); i++) {
-            Position position = positions.get(i);
-            if (position.y == ny && position.x == nx) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     static class Position {
