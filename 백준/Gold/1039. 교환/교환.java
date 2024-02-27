@@ -18,32 +18,25 @@ public class Main {
         n = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
 
-        dfs();
+        visited[n][0] = true;
+        dfs(n, 0);
         System.out.println(answer);
     }
 
-    private static void dfs() {
-        Queue<Info> que = new LinkedList<>();
+    private static void dfs(int n, int cnt) {
+        if (cnt == k) {
+            answer = Math.max(n, answer);
+            return;
+        }
 
-        que.add(new Info(n, 0));
-        visited[n][0] = true;
-
-        while (!que.isEmpty()) {
-            Info now = que.poll();
-
-            if (now.cnt == k) {
-                answer = Math.max(answer, now.num);
-                continue;
-            }
-
-            char[] arr = String.valueOf(now.num).toCharArray();
-            for (int i = 0; i < arr.length; i++) {
-                for (int j = i + 1; j < arr.length; j++) {
-                    int next = swap(i, j, arr);
-                    if (next != -1 && !visited[next][now.cnt + 1]) {
-                        que.add(new Info(next, now.cnt + 1));
-                        visited[next][now.cnt + 1] = true;
-                    }
+        char[] arr = String.valueOf(n).toCharArray();
+        int len = arr.length;
+        for (int i = 0; i < len; i++) {
+            for (int j = i + 1; j < len; j++) {
+                int next = swap(i, j, arr);
+                if (next != -1 && !visited[next][cnt + 1]) {
+                    visited[next][cnt + 1] = true;
+                    dfs(next, cnt + 1);
                 }
             }
         }
@@ -58,15 +51,5 @@ public class Main {
             return -1;
         }
         return Integer.parseInt(new String(cloneArr));
-    }
-
-    static class Info {
-        int num;
-        int cnt;
-
-        public Info(int num, int cnt) {
-            this.num = num;
-            this.cnt = cnt;
-        }
     }
 }
