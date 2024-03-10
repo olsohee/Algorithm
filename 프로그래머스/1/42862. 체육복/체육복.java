@@ -1,40 +1,37 @@
-
 import java.util.*;
-// 시간복잡도: O(N)
+
 class Solution {
-
-    int answer = 0; // 체육복을 갖는 최대 학생 수
-    int[] people;
-
     public int solution(int n, int[] lost, int[] reserve) {
-        people = new int[n + 1];
-        Arrays.fill(people, 1);
-        for (int i : reserve) {
-            people[i]++;
+        // 배열에 저장 (도난 당한 사람 -1, 여벌 있는 사람 1)
+        int[] arr = new int[n + 1];
+        for (int num : lost) {
+            arr[num] = -1;
         }
-        for (int i : lost) {
-            people[i]--;
+        for (int num : reserve) {
+            arr[num]++;
         }
-
+        
+        // 1번부터 N번까지 돌면서 체육복 빌리기
         for (int i = 1; i <= n; i++) {
-            if (people[i] == 2) {
-                // 앞 학생에게 빌려주기
-                if (i >= 2 && people[i - 1] == 0) {
-                    people[i - 1] = 1;
-                    people[i] = 1;
+            if (arr[i] == -1) {
+                // 앞 학생에게 빌리기
+                if (i - 1 >= 1 && arr[i - 1] == 1) {
+                    arr[i] = 0; 
+                    arr[i - 1]--;
+                    continue;
                 }
-                // 뒤 학생에게 빌려주기
-                else if (i <= n - 1 && people[i + 1] == 0) {
-                    people[i + 1] = 1;
-                    people[i] = 1;
+                // 뒤 학생에게 빌리기
+                if (i + 1 <= n && arr[i + 1] == 1) {
+                    arr[i] = 0;
+                    arr[i + 1]--;
                 }
             }
         }
-
+        
+        // 체육수업을 들을 수 있는 학생 수 구하기
+        int answer = 0;
         for (int i = 1; i <= n; i++) {
-            if (people[i] > 0) {
-                answer++;
-            }
+            if (arr[i] >= 0) answer++;
         }
         return answer;
     }
