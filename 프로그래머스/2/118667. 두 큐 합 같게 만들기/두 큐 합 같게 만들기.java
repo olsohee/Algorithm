@@ -1,47 +1,44 @@
-
-
 import java.util.*;
 
 class Solution {
     public int solution(int[] queue1, int[] queue2) {
-
+        
         Queue<Integer> que1 = new LinkedList<>();
         Queue<Integer> que2 = new LinkedList<>();
-        long totalSum = 0;
-        long que1Sum = 0;
-
-        for (int i = 0; i < queue1.length; i++) {
-            que1.add(queue1[i]);
-            que2.add(queue2[i]);
-            que1Sum += queue1[i];
-            totalSum += (queue1[i] + queue2[i]);
+        
+        long sum1 = 0;
+        long sum2 = 0;
+        for (int num : queue1) {
+            sum1 += num;
+            que1.add(num);
         }
-
-        if(totalSum % 2 != 0) {
-            return -1;
+        
+        for (int num : queue2) {
+            sum2 += num;
+            que2.add(num);
         }
-
-        int cnt = 0;
-        long goal = totalSum / 2;
-
-        while(que1Sum != goal) {
-            if(cnt == queue1.length * 4) {
+        
+        // 합이 큰 큐에서 poll하기
+        long goal = (sum1 + sum2) / 2;
+        int count = 0;
+        while (sum1 != sum2) {
+            if (count >= queue1.length * 4) {
                 return -1;
             }
-
-            if(que1Sum > goal) {
-                Integer value = que1.poll();
-                que1Sum -= value;
-                que2.add(value);
+            count++;
+            if (sum1 > sum2) {
+                int poll = que1.poll();
+                que2.add(poll);
+                sum1 -= poll;
+                sum2 += poll;
             } else {
-                Integer value = que2.poll();
-                que1Sum += value;
-                que1.add(value);
+                int poll = que2.poll();
+                que1.add(poll);
+                sum2 -= poll;
+                sum1 += poll;
             }
-            cnt++;
         }
-
-        return cnt;
+        
+        return count;
     }
 }
-
