@@ -1,51 +1,55 @@
 import java.util.*;
 
 class Solution {
-        String numbers;
-        boolean[] visited;
+    
+    Set<Integer> set = new HashSet<>();
+    String[] arr;
+    boolean[] visited;
+    
+    public int solution(String numbers) {
+        
+        arr = numbers.split("");
+        visited = new boolean[arr.length];
+        
+        // 완전탐색해서 구한 수 set에 넣기
+        dfs("");
+        
+        // set에 있는 값 탐색하며 소수 개수 찾기
         int answer = 0;
-        Set<Integer> set = new HashSet<>();
-
-        public int solution(String numbers) {
-            this.numbers = numbers;
-            visited = new boolean[numbers.length()];
-
-            for (int i = 1; i <= numbers.length(); i++) {
-                func("", i, visited);
-            }
-
-            for (Integer num : set) {
-                if (isPrime(num)) {
-                    answer++;
-                }
-            }
-            return answer;
-        }
-
-        private void func(String str, int len, boolean[] visited) {
-            if (str.length() == len) {
-                set.add(Integer.parseInt(str));
-                return;
-            }
-
-            for (int i = 0; i < numbers.length(); i++) {
-                if (!visited[i]) {
-                    visited[i] = true;
-                    func(str + String.valueOf(numbers.charAt(i)), len, visited);
-                    visited[i] = false;
-                }
+        for (int num : set) {
+            if (isPrime(num)) {
+                answer++;
             }
         }
-
-        private boolean isPrime(Integer num) {
-            if (num == 0 || num == 1) return false;
-
-            for (int i = 2; i < num; i++) {
-                if (num % i == 0) {
-                    return false;
-                }
-            }
-
-            return true;
+        return answer;
+    }
+    
+    public void dfs(String str) {
+        if (str != "") {
+            set.add(Integer.parseInt(str));
         }
+        
+        if (str.length() == arr.length) {
+            return;
+        }
+        
+        for (int i = 0; i < arr.length; i++) {
+            if (!visited[i]) {
+                visited[i] = true;
+                dfs(str + arr[i]);
+                visited[i] = false;
+            }
+        }
+    }
+    
+    public boolean isPrime(int num) {
+        if (num <= 1) return false;
+        
+        for (int i = 2; i < num; i++) {
+            if (num % i == 0) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
