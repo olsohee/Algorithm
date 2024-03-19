@@ -1,28 +1,46 @@
 import java.util.*;
+
 class Solution {
-     public int[] solution(int[] progresses, int[] speeds) {
-
-            Queue<Integer> q = new LinkedList<>();
-            List<Integer> answerList = new ArrayList<>();
-
-            for (int i = 0; i < progresses.length; i++) {
-                // 각 작업이 완성되는데 걸리는 시간 계산
-                int day = (int)Math.ceil((100 - progresses[i]) / (double)speeds[i]);
-
-                // 배포 날짜 계산
-                if (!q.isEmpty() && q.peek() < day) {
-                    answerList.add(q.size());
-                    q.clear();
-                }
-                q.add(day);
+    public int[] solution(int[] progresses, int[] speeds) {
+        int n = progresses.length;
+        int[] days = new int[n];
+        
+        for (int i = 0; i < n; i++) {
+            int day = (100 - progresses[i]) / speeds[i];
+            if ((100 - progresses[i]) % speeds[i] != 0) {
+                day++;
             }
-
-            answerList.add(q.size());
-
-            int[] answer = new int[answerList.size()];
-            for (int i = 0; i < answerList.size(); i++) {
-                answer[i] = answerList.get(i);
-            }
-            return answer;
+            days[i] = day;
         }
+        
+        List<Integer> list = new ArrayList<>();
+        
+        Stack<Integer> stack = new Stack<>();
+        stack.push(days[0]);
+        int max = days[0];
+        
+        for (int i = 1; i < n; i++) {
+            if (days[i] <= max) {
+                stack.push(days[i]);
+            } else {
+                int cnt = 0;
+                while (!stack.isEmpty()) {
+                    stack.pop();
+                    cnt++;
+                }
+                list.add(cnt);
+                stack.push(days[i]);
+                max = days[i];
+            }
+        }
+        
+        list.add(stack.size());
+        
+        int[] answer = new int[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            answer[i] = list.get(i);
+        }
+         
+        return answer;
+    }
 }
