@@ -1,77 +1,49 @@
-
-import java.io.*;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 class Solution {
-
-    int[][] maps;
-    boolean[][] visited;
-    int m;
-    int n;
-    int answer;
+    
     int[] dx = {1, -1, 0, 0};
     int[] dy = {0, 0, 1, -1};
-
+        
     public int solution(int[][] maps) {
-
-        this.maps = maps;
-        m = maps.length;
-        n = maps[0].length;
-        visited = new boolean[m][n];
-
-        bfs(0,0);
-
-        return answer;
-    }
-
-    public void bfs(int y, int x) {
-
-        // 시작점(0,0)부터 bfs 시작
-        Queue<Point> que = new LinkedList<>();
-        que.offer(new Point(y, x)); // 큐에 넣기
-        visited[y][x] = true; // 방문 처리
-        answer++;
-
-        while(!que.isEmpty()) {
-
-            Point p = que.poll();
-            // 사방면 탐색
-            for(int i = 0; i < 4; i++) {
-                int ny = dy[i] + p.y;
-                int nx = dx[i] + p.x;
-
-                // 도달한 경우
-                if((ny == m - 1) && (nx == n - 1)) {
-                    maps[ny][nx] = maps[p.y][p.x] + 1;
-                    answer = maps[ny][nx];
-                    return;
-                }
-
-                // 그래프 밖인 경우
-                if(ny < 0 || ny >= m || nx < 0 || nx >= n) {
+        
+        // bfs로 이동 (0, 0에서 -> n, m으로)
+        int n = maps.length;
+        int m = maps[0].length;
+        int[][] visited = new int[n][m];
+        
+        Queue<Node> que = new LinkedList<>();
+        que.add(new Node(0, 0));
+        visited[0][0] = 1;
+        
+        while (!que.isEmpty()) {
+            Node node = que.poll();
+            for (int i = 0; i < 4; i++) {
+                int ny = node.y + dy[i];
+                int nx = node.x + dx[i];
+                
+                if (nx < 0 || nx >= m || ny < 0 || ny >= n) {
                     continue;
                 }
-
-                // 벽이거나(0) 이미 방문한 경우
-                if(maps[ny][nx] == 0 || visited[ny][nx]) {
+                if (visited[ny][nx] != 0 || maps[ny][nx] == 0) {
                     continue;
                 }
-
-                que.offer(new Point(ny, nx));
-                visited[ny][nx] = true;
-                maps[ny][nx] = maps[p.y][p.x] + 1;
+                
+                visited[ny][nx] = visited[node.y][node.x] + 1;
+                que.add(new Node(ny, nx));
             }
         }
-
-        // 도달하지 못한 경우
-        answer = -1;
+        
+        // 지나가는 최소 칸수 (도착 불가하면 -1)
+        if (visited[n - 1][m - 1] == 0) {
+            return -1;
+        }
+        return visited[n - 1][m - 1];
     }
-
-    static class Point {
+    
+    public class Node {
         int y, x;
-
-        public Point(int y, int x) {
+        public Node(int y, int x) {
             this.y = y;
             this.x = x;
         }
