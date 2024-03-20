@@ -3,28 +3,27 @@ import java.util.*;
 class Solution {
     public int solution(int[] scoville, int K) {
         
-        // 우선순위 큐에 음식 넣기 (스코빌 지수가 작을수록 우선순위가 높음)
-        Queue<Integer> que = new PriorityQueue();
-        for(int i = 0; i < scoville.length; i++) {
-            que.add(scoville[i]);
+        // 섞는 최소 횟수 (불가능: -1)
+        int answer = 0;
+        
+        // 우선순위 큐: 숫자가 작은 게 우선
+        Queue<Integer> que = new PriorityQueue<>();
+        for (int num : scoville) {
+            que.add(num);
+        } 
+        
+        // 큐에서 peek한 값이 K 이상이면 끝내기
+        while (que.peek() < K) {
+            // 큐 사이즈가 1개인데 K 미만이면, 불가능하므로 -1 반환
+            if (que.size() == 1) {
+                return -1;
+            }
+            // K 미만이면 2개 꺼내서 섞고, 넣기
+            que.add(que.poll() + que.poll() * 2);
+            answer++;
         }
         
-        int answer = 0;
-        while (!que.isEmpty()) {
-            // 스코빌 지수가 제일 작은 1개가 k와 같거나 크면 끝내기
-            if (que.peek() >= K) {
-                return answer;
-            }
-            
-            // 큐 사이즈가 2개 이상일 때만 진행 가능
-            if (que.size() < 2) {
-                break;
-            }
-            // 스코빌 지수 작은 2개를 큐에서 꺼내서, 섞기, 섞은 스코빌 지수를 큐에 넣기
-            int newScoville = que.poll() + que.poll() * 2;
-            que.add(newScoville);
-            answer++;   
-        }
-        return -1;
+        
+        return answer;
     }
 }
