@@ -1,67 +1,54 @@
 import java.util.*;
 
 class Solution {
-           int[][] map;
-        boolean[] visited;
-        int answer;
-        int startIdx = 0;
-        int endIdx;
-        int n;
-
-        public int solution(String begin, String target, String[] words) {
-
-            n = words.length + 1;
-            visited = new boolean[n + 1];
-            map = new int[n + 1][n + 1];
-
-            for (int i = 0; i < words.length; i++) {
-                if (words[i].equals(target)) {
-                    endIdx = i + 1;
-                }
-            }
-            // word에 target이 없는 경우
-            if (endIdx == 0) return 0;
-
-            // 그래프 채우기
-            for (int i = 0; i < words.length; i++) {
-                if (canConvert(begin, words[i])) {
-                    map[0][i + 1] = 1;
-                    map[i + 1][0] = 1;
-                }
-            }
-
-            for (int i = 0; i < words.length; i++) {
-                for (int j = i + 1; j < words.length; j++) {
-                    if (canConvert(words[i], words[j])) {
-                        map[i + 1][j + 1] = 1;
-                        map[j + 1][i + 1] = 1;
-                    }
-                }
-            }
-            // 최단거리 구하기 (dfs)
-            dfs(0, 0);
-            return answer;
+    
+    String begin;
+    String target;
+    String[] words;
+    int answer = Integer.MAX_VALUE;
+    int len = 0;
+    boolean[] visited;
+    
+    public int solution(String begin, String target, String[] words) {
+        this.begin = begin;
+        this.target = target;
+        this.words = words;
+        this.len = begin.length();
+        this.visited = new boolean[words.length];
+        
+        dfs(0, begin);
+        
+        // 최소 변환 단계(불가능하면 0)
+        if (answer == Integer.MAX_VALUE) return 0;
+        return answer;
+    }
+    
+    
+    public void dfs(int cnt, String str) {
+        
+        if (str.equals(target)) {
+            answer = Math.min(answer, cnt);
+            return;
         }
-
-        private boolean canConvert(String begin, String word) {
-            int sameCnt = 0;
-            for (int i = 0; i < begin.length(); i++) {
-                if (begin.charAt(i) == word.charAt(i)) sameCnt++;
-            }
-            return sameCnt == begin.length() - 1;
-        }
-
-        private void dfs(int startIdx, int cnt) {
-            if (startIdx == endIdx) {
-                answer = cnt;
-                return;
-            }
-            visited[startIdx] = true;
-
-            for (int i = 0; i <= n; i++) {
-                if (map[startIdx][i] == 1 && !visited[i]) {
-                    dfs(i, cnt + 1);
+        
+        // str과 words 배열 비교해서, 한 자리만 다르면 변환하기
+        for (int i = 0; i < words.length; i++) {
+            if (visited[i]) continue; // 이미 해당 단어 방문했으면 패스
+            
+            String word = words[i];
+        
+            int diffCnt = 0;
+            for (int j = 0; j < len; j++) {
+                if (word.charAt(j) != str.charAt(j)) {
+                    diffCnt++;
                 }
+            }
+            // 한 자리만 다르면 dfs
+            if (diffCnt == 1) {
+                visited[i] = true;
+                dfs(cnt + 1, word);
+                visited[i] = false;
             }
         }
+    }
 }
