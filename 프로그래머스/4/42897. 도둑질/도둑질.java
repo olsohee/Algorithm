@@ -3,28 +3,28 @@ import java.util.*;
 class Solution {
     public int solution(int[] money) {
         
-        // 첫번째 집 포함
-        int[] dp1 = new int[money.length];
-        dp1[0] = money[0];
-        dp1[1] = money[0];
+        int n = money.length;
         
-        // 첫번째 집 미포함
-        int[] dp2 = new int[money.length];
-        dp2[0] = 0;
-        dp2[1] = money[1];
+        // 첫 번째 집 터는 경우
+        int[] dpO = new int[n];
         
-        // dp 배열 채우기
-        for (int i = 2; i < money.length - 1; i++) {
-            dp1[i] = Math.max(dp1[i - 1], dp1[i - 2] + money[i]);
-            dp2[i] = Math.max(dp2[i - 1], dp2[i - 2] + money[i]);
+        // 첫 번째 집 안 터는 경우
+        int[] dpX = new int[n];
+        
+        dpO[0] = money[0];
+        dpO[1] = dpO[0];
+        
+        dpX[0] = 0;
+        dpX[1] = money[1];
+        
+        // dp
+        for (int i = 2; i <= n - 1; i++) {
+            dpO[i] = Math.max(dpO[i - 1], dpO[i - 2] + money[i]);
+            dpX[i] = Math.max(dpX[i - 1], dpX[i - 2] + money[i]);
         }
         
-        // 마지막 집
-        int last = money.length - 1;
-        // 1. 첫번째 집 포함 + 마지막 집 제외
-        int answer = dp1[last - 1];
-        // 2. 첫번째 집 미포함
-        answer = Math.max(answer, Math.max(dp2[last - 1], dp2[last - 2] + money[last]));
+        // 마지막 집 털기
+        int answer = Math.max(dpO[n - 2], Math.max(dpX[n - 2], dpX[n - 3] + money[n - 1]));
         
         return answer;
     }
