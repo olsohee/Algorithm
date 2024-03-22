@@ -2,51 +2,46 @@ import java.util.*;
 
 class Solution {
     
-    String begin;
+    int answer = Integer.MAX_VALUE;
+    int wordLen = 0;
     String target;
     String[] words;
-    int answer = Integer.MAX_VALUE;
-    int len = 0;
     boolean[] visited;
     
     public int solution(String begin, String target, String[] words) {
-        this.begin = begin;
+       
+        wordLen = begin.length();
         this.target = target;
         this.words = words;
-        this.len = begin.length();
         this.visited = new boolean[words.length];
         
-        dfs(0, begin);
+        dfs(begin, 0);
         
-        // 최소 변환 단계(불가능하면 0)
-        if (answer == Integer.MAX_VALUE) return 0;
+        // 최소 변환 횟수 (불가하면 0)
+        if (answer == Integer.MAX_VALUE) {
+            return 0;
+        }
         return answer;
     }
     
-    
-    public void dfs(int cnt, String str) {
-        
+    public void dfs (String str, int cnt) {
+        System.out.println("cnt = " + cnt + ", str = " + str);
         if (str.equals(target)) {
             answer = Math.min(answer, cnt);
             return;
         }
         
-        // str과 words 배열 비교해서, 한 자리만 다르면 변환하기
+        // 1자리만 다른 변환 가능한 단어가 있으면 변환하여 dfs
         for (int i = 0; i < words.length; i++) {
-            if (visited[i]) continue; // 이미 해당 단어 방문했으면 패스
-            
-            String word = words[i];
-        
-            int diffCnt = 0;
-            for (int j = 0; j < len; j++) {
-                if (word.charAt(j) != str.charAt(j)) {
-                    diffCnt++;
+            int diff = 0;
+            for (int j = 0; j < wordLen; j++) {
+                if (words[i].charAt(j) != str.charAt(j)) {
+                    diff++;
                 }
             }
-            // 한 자리만 다르면 dfs
-            if (diffCnt == 1) {
+            if (diff == 1 && !visited[i]) {
                 visited[i] = true;
-                dfs(cnt + 1, word);
+                dfs(words[i], cnt + 1);
                 visited[i] = false;
             }
         }
