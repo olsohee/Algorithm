@@ -1,11 +1,12 @@
 import java.util.*;
 
 class Solution {
+    
     public int solution(int n, int[][] edge) {
         
         List<List<Node>> list = new ArrayList<>();
         for (int i = 0; i <= n; i++) {
-            list.add(new ArrayList());
+            list.add(new ArrayList<>());
         }
         
         for (int[] e : edge) {
@@ -15,23 +16,21 @@ class Solution {
             list.get(end).add(new Node(start, 1));
         }
         
-        // 1번을 시작으로 다익스트라
-        Queue<Node> que = new PriorityQueue<>();
-        int[] dist = new int[n + 1];
+        // 1번 노드를 시작으로 다익스트라 
         boolean[] visited = new boolean[n + 1];
+        int[] dist = new int[n + 1];
         Arrays.fill(dist, Integer.MAX_VALUE);
         
-        dist[1] = 0;
+        Queue<Node> que = new PriorityQueue<>();
         que.add(new Node(1, 0));
+        dist[1] = 0;
         
         while (!que.isEmpty()) {
             Node now = que.poll();
             
             if (visited[now.end]) continue;
-            
             visited[now.end] = true;
             
-            // now.end에서 출발
             for (Node node : list.get(now.end)) {
                 if (dist[node.end] > now.cost + node.cost) {
                     dist[node.end] = now.cost + node.cost;
@@ -40,32 +39,29 @@ class Solution {
             }
         }
         
-        // dist[i]: 1에서 i까지 가는데 걸리는 비용
+        // dist 배열에서 가장 큰 값의 노드 번호 찾기
         int max = 0;
-        int answer = 0;
-        for (int i = 2; i <= n; i++) {
-            if (dist[i] > max) {
+        int maxCnt = 0;
+        for (int i = 1; i <= n; i++) {
+            if (max < dist[i]) {
                 max = dist[i];
-                answer = 0;
-            }
-            if (dist[i] == max) {
-                answer++;
+                maxCnt = 1;
+            } else if (max == dist[i]) {
+                maxCnt++;
             }
         }
         
-        return answer;
+        // 1번 노드로부터 가장 멀리 떨어진 노드의 개수
+        return maxCnt;
     }
     
     public class Node implements Comparable<Node> {
-        
         int end, cost;
-        
-        public Node(int end, int cost) {
+        public Node (int end, int cost) {
             this.end = end;
             this.cost = cost;
         }
         
-        @Override
         public int compareTo(Node o) {
             return this.cost - o.cost;
         }
