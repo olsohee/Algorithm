@@ -11,23 +11,28 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
-        int answer = 0;
         int target = Integer.parseInt(br.readLine());
-        
-        while (true) {
-            if (target % 5 == 0) {
-                answer += target / 5;
-                break;
-            } else {
-                target -= 3;
-                answer++;
+
+        int[] dp = new int[5001];
+        dp[3] = 1;
+        dp[5] = 1;
+        for (int i = 6; i <= target; i++) {
+            if (dp[i - 3] != 0) {
+                dp[i] = dp[i - 3] + 1;
             }
-            if (target < 0) {
-                answer = -1;
-                break;
+            if (dp[i - 5] != 0) {
+                if (dp[i] != 0) {
+                    dp[i] = Math.min(dp[i], dp[i - 5] + 1);
+                } else {
+                    dp[i] = dp[i - 5] + 1;
+                }
             }
+//            System.out.println("dp[" + i + "] =" + dp[i]);
         }
-        
-        System.out.println(answer); // 불가능하면 -1 출력
+        if (dp[target] == 0) {
+            System.out.println(-1);
+            return;
+        }
+        System.out.println(dp[target]);
     }
 }
