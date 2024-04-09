@@ -8,8 +8,8 @@ public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
 
-    static String[][] map;
-    static Set<String> keys;
+    static char[][] map;
+    static Set<Character> keys;
     static int newKeyCnt = 0;
     static int openDoorCnt = 0;
     static int answer = 0;
@@ -22,15 +22,16 @@ public class Main {
 
         int t = Integer.parseInt(br.readLine());
         while (t-- > 0) {
+            // answer 초기화
             answer = 0;
 
             // map 초기화
             st = new StringTokenizer(br.readLine());
             h = Integer.parseInt(st.nextToken());
             w = Integer.parseInt(st.nextToken());
-            map = new String[h][w];
+            map = new char[h][w];
             for (int i = 0; i < h; i++) {
-                String[] input = br.readLine().split("");
+                char[] input = br.readLine().toCharArray();
                 for (int j = 0; j < w; j++) {
                     map[i][j] = input[j];
                 }
@@ -38,7 +39,7 @@ public class Main {
 
             // keys 초기화
             keys = new HashSet<>();
-            String[] input = br.readLine().split("");
+            char[] input = br.readLine().toCharArray();
             for (int i = 0; i < input.length; i++) {
                 keys.add(input[i]);
             }
@@ -47,16 +48,14 @@ public class Main {
                 newKeyCnt = 0;
                 openDoorCnt = 0;
 
-                // 가장자리 .에서부터 bfs 시작
+                // 테두리에서 들어갈 수 있으면 bfs 시작
                 for (int i = 0; i < h; i++) {
                     for (int j = 0; j < w; j++) {
                         if (i > 0 && i <= h - 2 && j > 0 && j <= w - 2) {
                             continue;
                         }
 
-                        char c= map[i][j].charAt(0);
-                        // 길이거나 문서거나 열쇠거나 문이면 bfs
-                        if (!map[i][j].equals("*")) {
+                        if (map[i][j] != '*') {
                             bfs(i, j);
                         }
                     }
@@ -80,40 +79,34 @@ public class Main {
         boolean[][] visited = new boolean[h][w];
         Queue<Node> que = new LinkedList<>();
 
-        char c = map[y][x].charAt(0);
-
         // 문서
-        if (c == '$') {
+        if (map[y][x] == '$') {
             answer++;
-            map[y][x] = ".";
+            map[y][x] = '.';
         }
 
         // 열쇠
-        if (c >= 97 && c <= 122) {
+        if (map[y][x] >= 97 && map[y][x] <= 122) {
             newKeyCnt++;
-            keys.add(String.valueOf(c));
-            map[y][x] = ".";
+            keys.add(map[y][x]);
+            map[y][x] = '.';
         }
 
         // 문
-        boolean flag = false;
-        if (c >= 65 && c <= 90) {
-            for (String key : keys) {
-                if (key.charAt(0) - 32 == c) {
-                    map[y][x] = ".";
+        if (map[y][x] >= 65 && map[y][x] <= 90) {
+            for (char key : keys) {
+                if (key - 32 == map[y][x]) {
                     openDoorCnt++;
-                    flag = true;
+                    map[y][x] = '.';
                     break;
                 }
             }
-            if (!flag) {
-                return;
-            }
         }
 
-        que.add(new Node(y, x));
-        visited[y][x] = true;
-
+        if (map[y][x] == '.') {
+            que.add(new Node(y, x));
+            visited[y][x] = true;
+        }
 
         while (!que.isEmpty()) {
             Node now = que.poll();
@@ -123,35 +116,34 @@ public class Main {
 
                 if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
                 if (visited[ny][nx]) continue;
-                if (map[ny][nx].equals("*")) continue;
+                if (map[ny][nx] == '*') continue;
 
-                char next = map[ny][nx].charAt(0);
                 // 열쇠(소문자)인 경우
-                if (next >= 97 && next <= 122) {
+                if (map[ny][nx] >= 97 && map[ny][nx] <= 122) {
                     newKeyCnt++;
-                    keys.add(String.valueOf(next));
-                    map[ny][nx] = ".";
+                    keys.add(map[ny][nx]);
+                    map[ny][nx] = '.';
                 }
 
                 // 문서인 경우
-                if (next == '$') {
+                if (map[ny][nx] == '$') {
                     answer++;
-                    map[ny][nx] = ".";
+                    map[ny][nx] = '.';
                 }
 
                 // 문인 경우
-                if (next >= 65 && next <= 90) {
-                    for (String key : keys) {
-                        if (key.charAt(0) - 32 == next) {
-                            map[ny][nx] = ".";
+                if (map[ny][nx] >= 65 && map[ny][nx] <= 90) {
+                    for (char key : keys) {
+                        if (key - 32 == map[ny][nx]) {
                             openDoorCnt++;
+                            map[ny][nx] = '.';
                             break;
                         }
                     }
                 }
 
                 // 다음으로 이동
-                if (map[ny][nx].equals(".")) {
+                if (map[ny][nx] == '.') {
                     visited[ny][nx] = true;
                     que.add(new Node(ny, nx));
                 }
