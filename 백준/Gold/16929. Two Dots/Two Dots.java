@@ -30,7 +30,7 @@ public class Main {
             }
         }
 
-        // dfs
+        // 모든 노드를 시작으로 dfs 
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 visited[i][j] = true;
@@ -48,7 +48,7 @@ public class Main {
 
     public static void dfs(int y, int x, int startY, int startX, int beforeY, int beforeX) {
 
-        // map[y][x]에 인접한 노드 중
+        // map[y][x]에 인접하면서 같은 알파벳인 노드들 중
         for (int i = 0; i < 4; i++) {
             int ny = dy[i] + y;
             int nx = dx[i] + x;
@@ -56,11 +56,12 @@ public class Main {
             if (nx < 0 || nx >= m || ny < 0 || ny >= n) continue;
             if (map[y][x] != map[ny][nx]) continue;
 
-            // 현재 루트의 시작점과 다음 노드가 같으면 사이클 완성(직전 노드 제외)
-            if ((ny == startY && nx == startX) && ((beforeY != startY) && (beforeX != startX))) {
+            // 시작 노드와 다음 노드가 같으면 사이클 완성 (이때 직전 노드는 제외)
+            if ((ny == startY && nx == startX) && (beforeY != startY) && (beforeX != startX)) {
                 answer = true;
                 return;
             }
+            // 그렇지 않은 경우, 방문하지 않은 노드 방문 (이때 이미 방문한 노드는 제외)
             else {
                 if (!visited[ny][nx]) {
                     visited[ny][nx] = true;
@@ -70,13 +71,5 @@ public class Main {
             }
         }
     }
-
-    public static class Node {
-        int y, x;
-
-        public Node(int y, int x) {
-            this.y = y;
-            this.x = x;
-        }
-    }
 }
+
