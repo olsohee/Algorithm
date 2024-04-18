@@ -7,6 +7,7 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
+    static int answer;
     static int[] dx1 = {-2, -2, -1, -1, 1, 1, 2, 2};
     static int[] dy1 = {-1, 1, -2, 2, -2, 2, -1, 1};
     static int[] dx2 = {1, -1, 0, 0};
@@ -25,14 +26,12 @@ public class Main {
                 map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-
         int[][][] visited = new int[k + 1][h][w];
 
         // bfs
         Queue<Node> que = new LinkedList<>();
         que.add(new Node(0, 0, 0));
         visited[0][0][0] = 1;
-        int answer = Integer.MAX_VALUE;
 
         while (!que.isEmpty()) {
             Node now = que.poll();
@@ -44,6 +43,7 @@ public class Main {
             // 말 이동 방식
             for (int i = 0; i < 8; i++) {
                 if (now.kCnt + 1 > k) break;
+
                 int nx = now.x + dx1[i];
                 int ny = now.y + dy1[i];
 
@@ -68,17 +68,15 @@ public class Main {
                 }
             }
         }
-        if (answer == Integer.MAX_VALUE) {
-            System.out.println(-1);
-        } else {
-            System.out.println(answer - 1);
-        }
+        answer = (answer == 0) ? -1 : --answer;
+        System.out.println(answer);
     }
 
     public static class Node {
         int y, x;
         int kCnt;
-        public Node (int y, int x, int kCnt) {
+
+        public Node(int y, int x, int kCnt) {
             this.y = y;
             this.x = x;
             this.kCnt = kCnt;
