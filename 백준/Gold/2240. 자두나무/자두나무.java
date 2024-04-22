@@ -17,10 +17,11 @@ public class Main {
         int[][] dp = new int[t + 1][w + 1];
 
         for (int i = 1; i <= t; i++) {
-            int num = Integer.parseInt(br.readLine());
-            if (num == 1) {
+            int tree = Integer.parseInt(br.readLine());
+            if (tree == 1) {
                 arr[i][1] = 1;
-            } else {
+            }
+            if (tree == 2) {
                 arr[i][2] = 1;
             }
         }
@@ -31,24 +32,12 @@ public class Main {
 
         // dp
         for (int i = 2; i <= t; i++) {
-
-            dp[i][0] = dp[i - 1][0] + arr[i][1];
-
+            dp[i][0] = dp[i - 1][0] + arr[i][1]; // 1번 나무에서 쭉 내려오는 경우
             for (int j = 1; j <= w; j++) {
                 int now = (j % 2 == 0 ? arr[i][1] : arr[i][2]);
-                int n1 = dp[i - 1][j - 1] + now;
-                int n2 = dp[i - 1][j] + now;
-                dp[i][j] = Math.max(n1, n2);
+                dp[i][j] = Math.max(dp[i - 1][j - 1], dp[i - 1][j]) + now;
             }
         }
-
-//        for (int i = 1; i <= t; i++) {
-//
-//            for (int j = 0; j <= w; j++) {
-//                System.out.print(dp[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
 
         // 결과 출력
         int answer = 0;
