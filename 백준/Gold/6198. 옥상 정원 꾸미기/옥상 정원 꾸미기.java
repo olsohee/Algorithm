@@ -18,26 +18,15 @@ public class Main {
         long answer = 0;
 
         Stack<Integer> stack = new Stack<>();
+        
         for (int i = 0; i < n; i++) {
-            if (stack.isEmpty()) {
-                stack.push(i);
-                continue;
+            
+            while (!stack.isEmpty() && arr[stack.peek()] <= arr[i]) {
+                stack.pop();
             }
 
-            if (arr[stack.peek()] > arr[i]) {
-                stack.push(i);
-            } else {
-                while (!stack.isEmpty() && arr[stack.peek()] <= arr[i]) {
-                    answer += i - stack.pop() - 1;
-                }
-                stack.push(i);
-            }
-        }
-
-        // 스택에 남은 값들도 처리
-        int i = stack.pop();
-        while (!stack.isEmpty()) {
-            answer += i - stack.pop();
+            stack.push(i);
+            answer += stack.size() - 1;
         }
 
         System.out.println(answer);
