@@ -2,41 +2,41 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String[] genres, int[] plays) {
-        Map<String, List<Info>> map = new HashMap<>();
+        
+        Map<String, List<Info>> genreAndPlay = new HashMap<>();
         Map<String, Integer> playSum = new HashMap<>();
         List<Rank> rankList = new ArrayList<>();
         
         int n = genres.length;
         for (int i = 0; i < n; i++) {
-            playSum.put(genres[i], playSum.getOrDefault(genres[i], 0) + plays[i]);
-            
-            List<Info> list = map.getOrDefault(genres[i], new ArrayList<>());
+            List<Info> list = genreAndPlay.getOrDefault(genres[i], new ArrayList<>());
             list.add(new Info(plays[i], i));
-            map.put(genres[i], list);
+            genreAndPlay.put(genres[i], list);
+            
+            playSum.put(genres[i], playSum.getOrDefault(genres[i], 0) + plays[i]);
         }
         
+        // 재생 횟수가 높은 순으로 장르 정렬
         for (String genre : playSum.keySet()) {
             rankList.add(new Rank(genre, playSum.get(genre)));
         }
         Collections.sort(rankList);
         
-        List<Integer> answerList = new ArrayList<>();
-        
+        // 각 장르 내에서 재생 횟수가 높은 노래 2개 선정
+        List<Integer> answer = new ArrayList<>();
         for (Rank rank : rankList) {
             int addCnt = 0;
-            Collections.sort(map.get(rank.genre));
-            for (Info info : map.get(rank.genre)) {
+            Collections.sort(genreAndPlay.get(rank.genre));
+            for (Info info : genreAndPlay.get(rank.genre)) {
                 if (addCnt >= 2) break;
-                answerList.add(info.idx);
+                answer.add(info.idx);
                 addCnt++;
             }
         }
         
-        int[] answer = new int[answerList.size()];
-        for (int i = 0; i < answerList.size(); i++) {
-            answer[i] = answerList.get(i);
-        }
-        return answer;
+        return answer.stream()
+            .mapToInt(num -> num)
+            .toArray();
     }
     
     class Rank implements Comparable<Rank> {
