@@ -1,100 +1,60 @@
 import java.util.*;
 
 class Solution {
-    
-    // 큰 거 우선인 que1
-    Queue<Integer> que1 = new PriorityQueue<>((o1, o2) -> {
-        return o2 - o1;
-    });
-    
-    // 작은 거 우선인 que2
-    Queue<Integer> que2 = new PriorityQueue<>();
-        
-    // 큐에 공통으로 저장된 수를 기록하는 set
-    Set<Integer> set = new HashSet<>();
-    
     public int[] solution(String[] operations) {
+        Set<Integer> set = new HashSet<>();
+        PriorityQueue<Integer> minQue = new PriorityQueue<>();
+        PriorityQueue<Integer> maxQue = new PriorityQueue<>((o1, o2) -> o2 - o1);
         
-        for (String op : operations) {
-            String o = op.split(" ")[0];
-            // 삽입
-            if (o.equals("I")) {
-                addNum(Integer.parseInt(op.split(" ")[1]));
-            }
+        for (String s : operations) {
+            String op = s.split(" ")[0];
+            int num = Integer.parseInt(s.split(" ")[1]);
             
-            if (o.equals("D")) {
-                // 최댓값 제거
-                if (op.split(" ")[1].equals("1")) {
-                    removeMax();
-                } 
-                // 최솟값 제거
-                else {
-                    removeMin();
+            if (op.equals("I")) {
+                set.add(num);
+                minQue.add(num);
+                maxQue.add(num);
+            } 
+            if (op.equals("D") && num == 1) {
+                while (!maxQue.isEmpty()) {
+                    int poll = maxQue.poll();
+                    if (set.contains(poll)) {
+                        set.remove(poll);
+                        break;
+                    }
                 }
-            }
+            } 
+            if (op.equals("D") && num == -1) {
+                while (!minQue.isEmpty()) {
+                    int poll = minQue.poll();
+                    if (set.contains(poll)) {
+                        set.remove(poll);
+                        break;
+                    }
+                }
+            } 
         }
         
+        int[] answer = new int[2];
         if (set.size() == 0) {
-            return new int[] {0, 0};
+            return answer;
         }
-        
-        if (set.size() == 1) {
-            int result = 0;
-            for (int num : set) {
-                result = num;
-            }
-            return new int[] {result, result};
-        }
-        
-        int max = 0;
-        int min = 0;
-        while (!que1.isEmpty()) {
-            int num = que1.poll();
-            if (set.contains(num)) {
-                max = num;
+        while (!maxQue.isEmpty()) {
+            int poll = maxQue.poll();
+            if (set.contains(poll)) {
+                answer[0] = poll;
                 break;
             }
         }
-        while (!que2.isEmpty()) {
-            int num = que2.poll();
-            if (set.contains(num)) {
-                min = num;
+        while (!minQue.isEmpty()) {
+            int poll = minQue.poll();
+            if (set.contains(poll)) {
+                answer[1] = poll;
                 break;
             }
         }
-        return new int[] {max, min};
-    }
-    
-    // 삽입: que1, que2, set에 삽입
-    public void addNum(int num) {
-        que1.add(num);
-        que2.add(num);
-        set.add(num);
-    }
-    
-    // 최댓값 삭제: que1, set에서 삭제
-    public void removeMax() {
-        if (set.size() > 0) {
-            while (!que1.isEmpty()) {
-                int num = que1.poll();
-                if (set.contains(num)) {
-                    set.remove(num);
-                    break;
-                }
-            }
-        }
-    }
-    
-    // 최솟값 삭제: que2, set에서 삭제
-    public void removeMin() {
-        if (set.size() > 0) {
-            while (!que2.isEmpty()) {
-                int num = que2.poll();
-                if (set.contains(num)) {
-                    set.remove(num);
-                    break;
-                }
-            }
-        }
+        
+        // 0, 0 또는 최댓값, 최솟값 반환
+        return answer;
     }
 }
