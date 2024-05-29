@@ -1,45 +1,34 @@
-import java.util.*;
-
 class Solution {
     
-    int answer = Integer.MAX_VALUE;
-    boolean[][] map;
-    boolean[] visited;
     int n;
+    int[][] wires;
+    int answer = Integer.MAX_VALUE;
+    boolean[] visited;
+    boolean[][] map;
     
     public int solution(int n, int[][] wires) {
         
         this.n = n;
+        this.wires = wires;
         
-        for (int i = 0; i < wires.length; i++) {
-            // 초기화
-            map = new boolean[n + 1][n + 1];
+        for (int i = 0; i < n - 1; i++) {
             visited = new boolean[n + 1];
+            map = new boolean[n + 1][n + 1];
             
-            for (int j = 0; j < wires.length; j++) {
-                if (i == j) {
-                    continue;
-                }
-                int n1 = wires[j][0];
-                int n2 = wires[j][1];
-                map[n1][n2] = true;
-                map[n2][n1] = true;
+            for (int j = 0; j < n - 1; j++) {
+                if (i == j) continue;
+                map[wires[j][0]][wires[j][1]] = true;
+                map[wires[j][1]][wires[j][0]] = true;
             }
             
-            // dfs
-            int result1 = dfs(1);
+            int result1 = dfs(wires[i][0]);
             int result2 = n - result1;
-            
             answer = Math.min(answer, Math.abs(result1 - result2));
         }
-        
-        // 개수 차이의 절대값
         return answer;
     }
     
-    // 연결된 한 덩어리의 노드 개수 반환
-    public int dfs (int start) {
-        
+    public int dfs(int start) {
         visited[start] = true;
         int sum = 1;
         
@@ -48,6 +37,7 @@ class Solution {
                 sum += dfs(i);
             }
         }
+        
         return sum;
     }
 }
