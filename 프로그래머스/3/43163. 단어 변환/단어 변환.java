@@ -2,48 +2,46 @@ import java.util.*;
 
 class Solution {
     
-    int answer = Integer.MAX_VALUE;
-    int wordLen = 0;
+    String begin;
     String target;
     String[] words;
     boolean[] visited;
+    int answer = Integer.MAX_VALUE;
     
     public int solution(String begin, String target, String[] words) {
-       
-        wordLen = begin.length();
+        this.begin = begin;
         this.target = target;
         this.words = words;
-        this.visited = new boolean[words.length];
+        visited = new boolean[words.length]; // 각 단어에 대한 방문 처리
         
         dfs(begin, 0);
         
-        // 최소 변환 횟수 (불가하면 0)
-        if (answer == Integer.MAX_VALUE) {
-            return 0;
-        }
-        return answer;
+        return answer == Integer.MAX_VALUE ? 0 : answer;
     }
     
-    public void dfs (String str, int cnt) {
-        System.out.println("cnt = " + cnt + ", str = " + str);
-        if (str.equals(target)) {
+    public void dfs(String now, int cnt) {
+        
+        if (now.equals(target)) {
             answer = Math.min(answer, cnt);
             return;
         }
         
-        // 1자리만 다른 변환 가능한 단어가 있으면 변환하여 dfs
         for (int i = 0; i < words.length; i++) {
-            int diff = 0;
-            for (int j = 0; j < wordLen; j++) {
-                if (words[i].charAt(j) != str.charAt(j)) {
-                    diff++;
-                }
-            }
-            if (diff == 1 && !visited[i]) {
+            if (!visited[i] && canConvert(now, words[i])) {
                 visited[i] = true;
                 dfs(words[i], cnt + 1);
                 visited[i] = false;
             }
         }
+    }
+    
+    public boolean canConvert(String str1, String str2) {
+        int diff = 0;
+        for (int i = 0; i < str1.length(); i++) {
+            if (str1.charAt(i) != str2.charAt(i)) diff++;
+        }
+        
+        if (diff == 1) return true;
+        return false;
     }
 }
