@@ -1,47 +1,32 @@
 import java.util.*;
 
 class Solution {
-    
-    int answer = 0;
-    
     public int solution(int[][] routes) {
         
-        Queue<Time> que = new PriorityQueue<>();
-        for (int[] route : routes) {
-            que.add(new Time(route[0], route[1]));
-        }
-        
-        while (!que.isEmpty()) {
-            answer++;
-            Time time = que.poll(); // 처리해야 하는 루트
-            int start = time.start;
-            int end = time.end;
-            while (!que.isEmpty()) {
-                // 시간 겹치는지 확인
-                if (que.peek().start <= end) { 
-                    Time poll = que.poll();
-                    start = Math.max(start, poll.start);
-                    end = Math.min(end, poll.end);
-                } else {
-                    break;
-                }
+        // 끝나는 시간이 이른 순으로 정렬 
+        Arrays.sort(routes, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[1] - o2[1];
             }
+        });
+            
+      
+        int last = routes[0][1];
+        System.out.println(last);
+        int answer = 1;
+        for (int i = 1; i < routes.length; i++) {
+            if (routes[i][0] <= last && routes[i][1] >= last) {
+                continue;
+            } 
+            last = routes[i][1];
+            answer++;
+            System.out.println(last);
+            
         }
-        
-        return answer;
-    }
     
-    public class Time implements Comparable<Time> {
-        int start;
-        int end;
-        public Time(int start, int end) {
-            this.start = start;
-            this.end = end;
-        }
         
-        @Override
-        public int compareTo (Time o) {
-            return this.start - o.start;
-        }
+        // 설치해야 하는 최소 카메라 수 반환
+        return answer;
     }
 }
