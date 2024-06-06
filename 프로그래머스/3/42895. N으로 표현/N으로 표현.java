@@ -1,30 +1,26 @@
 import java.util.*;
 
 class Solution {
-    
     public int solution(int N, int number) {
         
-        if (N == number) return 1;
+        if (N == number) {
+            return 1;
+        }
         
-        // i개로 만들 수 있는 수를 list에 저장
         List<Set<Integer>> list = new ArrayList<>();
         
-        // 1. dp 초기화
-        list.add(new HashSet<>()); // idx: 0
-        
-        Set<Integer> set = new HashSet<>();
+        list.add(new HashSet<>()); // 인덱스 0
+        Set<Integer> set = new HashSet<>(); // 인덱스 1
         set.add(N);
-        list.add(set); // idx: 1
-        
+        list.add(set);
         for (int i = 2; i <= 8; i++) {
-            // 2. dp에 저장
             set = new HashSet<>();
             
-            String s = "";
+            String str = "";
             for (int j = 0; j < i; j++) {
-                s += N;
+                str += N;
             }
-            set.add(Integer.parseInt(s));
+            set.add(Integer.parseInt(str));
             
             for (int j = 1; j < i; j++) {
                 int k = i - j;
@@ -41,8 +37,7 @@ class Solution {
             }
             list.add(set);
             
-            // 3. number가 있는지 확인
-            for (int num : set) {
+            for (int num : list.get(i)) {
                 if (num == number) {
                     return i;
                 }
