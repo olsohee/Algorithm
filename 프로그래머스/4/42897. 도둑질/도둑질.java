@@ -3,28 +3,27 @@ import java.util.*;
 class Solution {
     public int solution(int[] money) {
         
-        int n = money.length;
+        int answer = 0;
         
-        // 첫 번째 집 터는 경우
-        int[] dpO = new int[n];
+        // 첫 번째 집을 터는 경우
+        int[] dpWithFirst = new int[money.length];
+        // 첫 번째 집을 털지 않는 경우
+        int[] dpWithoutFirst = new int[money.length];
         
-        // 첫 번째 집 안 터는 경우
-        int[] dpX = new int[n];
+        dpWithFirst[0] = money[0];
+        dpWithFirst[1] = Math.max(dpWithFirst[0], money[1]);
+        dpWithoutFirst[1] = money[1];
         
-        dpO[0] = money[0];
-        dpO[1] = dpO[0];
-        
-        dpX[0] = 0;
-        dpX[1] = money[1];
-        
-        // dp
-        for (int i = 2; i <= n - 1; i++) {
-            dpO[i] = Math.max(dpO[i - 1], dpO[i - 2] + money[i]);
-            dpX[i] = Math.max(dpX[i - 1], dpX[i - 2] + money[i]);
+        for (int i = 2; i < money.length; i++) {
+            if (i == money.length - 1) {
+                dpWithFirst[i] = dpWithFirst[i - 1];
+                dpWithoutFirst[i] = Math.max(dpWithoutFirst[i - 1], dpWithoutFirst[i - 2] + money[i]);
+                answer = Math.max(dpWithFirst[i], dpWithoutFirst[i]);
+                break;
+            } 
+            dpWithFirst[i] = Math.max(dpWithFirst[i - 1], dpWithFirst[i - 2] + money[i]);
+            dpWithoutFirst[i] = Math.max(dpWithoutFirst[i - 1], dpWithoutFirst[i - 2] + money[i]);
         }
-        
-        // 마지막 집 털기
-        int answer = Math.max(dpO[n - 2], Math.max(dpX[n - 2], dpX[n - 3] + money[n - 1]));
         
         return answer;
     }
