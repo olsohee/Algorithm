@@ -4,95 +4,68 @@ class Solution {
     
     int[][] users;
     int[] emoticons;
-    int n;
-    int m;
-    List<int[]> sales = new ArrayList<>();
+    List<int[]> saleList = new ArrayList<>();
     
     public int[] solution(int[][] users, int[] emoticons) {
         this.users = users;
         this.emoticons = emoticons;
         
-        n = users.length;
-        m = emoticons.length;
+        // 할인 조합 만들기
+        dfs(0, new int[emoticons.length]);
         
-        // 1. 각 이모티콘의 할인율의 경우의 수 (O(4^m)) (할인율: 10, 20, 30, 40%)
-        dfs(0, new int[m]);
+//         for (int[] arr : saleList) {
+//             for (int i : arr) {
+//                 System.out.print(i + " ");
+                
+//             }
+//             System.out.println();
+//         }
         
-        // 2. 해당 경우의 수에서 사용자 별로 플러스 가입 OR 이모티콘 구매 판단 (O(100))
-        List<Result> result = new ArrayList<>();
-        
-        // for (int[] arr : sales) {
-        //     for (int n : arr) {
-        //         System.out.print(n + " ");
-        //     }
-        //     System.out.println();
-        // }
-        
-        // 세일 경우마다 Result(총 플러스 구매 수, 판매액)를 리스트에 저장
-        for (int[] sale : sales) {
-            int plus = 0;
-            int purchase = 0;
-            
-            // 사용자마다 판단
+        // 각 할인 조합마다 판단
+        int[] answer = new int[2];
+        for (int[] sale : saleList) {
+            int totalJoinCnt = 0;
+            int totalBuyCost = 0;
             for (int[] user : users) {
-                int sum = 0;
-                for (int i = 0; i < m; i++) {
-                    int percent = sale[i];
-                    if (percent >= user[0]) {
-                        sum += emoticons[i] * (100 - percent) / 100;
+                // user[0] : 비율, user[1]: 가격
+                int buyCost = 0;
+                for (int i = 0; i < emoticons.length; i++) {
+                    // user[0] 이상의 할인을 하면 구매
+                    if (sale[i] >= user[0]) {
+                        buyCost += emoticons[i] * (100 - sale[i]) / 100;
                     }
                 }
-                // 플러스 가입
-                if (sum >= user[1]) {
-                    plus++;
-                } 
-                // 이모티콘 구매
-                else {
-                    purchase += sum;
+                
+                // 총 구매 금액에 user[1] 이상이면 플러스 가입
+                if (buyCost >= user[1]) {
+                    totalJoinCnt++;
+                } else {
+                    totalBuyCost += buyCost;
                 }
             }
             
-            result.add(new Result(plus, purchase));
+            // 플러스 가입자 수가 가장 많고, 구매 금액이 가장 많은 것이 답
+            if (totalJoinCnt > answer[0]) {
+                answer[0] = totalJoinCnt;
+                answer[1] = totalBuyCost;
+            } else if (totalJoinCnt == answer[0])  {
+                if (totalBuyCost > answer[1]) {
+                    answer[1] = totalBuyCost;
+                }
+            }
         }
-        
-        // 플러스 가입 수, 매출액 반환 (1순위: 플러스 가입 수, 2순위: 매출액)
-        Collections.sort(result);
-        int[] answer = new int[2];
-        answer[0] = result.get(0).plus;
-        answer[1] = result.get(0).purchase;
         return answer;
     }
     
-    public void dfs(int cnt, int[] arr) {
-        
-        // 이모티콘의 할인률 모두 결정되면(m개) 끝내기
-        if (cnt == m) {
-            sales.add(arr);
+    public void dfs(int depth, int[] arr) {
+        if (depth == emoticons.length) {
+            saleList.add(arr.clone());
             return;
         }
         
-        // cnt번째 이모티콘의 할인률 결정
         for (int i = 1; i <= 4; i++) {
-            int[] cloneArr = arr.clone();
-            cloneArr[cnt] = i * 10;
-            dfs(cnt + 1, cloneArr);
-        }
-    }
-    
-    public class Result implements Comparable<Result> {
-        int plus;
-        int purchase;
-        public Result (int plus, int purchase) {
-            this.plus = plus;
-            this.purchase = purchase;
-        }
-        
-        @Override
-        public int compareTo(Result o) {
-            if (o.plus == this.plus) {
-                return o.purchase - this.purchase;
-            }
-            return o.plus - this.plus;
+            arr[depth] = i * 10;
+            dfs(depth + 1, arr);
         }
     }
 }
