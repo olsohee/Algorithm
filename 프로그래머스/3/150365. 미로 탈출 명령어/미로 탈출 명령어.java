@@ -1,77 +1,82 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 class Solution {
-
-    char[] dist = {'d', 'l', 'r', 'u'};
-    int[] dx = {1, 0, 0, -1}; // 세로
-    int[] dy = {0, -1, 1, 0}; // 가로
-    int n; int m;
-    int x; int y;
-    int r; int c;
+    
+    int n, m;
+    int r, c;
     int k;
-    List<char[]> answerList = new ArrayList<>();
+    int[] dx = {0, -1, 1, 0};
+    int[] dy = {1, 0, 0, -1};
+    List<String> list = new ArrayList<>();
+    
     public String solution(int n, int m, int x, int y, int r, int c, int k) {
-
         this.n = n; this.m = m;
-        this.x = x; this.y = y;
         this.r = r; this.c = c;
         this.k = k;
-
-        dfs(0, new char[k], x, y);
-
-        if(answerList.size() == 0) {
+        
+        dfs(0, x, y, "");
+        
+        if (list.size() == 0) {
             return "impossible";
-        } else {
-            char[] chars = answerList.get(0);
-            String answer = "";
-            for (char ch : chars) {
-                answer += ch;
-            }
-            return answer;
-        }
+        } 
+        // Collections.sort(list);
+        return list.get(0);
     }
-
-    // a: 현재 세로 위치
-    // b: 현재 가로 위치
-    private void dfs(int depth, char[] chars, int a, int b) {
-        // 답 하나 찾았으면 탐색X
-        if(answerList.size() >= 1) {
-            return;
-        }
-
-        // (남은 움직임 수 - 거리)가 홀수인 경우 탐색X
-        if(((k - depth) - getDistance(a, b)) % 2 != 0) {
-            return;
-        }
-
-        // (남은 움직임 수 < 현재 위치와 탈출구의 거리)인 경우 탐색X
-        if((k - depth) < getDistance(a, b)) {
-            return;
-        }
-
-        if(depth == k) {
-            if(a == r && b == c) {
-                answerList.add(chars);
+    
+    private void dfs(int cnt, int y, int x, String route) {
+        if (list.size() >= 1) return;
+        if (cnt == k) {
+            if (y == r && x == c) {
+                list.add(route);
             }
             return;
         }
-
-        for(int i = 0; i < 4; i++) {
-            int nx = dx[i] + a;
-            int ny = dy[i] + b;
-
-            if(nx <= 0 || ny <= 0 || nx > n || ny > m) {
+        
+       
+        
+        int distance = getDistance(y, x);
+        // 도착점까지의 거리, 남은 이동 가능 거리 "거리 비교"
+        if (distance > k - cnt) {
+            return;
+        }
+        
+        // 도착점까지의 거리, 남은 이동 가능 거리 "짝/홀 비교"
+        if (!canGo(distance, k - cnt)) {
+            return;
+        }
+        
+        for (int i = 0; i < 4; i++) {
+            int ny = y + dy[i];
+            int nx = x + dx[i];
+            
+            if (ny <= 0 || ny > n || nx <= 0 || nx > m) {
                 continue;
             }
-
-            char[] cloneChars = chars.clone();
-            cloneChars[depth] = dist[i];
-            dfs(depth + 1, cloneChars, nx, ny);
+            
+            String newRoute = "";
+            if (i == 0) newRoute = route + "d";
+            if (i == 1) newRoute = route + "l";
+            if (i == 2) newRoute = route + "r";
+            if (i == 3) newRoute = route + "u";
+            dfs(cnt + 1, ny, nx, newRoute);
         }
     }
-
-    private int getDistance(int a, int b) {
-        return Math.abs(a - r) + Math.abs(b - c);
+    
+    public int getDistance(int y, int x) {
+        return Math.abs((y - r)) + Math.abs(x - c);
+    }
+    
+    public boolean canGo(int distance, int k) {
+        // if (k - distance % 2 != 0) {
+        //     return false;
+        // }
+        // return true;
+        if (distance % 2 == 0 && k % 2 == 0) {
+            return true;
+        }
+        if (distance % 2 == 1 && k % 2 == 1) {
+            return true;
+        }
+        return false;
     }
 }
