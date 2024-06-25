@@ -2,79 +2,64 @@ import java.util.*;
 
 class Solution {
     public int[] solution(int[] fees, String[] records) {
-        
-        // 입차한 차들 저장하는 map
-        Map<Integer, Integer> recordMap = new HashMap<>();
-        
-        // 머무른 시간을 저장하는 map
+
         Map<Integer, Integer> timeMap = new HashMap<>();
-        
-        for (String str : records) {
-            String timeStr = str.split(" ")[0];
-            int time = Integer.parseInt(timeStr.split(":")[0]) * 60 + Integer.parseInt(timeStr.split(":")[1]);
-            int carNum = Integer.parseInt(str.split(" ")[1]);
-            String command = str.split(" ")[2];
-            
-            // 입차 -> map에 시간 저장
-            if (command.equals("IN")) {
-                recordMap.put(carNum, time);
-            } 
-            // 출차 -> map에서 입차 시간 빼서 머무른 시간 저장
-            else {
-                int total = time - recordMap.get(carNum);
-                timeMap.put(carNum, timeMap.getOrDefault(carNum, 0) + total);
-                recordMap.remove(carNum); // 출차한 차는 map에서 제거
+        Map<Integer, Integer> inTimeMap = new HashMap<>();
+        Map<Integer, Integer> feeMap = new HashMap<>();
+
+        for (String record : records) {
+            String[] arr = record.split(" ");
+            int time = Integer.parseInt(arr[0].split(":")[0]) * 60 + Integer.parseInt(arr[0].split(":")[1]);
+            int carNum = Integer.parseInt(arr[1]);
+
+            if (arr[2].equals("IN")) {
+                inTimeMap.put(carNum, time);
+            }
+
+            if (arr[2].equals("OUT")) {
+                int inTime = inTimeMap.get(carNum);
+                timeMap.put(carNum, timeMap.getOrDefault(carNum, 0) + time - inTime);
+                                inTimeMap.remove(carNum);
+
             }
         }
-        
-        // map에 남은 차(출차 안 한 차) 시간 계산
-        for (int carNum : recordMap.keySet()) {
-            int total = 23 * 60 + 59 - recordMap.get(carNum);
-            timeMap.put(carNum, timeMap.getOrDefault(carNum, 0) + total);
+
+        // 출차 안한 경우 (23:59 출차로 간주)
+        for (int carNum : inTimeMap.keySet()) {
+            int inTime = inTimeMap.get(carNum);
+            timeMap.put(carNum, timeMap.getOrDefault(carNum, 0) + 23 * 60 + 59 - inTime);
         }
-        
-        // 요금 계산하기
-        List<Result> list = new ArrayList<>();
-        
+
+        int basicTime = fees[0];
+        int basicFee = fees[1];
+        int additionalTime = fees[2];
+        int additionalFee = fees[3];
+
+     
         for (int carNum : timeMap.keySet()) {
-            int time = timeMap.get(carNum);
-            
-            // 기본 시간 이하 -> 기본 요금
-            if (time <= fees[0]) {
-                list.add(new Result(carNum, fees[1]));
-            } 
-            // 기본 시간 초과 -> 기본 요금 + 초과 시간에 대한 청구 (올림)
-            else {
-                int feeSum = fees[1];
-                time -= fees[0];
-                int num = time / fees[2];
-                if (time % fees[2] != 0) num++;
-                feeSum += num * fees[3];
-                list.add(new Result(carNum, feeSum));
+            int totalTime = timeMap.get(carNum);
+            System.out.println(carNum);
+            System.out.println(timeMap.get(carNum));
+            System.out.println();
+            if (totalTime > basicTime) {
+                int fee = basicFee + (int)Math.ceil((double)(totalTime - basicTime) / additionalTime) * additionalFee;
+                feeMap.put(carNum, fee);
+            } else {
+                feeMap.put(carNum, basicFee);
             }
         }
-        
-        // 청구할 주차 요금 (차량 번호가 작은 순서)
-        Collections.sort(list);
-        int[] answer = new int[list.size()];
-        for (int i = 0; i < list.size(); i++) {
-            answer[i] = list.get(i).fee;
+
+        // 차번호대로 올림
+        List<Integer> carNumList = new ArrayList<>();
+        for (int carNum : feeMap.keySet()) {
+            carNumList.add(carNum);
+        }
+        Collections.sort(carNumList);
+
+        int[] answer = new int[carNumList.size()];
+        for (int i = 0; i < carNumList.size(); i++) {
+            answer[i] = feeMap.get(carNumList.get(i));
         }
         return answer;
-    }
-    
-    public class Result implements Comparable<Result> {
-        int carNum;
-        int fee;
-        
-        public Result (int carNum, int fee) {
-            this.carNum = carNum;
-            this.fee = fee;
-        }
-        
-        @Override
-        public int compareTo(Result o) {
-            return this.carNum - o.carNum;
-        }
     }
 }
