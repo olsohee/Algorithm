@@ -13,23 +13,21 @@ public class Main {
         int t = Integer.parseInt(br.readLine());
         for (int i = 0; i < t; i++) {
             int n = Integer.parseInt(br.readLine());
-            st = new StringTokenizer(br.readLine());
             int[] coins = new int[n];
+            st = new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
                 coins[j] = Integer.parseInt(st.nextToken());
             }
-            int m = Integer.parseInt(br.readLine());
 
-            // dp
+            int m = Integer.parseInt(br.readLine());
             int[] dp = new int[m + 1];
             dp[0] = 1;
-
             for (int coin : coins) {
-                for (int j = coin; j <= m; j++) {
-                    dp[j] += dp[j - coin];
+                for (int k = coin ; k <= m; k++) {
+                    dp[k] += dp[k - coin];
                 }
             }
-            
+
             System.out.println(dp[m]);
         }
     }
