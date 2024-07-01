@@ -1,51 +1,51 @@
-import java.io.*;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.StringTokenizer;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public class Main {
 
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st;
-
-        int N = Integer.parseInt(br.readLine());
-
-        int[][] inputArr = new int[N][2];
-
-        for(int i = 0; i < N; i++) {
+        int n = Integer.parseInt(br.readLine());
+        List<Homework> list = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
-            int n1 = Integer.parseInt(st.nextToken());
-            int n2 = Integer.parseInt(st.nextToken());
-
-            inputArr[i][0] = n1;
-            inputArr[i][1] = n2;
+            int end = Integer.parseInt(st.nextToken());
+            int score = Integer.parseInt(st.nextToken());
+            list.add(new Homework(end, score));
         }
 
-        // 배점이 높은 순으로 정렬
-        Arrays.sort(inputArr, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                return o2[1] - o1[1];
-            }
+        Collections.sort(list, (o1, o2) -> {
+            return o2.score - o1.score; // 점수가 높은 순으로 정렬
         });
 
-        int[] result = new int[10001];
-
-        for(int i = 0; i < N; i++) {
-            for(int j = inputArr[i][0]; j > 0; j--) {
-                if(result[j] == 0) {
-                    result[j] = inputArr[i][1];
-                    break;
+        int scoreSum = 0;
+        boolean[] doHomework = new boolean[1001]; // doHomework[i] : i 날짜에 과제했는지 유무
+        for (Homework homework : list) {
+            for (int i = homework.end - 1; i >= 0; i--) {
+                if (doHomework[i]) {
+                    continue;
                 }
+                doHomework[i] = true;
+                scoreSum += homework.score;
+                break;
             }
         }
 
-        int sum = 0;
-        for(int i = 0; i < result.length; i++) {
-            sum += result[i];
-        }
+        System.out.println(scoreSum);
+    }
 
-        System.out.println(sum);
+    private static class Homework {
+
+        int end;
+        int score;
+
+        public Homework(int end, int score) {
+            this.end = end;
+            this.score = score;
+        }
     }
 }
