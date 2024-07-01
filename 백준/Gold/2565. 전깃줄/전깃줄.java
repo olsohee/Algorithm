@@ -10,28 +10,24 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         int n = Integer.parseInt(br.readLine());
-        int[] wires = new int[501];
+        int[][] wires = new int[n][2];
+        
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             int start = Integer.parseInt(st.nextToken());
             int dest = Integer.parseInt(st.nextToken());
-            wires[start] = dest;
+            wires[i][0] = start;
+            wires[i][1] = dest;
         }
-
-        int[] arr = new int[n];
-        int idx = 0;
-        for (int i = 1; i <= 500; i++) {
-            if (wires[i] != 0) {
-                arr[idx++] = wires[i];
-            }
-        }
+        
+        Arrays.sort(wires, (o1, o2) -> o1[0] - o2[0]); // 시작 전봇대를 기준으로 오름차순
 
         int[] dp = new int[n];
         int max = 0;
         for (int i = 0; i < n; i++) {
             dp[i] = 1;
             for (int j = 0; j < i; j++) {
-                if (arr[i] > arr[j]) {
+                if (wires[j][1] < wires[i][1]) {
                     dp[i] = Math.max(dp[i], dp[j] + 1);
                 }
             }
