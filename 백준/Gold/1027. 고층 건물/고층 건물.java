@@ -1,7 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.StringTokenizer;
 
 public class Main {
 
@@ -11,44 +11,42 @@ public class Main {
     static int[] arr;
 
     public static void main(String[] args) throws IOException {
+
         n = Integer.parseInt(br.readLine());
+        arr = new int[n];
         st = new StringTokenizer(br.readLine());
-        arr = new int[n + 1];
-        for (int i = 1; i <= n; i++) {
+        for (int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
 
-        int answer = 0;
-        for (int i = 1; i <= n; i++) {
-            answer = Math.max(answer, getCnt(i));
-        }
+        int max = 0;
 
-        System.out.println(answer);
-    }
+        for (int i = 0; i < n; i++) {
+            int cnt = 0;
 
-    private static int getCnt(int idx) {
-        int cnt = 0;
-        double maxSlope = 0;
-
-        // 오른쪽
-        for (int i = idx + 1; i <= n; i++) {
-            double slope = (double)(arr[i] - arr[idx]) / (i - idx);
-            if (i == idx + 1 || maxSlope < slope) {
-                maxSlope = slope;
-                cnt++;
+            // 오른쪽 빌딩: 최대 기울기 찾기
+            double maxSlope = Integer.MIN_VALUE;
+            for (int j = i + 1; j < n; j++) {
+                double slope = (double)(arr[j] - arr[i]) / (j - i);
+                if (maxSlope < slope) {
+                    cnt++;
+                    maxSlope = slope;
+                }
             }
-        }
 
-        // 왼쪽
-        maxSlope = 0;
-        for (int i = idx - 1; i >= 1; i--) {
-            double slope = (double)(arr[i] - arr[idx]) / (i - idx);
-            if (i == idx - 1 || maxSlope > slope) {
-                maxSlope = slope;
-                cnt++;
+            // 왼쪽 빌딩: 최저 기울기 찾기
+            double minSlope = Integer.MAX_VALUE;
+            for (int j = i - 1; j >= 0; j--) {
+                double slope = (double)(arr[i] - arr[j]) / (i - j);
+                if (minSlope > slope) {
+                    cnt++;
+                    minSlope = slope;
+                }
             }
+
+            max = Math.max(max, cnt);
         }
 
-        return cnt;
+        System.out.println(max);
     }
 }
