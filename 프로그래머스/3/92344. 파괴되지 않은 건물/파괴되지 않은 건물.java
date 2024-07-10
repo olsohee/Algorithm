@@ -1,64 +1,85 @@
+import java.util.*;
 
 class Solution {
-    int[][] sumGraph;
+    
+    int n, m;
+    int[][] skillMap;
+    int[][] sumMap;
     int[][] board;
-    int[][] skill;
-
+    
     public int solution(int[][] board, int[][] skill) {
+        n = board.length;
+        m = board[0].length;
         this.board = board;
-        this.skill = skill;
-        int N = board.length; // 높이
-        int M = board[0].length; // 가로 길이
-
-        sumGraph = new int[N + 1][M + 1];
-
-        // 각 skill 돌면서, 공격 또는 회복하기 (누적합 그래프 생성)
-        for(int i = 0; i < skill.length; i++) {
-            int[] oneSkill = skill[i];
-            int y1 = oneSkill[1]; int x1 = oneSkill[2];
-            int y2 = oneSkill[3]; int x2 = oneSkill[4];
-            int degree = oneSkill[5];
-            degree = (oneSkill[0] == 1) ? degree * -1 : degree * 1;
-            sumGraph[y1][x1] += degree;
-            sumGraph[y2 + 1][x1] -= degree;
-            sumGraph[y1][x2 + 1] -= degree;
-            sumGraph[y2 + 1][x2 + 1] += degree;
-        }
-
-        // 누적합 그래프 위아래로 합치기
-        // 상 하
-        for(int y = 1; y < N; y++) {
-            for(int x = 0; x < M; x++) {
-                sumGraph[y][x] += sumGraph[y - 1][x];
+        skillMap = new int[n][m];
+        sumMap = new int[n][m];
+        
+        // 1. 스킬 반영(배열의 끝 점들에만 반영)
+        for (int[] s : skill) {
+            // 공격
+            if (s[0] == 1) {
+                attack(s[1], s[2], s[3], s[4], s[5]);
+            }
+            
+            // 방어
+            if (s[0] == 2) {
+                defend(s[1], s[2], s[3], s[4], s[5]);
             }
         }
-
-        // 좌 우
-        for(int x = 1; x < M; x++) {
-            for(int y = 0; y <N; y++) {
-                sumGraph[y][x] += sumGraph[y][x - 1];
+        
+        // 2. 스킬들 누적합 구하기
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (i == 0 && j == 0) {
+                     sumMap[i][j] = skillMap[i][j]; 
+                } else if (i == 0) {
+                     sumMap[i][j] = sumMap[i][j - 1] + skillMap[i][j]; 
+                } else if (j == 0) {
+                     sumMap[i][j] = sumMap[i - 1][j] + skillMap[i][j]; 
+                } else {
+                   sumMap[i][j] = sumMap[i - 1][j] + sumMap[i][j - 1] - sumMap[i - 1][j - 1] + skillMap[i][j]; 
+                }
+                
             }
         }
-
-        // 누적합 그래프와 그냥 그래프 더해주기 (누적합 반영)
+        
+        // 3. 누적합을 게임 맵에 반영 후 답 구하기
         int answer = 0;
-//
-//        System.out.println("=========");
-//        for(int i = 0; i < sumGraph.length; i++) {
-//            for(int j = 0; j < sumGraph[i].length; j++) {
-//                System.out.print(sumGraph[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println("=========");
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if(board[i][j] +  sumGraph[i][j] > 0) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                board[i][j] += sumMap[i][j];
+                if (board[i][j] > 0) {
                     answer++;
                 }
             }
         }
+        
         return answer;
+    }
+    
+    private void attack(int r1, int c1, int r2, int c2, int degree) {
+        skillMap[r1][c1] -= degree;
+        if (r2 + 1 < n) {
+            skillMap[r2 + 1][c1] += degree;
+        }
+        if (c2 + 1 < m) {
+            skillMap[r1][c2 + 1] += degree;
+        }
+        if (r2 + 1 < n && c2 + 1 < m) {
+            skillMap[r2 + 1][c2 + 1] -= degree;
+        }
+    }
+    
+    private void defend(int r1, int c1, int r2, int c2, int degree) {
+        skillMap[r1][c1] += degree;
+        if (r2 + 1 < n) {
+            skillMap[r2 + 1][c1] -= degree;
+        }
+        if (c2 + 1 < m) {
+            skillMap[r1][c2 + 1] -= degree;
+        }
+        if (r2 + 1 < n && c2 + 1 < m) {
+            skillMap[r2 + 1][c2 + 1] += degree;
+        }
     }
 }
