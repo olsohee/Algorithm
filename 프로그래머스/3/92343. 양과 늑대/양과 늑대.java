@@ -1,47 +1,69 @@
 import java.util.*;
 
-/*
-백트래킹을 통해 가능한 모든 순서로 노드 탐색
-그 과정에서 ansnwer 갱신
-*/
 class Solution {
-    
+
+    private List<List<Integer>> graph = new ArrayList<>();
     private int answer = 0;
     private int[] info;
-    private int[][] edges;
-    private List<List<Integer>> graph = new ArrayList<>();
     
     public int solution(int[] info, int[][] edges) {
-        this.info = info;
-        this.edges = edges;
         
-        dfs(0, 0, 0, new boolean[info.length]);
+        this.info = info;
+        
+        for (int i = 0; i < info.length; i++) {
+            graph.add(new ArrayList<>());
+        }
+        
+        for (int[] edge : edges) {
+            graph.get(edge[0]).add(edge[1]);
+        }
+        
+        // 루트노드부터 시작
+        List<Integer> list = new ArrayList<>();
+        list.add(0);
+        dfs(0, 0, 0, list);
+        
         return answer;
     }
     
-    private void dfs(int node, int sheep, int wolf, boolean[] visited) {
-        visited[node] = true;
+    private void dfs(int node, int sheep, int wolf, List<Integer> nextRoute) {
         
         if (info[node] == 0) {
             sheep++;
         } else {
             wolf++;
         }
-        
-        if (sheep <= wolf) {
+
+        if (wolf >= sheep) {
             return;
         }
         
         answer = Math.max(answer, sheep);
         
-        for (int[] edge : edges) {
-            if (visited[edge[0]] && !visited[edge[1]]) {
-                boolean[] newVisited = new boolean[info.length];
-                for (int i = 0; i < info.length; i++) {
-                    newVisited[i] = visited[i];
-                }
-                dfs(edge[1], sheep, wolf, newVisited);
-            }
+        // 다음으로 이동
+        // List<Integer> copyNextRoute = new ArrayList<>();
+        // for (int next : nextRoute) {
+        //     copyNextRoute.add(next);
+        // }
+        
+        // copyNextRoute.remove(Integer.valueOf(node));
+        nextRoute.remove(Integer.valueOf(node));
+        
+        for (int next : graph.get(node)) {
+            // copyNextRoute.add(next);
+            nextRoute.add(next);
         }
+        
+        for (int next : nextRoute) {
+            List<Integer> list = new ArrayList<>();
+            for (int i : nextRoute) {
+                list.add(i);
+            }
+            dfs(next, sheep, wolf, list);
+        }
+        
+        // for (int next : copyNextRoute) {
+        //     dfs(next, sheep, wolf, copyNextRoute);
+        // }
     }
 }
