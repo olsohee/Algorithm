@@ -1,59 +1,71 @@
-
-import java.io.*;
-import java.util.StringTokenizer;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 
 public class Main {
 
-    static int N;
-    static int M;
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+    static int n; // 세로
+    static int m; // 가로
     static int[][] map;
-    static int year;
+    static boolean[][] visited;
     static int[] dx = {1, -1, 0, 0};
     static int[] dy = {0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        map = new int[N][M];
-        for(int i = 0; i < N; i++) {
+        st = new StringTokenizer(br.readLine());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+        map = new int[n][m];
+
+        for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
-            for (int j = 0; j < M; j++) {
+            for (int j = 0; j < m; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
             }
         }
 
-        while(true) {
+        int answer = 0;
 
-            // 한덩이인지 아닌지 확인
-            int result = countIsland();
-            if(result >= 2) {
+        while (true) {
+//            for (int i = 0; i < n; i++) {
+//                for (int j = 0; j < m; j++) {
+//                    System.out.print(map[i][j] +" ");
+//                }
+//                System.out.println();
+//            }
+
+            int cnt = getIslandCnt();
+//            System.out.println("cnt = " + cnt);
+            if (cnt == 0) {
+                answer = 0;
                 break;
-            } else if(result == 0) {
-                year = 0;
-                break ;
             }
-
-            year++;
-            map = minus();
-
+            else if (cnt > 1) {
+                break;
+            }
+            else if (cnt == 1) {
+//                System.out.println("녹이기");
+                melt();
+                answer++;
+            }
         }
 
-        System.out.println(year);
+        // 두 덩이 이상으로 분리되는 최초의 시간을 구하기
+        System.out.println(answer);
     }
 
-    public static int countIsland() {
-
-        boolean[][] visited = new boolean[N][M];
+    private static int getIslandCnt() {
         int cnt = 0;
+        visited = new boolean[n][m];
 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (!visited[i][j] && map[i][j] > 0) {
-                    dfs(i, j, visited);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (map[i][j] > 0 && !visited[i][j]) {
+                    bfs(i, j);
                     cnt++;
                 }
             }
@@ -62,82 +74,72 @@ public class Main {
         return cnt;
     }
 
-    public static void dfs(int y, int x, boolean[][] visited) {
+    private static void bfs(int startY, int startX) {
+        Queue<Node> que = new LinkedList<>();
+        visited[startY][startX] = true;
+        que.add(new Node(startY, startX));
 
-        visited[y][x] = true;
+        while (!que.isEmpty()) {
+            Node now = que.poll();
+            for (int i = 0; i < 4; i++) {
+                int ny = dy[i] + now.y;
+                int nx = dx[i] + now.x;
 
-        for(int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-            if(nx < 0 || nx >= M || ny < 0 || ny >= N) {
-                continue;
-            }
+                if (ny < 0 || ny >= n || nx < 0 || nx >= m || visited[ny][nx]) {
+                    continue;
+                }
 
-            if(map[ny][nx] != 0 && !visited[ny][nx]) {
-                dfs(ny, nx, visited);
-            }
-        }
-    }
-
-    public static int[][] minus() {
-
-        boolean[][] visited = new boolean[N][M];
-        int[][] cpyMap = new int[N][M];
-        int y = 0;
-        int x = 0;
-        outer:
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                if (map[i][j] > 0) {
-                    y = i;
-                    x = j;
-                    break outer;
+                if (map[ny][nx] > 0) {
+                    que.add(new Node(ny, nx));
+                    visited[ny][nx] = true;
                 }
             }
         }
-
-        minusDfs(y, x, visited, cpyMap);
-        return cpyMap;
     }
 
-    public static void minusDfs(int y, int x, boolean[][] visited, int[][] cpyMap) {
+    private static void melt() {
+        int[][] newMap = new int[n][m];
 
-        visited[y][x] = true;
-        int minusCnt = findMinusCnt(y, x);
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (map[i][j] == 0) {
+                    continue;
+                }
 
-        if(map[y][x] >= minusCnt) {
-            cpyMap[y][x] = map[y][x] - minusCnt;
-        } else {
-            cpyMap[y][x] = 0;
+                int seaCnt = check(i, j);
+                newMap[i][j] = (map[i][j] - seaCnt < 0) ? 0 : map[i][j] - seaCnt;
+            }
         }
 
-        // 근처 탐색
-        for(int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-            if(nx < 0 || nx >= M || ny < 0 || ny >= N) {
+        map = newMap;
+    }
+
+    private static int check(int y, int x) {
+        int seaCnt = 0;
+
+        for (int i = 0; i < 4; i++) {
+            int ny = dy[i] + y;
+            int nx = dx[i] + x;
+
+            if (ny < 0 || ny >= n || nx < 0 || nx >= m) {
                 continue;
             }
 
-            if(map[ny][nx] != 0 && !visited[ny][nx]) {
-                minusDfs(ny, nx, visited, cpyMap);
+            if (map[ny][nx] == 0) {
+                seaCnt++;
             }
         }
+
+        return seaCnt;
     }
 
-    public static int findMinusCnt(int y, int x) {
-        int minusCnt = 0;
-        for(int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-            if(nx < 0 || nx >= M || ny < 0 || ny >= N) {
-                continue;
-            }
+    private static class Node {
 
-            if(map[ny][nx] == 0) {
-                minusCnt++;
-            }
+        int y, x;
+
+        public Node(int y, int x) {
+            this.y = y;
+            this.x = x;
         }
-        return minusCnt;
     }
 }
