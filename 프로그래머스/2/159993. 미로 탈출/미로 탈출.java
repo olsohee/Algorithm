@@ -2,109 +2,102 @@ import java.util.*;
 
 class Solution {
     
-    int answer = 0; // 미로 탈출 최소 시간 (탈출 불가시 -1)
-    
+    static int r, c;
+    static char[][] map;
+    static boolean[][] visited;
+    static int startY, startX;
+    static int leverY, leverX;
+    static int endY, endX;
+    static int answer;    
+
     public int solution(String[] maps) {
         
-        int y = maps.length;
-        int x = maps[0].length();
-        int[] dx = {1, -1, 0, 0};
-        int[] dy = {0, 0, 1, -1};
-        char[][] map = new char[y][x];
-        int[][] visited = new int[y][x];
-        int startX = 0; int startY = 0;
-        int leverX = 0; int leverY = 0;
+        r = maps.length;
+        c = maps[0].length();
+        map = new char[r][c];
         
-        // map 채우기
-
-        for (int i = 0; i < y; i++) {
+        for (int i = 0; i < r; i++) {
             char[] arr = maps[i].toCharArray();
             for (int j = 0; j < arr.length; j++) {
                 map[i][j] = arr[j];
-                if (arr[j] == 'S') {
+                if (map[i][j] == 'S') {
                     startY = i;
                     startX = j;
                 }
-            }
-        }
-        
-        // 1. 시작점(S) -> 레버(L)
-        Queue<Point> que = new LinkedList<>();
-        visited[startY][startX] = 1;
-        que.add(new Point(startY, startX));
-        
-        boolean canGo = false;
-        while (!que.isEmpty()) {
-            Point now = que.poll();
-            
-            // 레버에 도착한 경우
-            if (map[now.y][now.x] == 'L') {
-                leverY = now.y;
-                leverX = now.x;
-                answer += visited[now.y][now.x] - 1;
-                canGo = true;
-                break;
-            }
-            for (int i = 0; i < 4; i++) {
-                int ny = dy[i] + now.y;
-                int nx = dx[i] + now.x;
-                
-                // 그래프 밖이면 패스
-                if (nx < 0 || nx >= x || ny < 0 || ny >= y) {
-                    continue;
+                if (map[i][j] == 'L') {
+                    leverY = i;
+                    leverX = j;
                 }
-                // 벽이거나 이미 방문했으면 패스
-                if (map[ny][nx] == 'X' || visited[ny][nx] != 0) continue;
-                
-                visited[ny][nx] = visited[now.y][now.x] + 1;
-                que.add(new Point(ny, nx));
-            }
-        }
-        if (!canGo) return -1;
-        canGo = false;
-        
-        // 2. 레버(L) -> 출구(E)
-        // visited 초기화 (1번에서 지난 길을 또 지날 수 있어야 하므로)
-        visited = new int[y][x];
-        que.clear();
-        visited[leverY][leverX] = 1;
-        que.add(new Point(leverY, leverX));
-        
-        while (!que.isEmpty()) {
-            Point now = que.poll();
-            
-            // 출구 도착한 경우
-            if (map[now.y][now.x] == 'E') {
-                answer += visited[now.y][now.x] - 1;
-                canGo = true;
-                break;
-            }
-            for (int i = 0; i < 4; i++) {
-                int ny = dy[i] + now.y;
-                int nx = dx[i] + now.x;
-                
-                // 그래프 밖이면 패스
-                if (nx < 0 || nx >= x || ny < 0 || ny >= y) {
-                    continue;
+                if (map[i][j] == 'E') {
+                    endY = i;
+                    endX = j;
                 }
-                // 벽이거나 이미 방문했으면 패스
-                if (map[ny][nx] == 'X' || visited[ny][nx] != 0) continue;
-                
-                visited[ny][nx] = visited[now.y][now.x] + 1;
-                que.add(new Point(ny, nx));
             }
         }
         
-        if (!canGo) return -1;
-
+        // 출발지점 -> 레버 (이 과정에서 출구 지나갈 수 있음)
+        int result = bfs(startY, startX, leverY, leverX);
+        if (result == -1) {
+            return -1;
+        }
+        answer += result;
+        
+        // 레버 -> 출구
+        result = bfs(leverY, leverX, endY, endX);
+        if (result == -1) {
+            return -1;
+        }
+        answer += result;
+        
+        // 최소 시간 반환(불가하면 -1)
         return answer;
     }
     
-    class Point {
+    public int bfs(int startY, int startX, int destY, int destX) {
+        int[] dx = {1, -1, 0, 0};
+        int[] dy = {0, 0, 1, -1};
+        
+        Queue<Node> que = new LinkedList<>();
+        visited = new boolean[r][c];
+        
+        que.add(new Node(startY, startX, 0));
+        visited[startY][startX] = true;
+        
+        while (!que.isEmpty()) {
+            Node now = que.poll();
+            if (now.y == destY && now.x == destX) {
+                return now.cnt;
+            }
+            
+            for (int i = 0; i < 4; i++) {
+                int ny = now.y + dy[i];
+                int nx = now.x + dx[i];
+                
+                if (ny < 0 || ny >= r || nx < 0 || nx >= c) {
+                    continue;
+                }
+                
+                if (visited[ny][nx] || map[ny][nx] == 'X') {
+                    continue;
+                }
+                
+                // 이동
+                que.add(new Node(ny, nx, now.cnt + 1));
+                visited[ny][nx] = true;
+            }
+        }
+        return -1;
+    }
+    
+    private class Node {
+        
         int y, x;
-        public Point (int y, int x) {
+        int cnt; // 현재 노드까지 오는데 걸린 시간
+        
+        public Node (int y, int x, int cnt) {
             this.y = y;
             this.x = x;
+            this.cnt = cnt;
         }
     }
 }
