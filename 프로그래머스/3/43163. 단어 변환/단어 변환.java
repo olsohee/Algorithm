@@ -2,46 +2,53 @@ import java.util.*;
 
 class Solution {
     
-    String begin;
     String target;
     String[] words;
     boolean[] visited;
-    int answer = Integer.MAX_VALUE;
+    int answer;
     
     public int solution(String begin, String target, String[] words) {
-        this.begin = begin;
         this.target = target;
         this.words = words;
-        visited = new boolean[words.length]; // 각 단어에 대한 방문 처리
         
-        dfs(begin, 0);
+        visited = new boolean[words.length];
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].equals(begin)) {
+                visited[i] = true;
+            }
+        }
+        dfs(0, begin);
         
-        return answer == Integer.MAX_VALUE ? 0 : answer;
+        return answer;
     }
     
-    public void dfs(String now, int cnt) {
+    private void dfs(int cnt, String now) {
         
         if (now.equals(target)) {
-            answer = Math.min(answer, cnt);
-            return;
+            answer = cnt;
         }
         
         for (int i = 0; i < words.length; i++) {
-            if (!visited[i] && canConvert(now, words[i])) {
+            if (words[i].equals(now)) {
+                continue;
+            }
+            if (canConvert(words[i], now) && !visited[i]) {
                 visited[i] = true;
-                dfs(words[i], cnt + 1);
+                dfs(cnt + 1, words[i]);
                 visited[i] = false;
             }
         }
     }
     
-    public boolean canConvert(String str1, String str2) {
+    private boolean canConvert(String s1, String s2) {
         int diff = 0;
-        for (int i = 0; i < str1.length(); i++) {
-            if (str1.charAt(i) != str2.charAt(i)) diff++;
+        
+        for (int i = 0; i < s1.length(); i++) {
+            if (s1.charAt(i) != s2.charAt(i)) {
+                diff++;
+            }
         }
         
-        if (diff == 1) return true;
-        return false;
+        return diff == 1;
     }
 }
