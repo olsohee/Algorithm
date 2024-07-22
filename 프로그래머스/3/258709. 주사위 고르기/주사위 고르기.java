@@ -1,97 +1,110 @@
 import java.util.*;
 
-
 class Solution {
+    
+        int n; // 주사위 개수
+        int maxWin; // 승리 횟수
+        int[] answer; // 가장 높은 승리 횟수를 갖는 주사위 조합
+        List<List<Integer>> combinations = new ArrayList<>();
+        int[][] dice;
 
-    int n;
-    int[][] dice;
-    List<List<Integer>> combination = new ArrayList<>();
-    int winCnt = 0;
-    List<Integer> answer;
+        public int[] solution(int[][] dice) {
+            this.n = dice.length;
+            this.dice = dice;
 
-    public int[] solution(int[][] dice) {
-        this.dice = dice;
-        this.n = dice.length;
+            // 1. 0번 ~ n-1번 주사위 중 A가 가져갈 주사위의 조합 생성: n개의 주사위 중 n/2개 고르기
+            dfs(new ArrayList<>(), 0);
 
-        // 1. 주사위 나누기
-        combination(0, 0, new ArrayList<>());
+            // 2. 해당 조합에 대해 승리 횟수 계산하기 (maxWin, answer 갱신)
+            for (List<Integer> combination : combinations) {
+                List<Integer> resultA = getResultForA(combination);
+                List<Integer> resultB = getResultForB(combination);
+                
+                // A가 가질 수 있는 결과들 vs B가 가질 수 있는 결과들: 이분탐색으로 A가 이기는 횟수 구하기
+                int aWinCnt = 0;
+                Collections.sort(resultA);
+                Collections.sort(resultB);
+                for (Integer aSum : resultA) {
+                    int start = 0;
+                    int end = resultB.size() - 1;
+                    while (start <= end) {
+                        int mid = (start + end) / 2;
+                        if (resultB.get(mid) >= aSum) {
+                            end = mid - 1;
+                        } else {
+                            start = mid + 1;
+                        }
+                    }
+                    aWinCnt += start;
+                }
 
-        for (List<Integer> aIdxList : combination) {
-            // 2. A 결과 추출
-            List<Integer> resultA = new ArrayList<>();
-            getResult(aIdxList, 0, 0, resultA);
-
-            // 3. B 결과 추출
-            List<Integer> bIdxList = new ArrayList<>();
-            for (int i = 0; i < n; i++) {
-                if (!aIdxList.contains(i)) {
-                    bIdxList.add(i);
+                // 갱신
+                if (maxWin < aWinCnt) {
+                    maxWin = aWinCnt;
+                    answer = combination.stream()
+                            .mapToInt(i -> i + 1)
+                            .toArray();
                 }
             }
-            List<Integer> resultB = new ArrayList<>();
-            getResult(bIdxList, 0, 0, resultB);
-            
-            // 4. A, B 결과 비교 (이분탐색)
-            int winCnt = compare(resultA, resultB);
-            if (this.winCnt < winCnt) {
-                this.winCnt = winCnt;
-                this.answer = aIdxList;
-            }
+
+            // 승리 확률이 가장 높은 A가 가져갈 주사위 번호 (오름차순)
+            Arrays.sort(answer);
+            return answer;
         }
 
-        // 오름차순 정렬
-        Collections.sort(answer);
-        return answer.stream()
-                .mapToInt(integer -> integer + 1)
-                .toArray();
-    }
-
-    public int compare(List<Integer> resultA, List<Integer> resultB) {
-        Collections.sort(resultA);
-        Collections.sort(resultB);
-        int winCnt = 0;
-
-        for (int score : resultA) {
-            int start = 0;
-            int end = resultB.size() - 1;
-            // score보다 큰 하한선 찾기
-            while (start <= end) {
-                int mid = (start + end) / 2;
-                if (resultB.get(mid) < score) {
-                    start = mid + 1;
-                } else {
-                    end = mid - 1;
+        private void dfs(List<Integer> diceNums, int start) {
+            if (diceNums.size() == n / 2) {
+                ArrayList<Integer> combination = new ArrayList<>();
+                for (Integer diceNum : diceNums) {
+                    combination.add(diceNum);
                 }
+                combinations.add(combination);
+                return;
             }
-            winCnt += start;
-        }
-        
-        //winCnt == 현재 조합에서의 A가 이기는 횟수
-        return winCnt;
-    }
 
-    public void getResult(List<Integer> idxList, int idx, int sum, List<Integer> resultA) {
-        if (idx == idxList.size()) {
-            resultA.add(sum);
-            return;
+            for (int i = start; i < n; i++) {
+                diceNums.add(i);
+                dfs(diceNums, i + 1);
+                diceNums.remove((Object)i);
+            }
         }
 
-        int[] dice = this.dice[idxList.get(idx)];
-        for (int i = 0; i < 6; i++) {
-            getResult(idxList, idx + 1, sum + dice[i], resultA);
-        }
-    }
+        private List<Integer> getResultForA(List<Integer> aDiceNums) {
+            List<int[]> aDiceList = new ArrayList<>();
+            for (int i = 0; i < dice.length; i++) {
+                if (!aDiceNums.contains(i)) {
+                    continue;
+                }
+                aDiceList.add(dice[i]);
+            }
 
-    public void combination(int depth, int start, List<Integer> idxList) {
-        if (depth == n / 2) {
-            combination.add(new ArrayList<>(idxList));
-            return;
+            List<Integer> sumResult = new ArrayList<>();
+            getResultByDfs(0, aDiceList, 0, sumResult);
+            return sumResult;
         }
 
-        for (int i = start; i < n; i++) {
-            idxList.add(i);
-            combination(depth + 1, i + 1, idxList);
-            idxList.remove(depth);
+        private List<Integer> getResultForB(List<Integer> aDiceNums) {
+            List<int[]> bDiceList = new ArrayList<>();
+            for (int i = 0; i < dice.length; i++) {
+                if (aDiceNums.contains(i)) {
+                    continue;
+                }
+                bDiceList.add(dice[i]);
+            }
+
+            List<Integer> sumResult = new ArrayList<>();
+            getResultByDfs(0, bDiceList, 0, sumResult);
+            return sumResult;
         }
-    }
+
+        private void getResultByDfs(int idx, List<int[]> diceList, int sum, List<Integer> sumResult) {
+            if (idx == diceList.size()) {
+                sumResult.add(sum);
+                return;
+            }
+            int[] dice = diceList.get(idx);
+            for (int num : dice) {
+                getResultByDfs(idx + 1, diceList, sum + num, sumResult);
+            }
+        }
 }
