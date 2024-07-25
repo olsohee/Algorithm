@@ -11,57 +11,52 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken()); // 그릇 개수
-        int d = Integer.parseInt(st.nextToken()); // 초밥 개수
-        int k = Integer.parseInt(st.nextToken()); // 연속해서 먹는 접시 수
-        int c = Integer.parseInt(st.nextToken()); // 쿠폰 번호
+        int n = Integer.parseInt(st.nextToken());
+        int d = Integer.parseInt(st.nextToken());
+        int k = Integer.parseInt(st.nextToken());
+        int c = Integer.parseInt(st.nextToken());
+
         int[] arr = new int[n];
         int[] eat = new int[d + 1];
-
-        int answer = 0;
-        int cnt = 0;
-
-        // 0. 초밥 초기화
+        int typeCnt = 0;
         for (int i = 0; i < n; i++) {
             arr[i] = Integer.parseInt(br.readLine());
+            if (i <= k - 1) {
+                eat[arr[i]]++;
+                if (eat[arr[i]] == 1) typeCnt++;
+            }
         }
 
-        // 1. 0번째 ~ k-1번째까지 먹고, 먹은 초밥 종류 개수 반영
-        for (int i = 0; i < k; i++) {
-            eat[arr[i]]++;
-        }
-        for (int i = 1; i < eat.length; i++) {
-            if (eat[i] != 0) cnt++;
-        }
-
-        // 2. 슬라이딩 윈도우 시작
+        // 슬라이딩 윈도우
+        int answer = 0;
         int start = 0;
         int end = k - 1;
 
         while (true) {
-            // 2 - 1. answer 반영
-            if (eat[c] != 0) {
-                answer = Math.max(answer, cnt);
+            // 쿠폰 고려해서 답 갱신
+            if (eat[c] > 0) {
+                answer = Math.max(answer, typeCnt);
             } else {
-                answer = Math.max(answer, cnt + 1);
+                answer = Math.max(answer, typeCnt + 1);
             }
 
-            // 2 - 2. start, end 한 칸씩 오른쪽으로 이동
-
-            // 만약 start가 n - 1이라면, 오른쪽으로 이동했을 때 원점이므로 끝내기
-            if (start == n - 1) {
+            // 이동
+            if (start + 1 == n) {
                 break;
             }
 
-            // start 이동
             eat[arr[start]]--;
-            if (eat[arr[start]] == 0) cnt--;
-            start++;
 
-            // end 이동
-            end = (end == n - 1) ? 0 : end + 1;
+            if (eat[arr[start]] == 0) typeCnt--;
+            start++;
+            
+            if (end + 1 == n) {
+                end = 0;
+            } else {
+                end++;
+            }
             eat[arr[end]]++;
-            if (eat[arr[end]] == 1) cnt++;
+            if (eat[arr[end]] == 1) typeCnt++;
         }
 
         System.out.println(answer);
