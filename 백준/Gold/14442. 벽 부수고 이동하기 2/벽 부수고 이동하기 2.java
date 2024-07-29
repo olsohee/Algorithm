@@ -7,86 +7,76 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
     static int n, m, k;
     static int[][] map;
-    static int[][][] visited;
-    static int answer = -1;
+    static int[] dy = {1, -1, 0, 0};
+    static int[] dx = {0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
-
         st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
-
         map = new int[n][m];
-        visited = new int[k + 1][n][m];
+        boolean[][][] visited = new boolean[k + 1][n][m];
 
         for (int i = 0; i < n; i++) {
-            String input = br.readLine();
+            char[] arr = br.readLine().toCharArray();
             for (int j = 0; j < m; j++) {
-                map[i][j] = input.charAt(j) - '0';
+                map[i][j] = arr[j] - '0';
             }
         }
 
-        bfs();
-        System.out.println(answer);
-    }
-
-    public static void bfs() {
+        // bfs
+        int answer = -1;
         Queue<Node> que = new LinkedList<>();
-        que.add(new Node(0, 0, 0));
-        visited[0][0][0] = 1;
+        que.add(new Node(0, 0, 1, 0));
+        visited[0][0][0] = true;
 
-        while(!que.isEmpty()) {
+        while (!que.isEmpty()) {
             Node now = que.poll();
 
             if (now.y == n - 1 && now.x == m - 1) {
-                answer = visited[now.breakCnt][now.y][now.x];
+                answer = now.cnt;
                 break;
             }
 
             for (int i = 0; i < 4; i++) {
-                int ny = now.y + dy[i];
-                int nx = now.x + dx[i];
+                int ny = dy[i] + now.y;
+                int nx = dx[i] + now.x;
+                if (ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
 
-                if (ny < 0 || ny >= n || nx < 0 || nx >= m) {
-                    continue;
+                // 벽인 경우, 부술 수 있으면 부수고 이동
+                if (map[ny][nx] == 1) {
+                    if (now.breakCnt >= k) {
+                        continue;
+                    }
+                    if (!visited[now.breakCnt + 1][ny][nx]) {
+                        que.add(new Node(ny, nx, now.cnt + 1, now.breakCnt + 1));
+                        visited[now.breakCnt + 1][ny][nx] = true;
+                    }
                 }
 
                 // 길인 경우
-                if (map[ny][nx] == 0) {
-                    if (visited[now.breakCnt][ny][nx] != 0) {
-                        continue;
+                else {
+                    if (!visited[now.breakCnt][ny][nx]) {
+                        que.add(new Node(ny, nx, now.cnt + 1, now.breakCnt));
+                        visited[now.breakCnt][ny][nx] = true;
                     }
-                    visited[now.breakCnt][ny][nx] = visited[now.breakCnt][now.y][now.x] + 1;
-                    que.add(new Node(ny, nx, now.breakCnt));
-                }
-
-                // 벽인 경우
-                if (map[ny][nx] == 1) {
-                    if (now.breakCnt + 1 > k) {
-                        continue;
-                    }
-                    if (visited[now.breakCnt + 1][ny][nx] != 0) {
-                        continue;
-                    }
-                    visited[now.breakCnt + 1][ny][nx] = visited[now.breakCnt][now.y][now.x] + 1;
-                    que.add(new Node(ny, nx, now.breakCnt + 1));
                 }
             }
         }
+        System.out.println(answer);
     }
 
     private static class Node {
         int y, x;
+        int cnt; // y, x까지 오는데 걸린 경로 수
         int breakCnt;
-
-        public Node(int y, int x, int breakCnt) {
+        public Node(int y, int x, int cnt, int breakCnt) {
             this.y = y;
             this.x = x;
+            this.cnt = cnt;
             this.breakCnt = breakCnt;
         }
     }
