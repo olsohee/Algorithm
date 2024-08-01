@@ -1,22 +1,19 @@
+import java.util.*;
+
 class Solution {
     public int[] solution(int brown, int yellow) {
+        
         int[] answer = new int[2];
         
-        for (int len = 1; len <= yellow; len++) {
-            // len=세로, wid=가로
-            if (yellow % len != 0) {
+        for (int i = 1; i <= yellow; i++) {
+            if (yellow % i != 0) {
                 continue;
             }
+            int j = yellow / i; // i: 세로, j: 가로
             
-            int wid = yellow / len;
-            if (len > wid) {
-                continue;
-            }
-            
-            int borderCnt = len * 2 + wid * 2 + 4;
-            if (borderCnt == brown) {
-                answer[0] = wid + 2;
-                answer[1] = len + 2;
+            if (i * 2 + j * 2 + 4 == brown) {
+                answer[0] = j + 2;
+                answer[1] = i + 2;
                 break;
             }
         }
