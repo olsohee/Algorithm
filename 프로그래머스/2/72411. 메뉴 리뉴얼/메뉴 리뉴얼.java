@@ -1,56 +1,69 @@
+
 import java.util.*;
 
+
 class Solution {
-    List<String> answerList = new ArrayList<>();
+
     Map<String, Integer> map = new HashMap<>();
 
     public String[] solution(String[] orders, int[] course) {
 
-        // 각 order 정렬
+        // orders의 각 주문들 알파벳 순 정렬
         for (int i = 0; i < orders.length; i++) {
-            char[] charArray = orders[i].toCharArray();
-            Arrays.sort(charArray);
-            orders[i] = String.valueOf(charArray);
+            char[] arr = orders[i].toCharArray();
+            Arrays.sort(arr);
+            orders[i] = String.valueOf(arr);
         }
 
-        // 메뉴 개수만큼 각 메뉴에서 조합 만들어서 map에 담기
+        // course 개수에 맞게 조합 만들고, 해당 조합이 몇 개인지 계산
+        List<String> list = new ArrayList<>();
+
         for (int cnt : course) {
+            System.out.println();
+            System.out.println("cnt = " + cnt);
             for (String order : orders) {
                 combination("", order, cnt);
             }
-            // 가장 많은 조합을 answerList에 저장
-            if(!map.isEmpty()) {
-                List<Integer> countList = new ArrayList<>(map.values());
-                Integer maxCount = Collections.max(countList);
-
-                if(maxCount > 1) {
-                    for(String key : map.keySet()) {
-                        if(map.get(key) == maxCount) {
-                            answerList.add(key);
-                        }
+            
+            // 각 코스의 메뉴 개수가 cnt이면서, value가 최대 값인 거 찾기
+            int maxCnt = 0;
+            List<String> menuCombiList = new ArrayList<>();
+            for (String key : map.keySet()) {
+                if (key.length() == cnt && map.get(key) >= 2) {
+                    if (maxCnt < map.get(key)) {
+                        maxCnt = map.get(key);
+                        menuCombiList.clear();
+                        menuCombiList.add(key);
+                    } else if (maxCnt == map.get(key)) {
+                        menuCombiList.add(key);
                     }
                 }
             }
-            map.clear();
-        }
 
-        Collections.sort(answerList);
-        String[] answer = new String[answerList.size()];
-        for(int i = 0; i < answerList.size(); i++) {
-            answer[i] = answerList.get(i);
+            for (String menuCombi : menuCombiList) {
+                System.out.println(menuCombi);
+                list.add(menuCombi);
+            }
+        }
+        
+        Collections.sort(list);
+
+        String[] answer = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            answer[i] = list.get(i);
         }
         return answer;
     }
 
-    private void combination(String result, String others, int cnt) {
-        if(cnt == 0) {
+    private void combination(String result, String orders, int cnt) {
+        if (cnt == 0) {
             map.put(result, map.getOrDefault(result, 0) + 1);
             return;
         }
 
-        for(int i = 0; i < others.length(); i++) {
-            combination(result + others.charAt(i), others.substring(i+1), cnt - 1);
-        }
 
+        for (int i = 0; i < orders.length(); i++) {
+            combination(result + orders.charAt(i), orders.substring(i + 1), cnt - 1);
+        }
     }
 }
