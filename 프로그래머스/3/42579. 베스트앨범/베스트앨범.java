@@ -2,75 +2,67 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String[] genres, int[] plays) {
-        
-        Map<String, List<Info>> genreAndPlay = new HashMap<>();
-        Map<String, Integer> playSum = new HashMap<>();
-        List<Rank> rankList = new ArrayList<>();
-        
-        int n = genres.length;
-        for (int i = 0; i < n; i++) {
-            List<Info> list = genreAndPlay.getOrDefault(genres[i], new ArrayList<>());
-            list.add(new Info(plays[i], i));
-            genreAndPlay.put(genres[i], list);
-            
-            playSum.put(genres[i], playSum.getOrDefault(genres[i], 0) + plays[i]);
+        Map<String, Integer> songCntMap = new HashMap<>(); // 장르마다 속한 노래 갯수
+        Map<String, List<Song>> songMap = new HashMap<>(); // 장르에 따른 노래들
+
+        for (int i = 0; i < genres.length; i++) {
+            songCntMap.put(genres[i], songCntMap.getOrDefault(genres[i], 0) + plays[i]);
+            List<Song> list = songMap.getOrDefault(genres[i], new ArrayList<>());
+            list.add(new Song(i, plays[i]));
+            songMap.put(genres[i], list);
         }
-        
-        // 재생 횟수가 높은 순으로 장르 정렬
-        for (String genre : playSum.keySet()) {
-            rankList.add(new Rank(genre, playSum.get(genre)));
+
+        List<Genre> list = new ArrayList<>();
+        for (String key : songCntMap.keySet()) {
+            list.add(new Genre(key, songCntMap.get(key)));
         }
-        Collections.sort(rankList);
-        
-        // 각 장르 내에서 재생 횟수가 높은 노래 2개 선정
+
+        Collections.sort(list, (o1, o2) -> o2.playCnt - o1.playCnt);
+
         List<Integer> answer = new ArrayList<>();
-        for (Rank rank : rankList) {
-            int addCnt = 0;
-            Collections.sort(genreAndPlay.get(rank.genre));
-            for (Info info : genreAndPlay.get(rank.genre)) {
-                if (addCnt >= 2) break;
-                answer.add(info.idx);
-                addCnt++;
+        for (Genre genre : list) {
+            List<Song> songs = songMap.get(genre.genre);
+            Collections.sort(songs, (o1, o2) -> {
+                if (o2.playCnt == o1.playCnt) {
+                    return o1.idx - o2.idx;
+                }
+                return o2.playCnt - o1.playCnt;
+            });
+
+            // 2개 수록
+            if (songs.size() < 2) {
+                answer.add(songs.get(0).idx);
+            } else {
+                answer.add(songs.get(0).idx);
+                answer.add(songs.get(1).idx);
             }
         }
-        
+
+        // 앨범에 들어갈 노래의 고유 번호를 순서대로 반환
         return answer.stream()
-            .mapToInt(num -> num)
-            .toArray();
+                .mapToInt(i -> i)
+                .toArray();
     }
-    
-    class Rank implements Comparable<Rank> {
-        
+
+    private class Genre {
+
         String genre;
-        int playSum;
-        
-        public Rank(String genre, int playSum) {
+        int playCnt;
+
+        public Genre(String genre, int playCnt) {
             this.genre = genre;
-            this.playSum = playSum;
-        }
-        
-        @Override
-        public int compareTo (Rank o) {
-            return o.playSum - this.playSum;
+            this.playCnt = playCnt;
         }
     }
-    
-    class Info implements Comparable<Info> {
-        
-        int cnt;
+
+    private class Song {
+
         int idx;
-        
-        public Info (int cnt, int idx) {
-            this.cnt = cnt;
+        int playCnt;
+
+        public Song(int idx, int playCnt) {
             this.idx = idx;
-        }
-        
-        @Override
-        public int compareTo (Info o) {
-            if (o.cnt == this.cnt) {
-                return this.idx - o.idx;
-            }
-            return o.cnt - this.cnt;
+            this.playCnt = playCnt;
         }
     }
 }
