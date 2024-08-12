@@ -9,11 +9,12 @@ public class Main {
     static StringTokenizer st;
     static int n;
     static int[] nums;
-    static int[] operator;
-    static int max = Integer.MIN_VALUE;
+    static int[] operations = new int[4];
     static int min = Integer.MAX_VALUE;
+    static int max = Integer.MIN_VALUE;
 
     public static void main(String[] args) throws IOException {
+
         n = Integer.parseInt(br.readLine());
         nums = new int[n];
         st = new StringTokenizer(br.readLine());
@@ -21,47 +22,41 @@ public class Main {
             nums[i] = Integer.parseInt(st.nextToken());
         }
 
-        operator = new int[4];
         st = new StringTokenizer(br.readLine());
         for (int i = 0; i < 4; i++) {
-            operator[i] = Integer.parseInt(st.nextToken());
+            operations[i] = Integer.parseInt(st.nextToken());
         }
 
-        dfs(nums[0], 1);
-
+        dfs(1, nums[0], operations);
         System.out.println(max);
         System.out.println(min);
     }
 
-    public static void dfs(int result, int idx) {
+    private static void dfs(int idx, int result, int[] operations) {
         if (idx == n) {
-            max = Math.max(max, result);
             min = Math.min(min, result);
+            max = Math.max(max, result);
             return;
         }
 
         for (int i = 0; i < 4; i++) {
-            if (operator[i] > 0) {
-                operator[i]--;
-                switch (i) {
-                    case 0:
-                        dfs(result + nums[idx], idx + 1);
-                        break;
-
-                    case 1:
-                        dfs(result - nums[idx], idx + 1);
-                        break;
-
-                    case 2:
-                        dfs(result * nums[idx], idx + 1);
-                        break;
-
-                    case 3:
-                        dfs(result / nums[idx], idx + 1);
-                        break;
+            if (operations[i] > 0) {
+                operations[i]--;
+                if (i == 0) {
+                    dfs(idx + 1, result + nums[idx], operations);
                 }
-                operator[i]++;
+                if (i == 1) {
+                    dfs(idx + 1, result - nums[idx], operations);
+                }
+                if (i == 2) {
+                    dfs(idx + 1, result * nums[idx], operations);
+                }
+                if (i == 3) {
+                    dfs(idx + 1, result / nums[idx], operations);
+                }
+                operations[i]++;
             }
         }
+
     }
 }
