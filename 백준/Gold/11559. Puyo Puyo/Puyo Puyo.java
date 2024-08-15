@@ -1,94 +1,81 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
-// 시간 복잡도:
 public class Main {
 
-    static char[][] map = new char[12][6];
-    static int pop = 0;
-    static boolean isPop = false;
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+    static boolean[][] visited;
+    static int answer = 0;
+    static boolean flag = false;
+    static char[][] map;
+    static int[] dy = {1, -1, 0, 0};
+    static int[] dx = {0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        // 그래프 초기화
+        map = new char[12][6];
         for (int i = 0; i < 12; i++) {
-            char[] input = br.readLine().toCharArray();
-            for (int j = 0; j < 6; j++) {
-                map[i][j] = input[j];
-            }
+            map[i] = br.readLine().toCharArray();
         }
 
-        // bfs
         while (true) {
-            isPop = false; // 초기화
-            bfs();
-
-            // 터트리지 않았으면 끝내기
-            if (!isPop) {
-                break;
-            }
-
-            // 터트렸으면 카운트하고 아래로 내리기
-            pop++;
-            onFloor();
-        }
-
-        System.out.println(pop);
-    }
-
-    private static void bfs() {
-        boolean[][] visited = new boolean[12][6];
-
-        for (int i = 0; i < 12; i++) {
-            for (int j = 0; j < 6; j++) {
-                if (!visited[i][j] && map[i][j] != '.') {
-                    Queue<Point> que = new LinkedList<>();
-                    List<Point> list = new ArrayList<>();
-                    // bfs
-                    que.add(new Point(i, j));
-                    visited[i][j] = true;
-                    list.add(new Point(i, j));
-
-                    while (!que.isEmpty()) {
-                        Point p = que.poll();
-                        for (int k = 0; k < 4; k++) {
-                            int nx = dx[k] + p.x;
-                            int ny = dy[k] + p.y;
-                            if (nx < 0 || nx >= 6 || ny < 0 || ny >= 12) {
-                                continue;
-                            }
-                            if (map[ny][nx] == map[i][j] && !visited[ny][nx]) {
-                                que.add(new Point(ny, nx));
-                                visited[ny][nx] = true;
-                                list.add(new Point(ny, nx));
-                            }
-                        }
-                    }
-
-                    // 인접한 같은 색이 4개 이상이면 터트리기(. 표시)
-                    if (list.size() >= 4) {
-                        for (int k = 0; k < list.size(); k++) {
-                            Point p = list.get(k);
-                            map[p.y][p.x] = '.';
-                        }
-                        isPop = true;
+            flag = false;
+            visited = new boolean[12][6];
+            for (int i = 0; i < 12; i++) {
+                for (int j = 0; j < 6; j++) {
+                    if (map[i][j] != '.' && !visited[i][j]) {
+                        bfs(i, j, map[i][j]);
                     }
                 }
             }
+
+            if (!flag) {
+                break;
+            }
+
+            answer++;
+            fall();
+        }
+
+        // 몇연쇄인지 출력 (하나도 터지지 않으면 0 출력)
+        System.out.println(answer);
+    }
+
+    private static void bfs(int y, int x, char color) {
+
+        Queue<Node> que = new LinkedList<>();
+        que.add(new Node(y, x));
+        visited[y][x] = true;
+        List<Node> list = new ArrayList<>();
+        list.add(new Node(y, x));
+
+        while (!que.isEmpty()) {
+            Node now = que.poll();
+            for (int i = 0; i < 4; i++) {
+                int ny = dy[i] + now.y;
+                int nx = dx[i] + now.x;
+
+                if (ny < 0 || ny >= 12 || nx < 0 || nx >= 6) continue;
+                if (visited[ny][nx] || map[ny][nx] != color) continue;
+
+                que.add(new Node(ny, nx));
+                visited[ny][nx] = true;
+                list.add(new Node(ny, nx));
+            }
+        }
+
+        if (list.size() >= 4) {
+            flag = true;
+            for (Node node : list) {
+                map[node.y][node.x] = '.';
+            }
         }
     }
 
-    private static void onFloor() {
-
+    private static void fall() {
         for (int i = 0; i < 6; i++) {
             Queue<Character> que = new LinkedList<>();
             for (int j = 11; j >= 0; j--) {
@@ -107,10 +94,11 @@ public class Main {
         }
     }
 
-    static class Point {
+    private static class Node {
+
         int y, x;
 
-        public Point(int y, int x) {
+        public Node(int y, int x) {
             this.y = y;
             this.x = x;
         }
