@@ -18,11 +18,7 @@ class Solution {
         }
 
         for (int i = 0; i < referral.length; i++) {
-            if (referral[i].equals("-")) {
-                parent[i] = -1;
-            } else {
-                parent[i] = idxMapByName.get(referral[i]);
-            }
+            parent[i] = (referral[i].equals("-")) ? -1 : idxMapByName.get(referral[i]);
         }
 
         // 수익금 계산
@@ -33,22 +29,20 @@ class Solution {
         return answer;
     }
 
-    private void dfs(int nameIdx, int money) {
+    private void dfs(int idx, int money) {
         int parentMoney = (int)(money * 0.1);
-        if (parent[nameIdx] == -1) {
-            if (parentMoney == 0) {
-                answer[nameIdx] += money;
-            } else {
-                answer[nameIdx] += money - parentMoney;
-            }
+
+       
+        if (parent[idx] == -1) {
+            answer[idx] += (parentMoney == 0) ? money : money - parentMoney;
             return;
         }
 
         if (parentMoney == 0) {
-            answer[nameIdx] += money;
+            answer[idx] += money;
         } else {
-            answer[nameIdx] += money - parentMoney;
-            dfs(parent[nameIdx], parentMoney);
+            answer[idx] += money - parentMoney;
+            dfs(parent[idx], parentMoney);
         }
     }
 }
