@@ -64,15 +64,12 @@ public class Main {
 
                     if (nx <= 0 || nx > m || ny <= 0 || ny > n) break;
                     if (map[ny][nx] == '#') break;
-//                    if (visited[ny][nx] <= visited[now.y][now.x] + 1) continue;
-
+                    
+                    if (visited[ny][nx] < visited[now.y][now.x] + 1) break;
                     if (visited[ny][nx] == Integer.MAX_VALUE) {
                         visited[ny][nx] = now.time + 1;
                         que.add(new Node(ny, nx, now.time + 1));
-                    } else if (visited[ny][nx] == now.time + 1) {
-                        continue;
-                    } else break;
-
+                    }
                 }
             }
         }
