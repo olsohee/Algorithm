@@ -34,8 +34,11 @@ public class Main {
     }
 
     private static void addLadder(int cnt) {
+        if (answer <= cnt) {
+            return;
+        }
         if (finish()) {
-            answer = Math.min(answer, cnt);
+            answer = cnt;
             return;
         }
 
@@ -46,7 +49,6 @@ public class Main {
         for (int i = 1; i <= h; i++) {
             for (int j = 1; j <= n - 1; j++) {
                 // 해당 위치에 사다리가 있으면 pass
-//                System.out.println(i + " , " + j);
                 if (map[i][j]) continue;
 
                 // 사다리가 좌우에 있으면 pass
@@ -55,24 +57,11 @@ public class Main {
                 map[i][j] = true;
                 addLadder(cnt + 1);
                 map[i][j] = false;
-             }
+            }
         }
     }
 
     private static boolean finish() {
-//        System.out.println();
-//        for (boolean[] m : map) {
-//            for (boolean b : m) {
-//                if (b) {
-//                    System.out.print("O ");
-//                } else {
-//                    System.out.print("X ");
-//
-//                }
-//            }
-//            System.out.println();
-//        }
-
         for (int i = 1; i <= n; i++) {
             int dest = start(1, i);
             if (dest != i) {
