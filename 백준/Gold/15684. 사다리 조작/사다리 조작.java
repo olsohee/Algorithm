@@ -1,68 +1,73 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
-    private static int n, m, h, answer;
-    private static int[][] map;
-    private static boolean finish = false;
 
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+    static int n, m, h;
+    static int[][] map;
+    static int answer = 4;
+    static boolean isFinish = false;
 
+    public static void main(String[] args) throws IOException {
+
+        st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
         h = Integer.parseInt(st.nextToken());
-
         map = new int[h + 1][n + 1];
 
-        int x, y;
         for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
-            x = Integer.parseInt(st.nextToken());
-            y = Integer.parseInt(st.nextToken());
-            map[x][y] = 1;
-            map[x][y + 1] = 2;
+            int num1 = Integer.parseInt(st.nextToken());
+            int num2 = Integer.parseInt(st.nextToken());
+            map[num1][num2] = 1;
+            map[num1][num2 + 1] = 2;
         }
 
         for (int i = 0; i <= 3; i++) {
             answer = i;
-            dfs(1, 0);
-            if (finish) break;
+            addLadder(1, 0);
+            if (isFinish) break;
         }
 
-        System.out.println((finish) ? answer : -1);
+        System.out.println((isFinish) ? answer : -1);
     }
 
-    private static void dfs(int x, int count) {
-        if (finish) return;
-        if (answer == count) {
-            if (check()) finish = true;
+    private static void addLadder(int x, int cnt) {
+        if (isFinish) return;
+        if (answer == cnt) {
+            if (finish()) isFinish = true;
             return;
         }
 
-        for (int i = x; i < h + 1; i++) {
-            for (int j = 1; j < n; j++) {
+        for (int i = x; i <= h; i++) {
+            for (int j = 1; j <= n - 1; j++) {
                 if (map[i][j] == 0 && map[i][j + 1] == 0) {
                     map[i][j] = 1;
                     map[i][j + 1] = 2;
-                    dfs(i, count + 1);
+                    addLadder(i, cnt + 1);
                     map[i][j] = map[i][j + 1] = 0;
                 }
             }
         }
     }
 
-    private static boolean check() {
+    private static boolean finish() {
+
         for (int i = 1; i <= n; i++) {
-            int x = 1, y = i;
+            int y = 1;
+            int x = i;
             for (int j = 0; j < h; j++) {
-                if (map[x][y] == 1) y++;
-                else if (map[x][y] == 2) y--;
-                x++;
+                if (map[y][x] == 1) x++;
+                else if (map[y][x] == 2) x--;
+                y++;
             }
-            if (y != i) return false;
+
+            if (i != x) return false;
         }
         return true;
     }
