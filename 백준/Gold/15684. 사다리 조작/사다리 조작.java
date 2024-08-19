@@ -62,14 +62,32 @@ public class Main {
     }
 
     private static boolean finish() {
+
         for (int i = 1; i <= n; i++) {
-            int dest = start(1, i);
-            if (dest != i) {
-                return false;
+            int y = 1;
+            int x = i;
+            while (y < h + 1) {
+                if (map[y][x]) {
+                    x++;
+                } else if (map[y][x - 1]) {
+                    x--;
+                }
+                y++;
             }
+
+            if (i != x) return false;
         }
 
         return true;
+
+//        for (int i = 1; i <= n; i++) {
+//            int dest = start(1, i);
+//            if (dest != i) {
+//                return false;
+//            }
+//        }
+//
+//        return true;
     }
     private static int start(int y, int x) {
 
