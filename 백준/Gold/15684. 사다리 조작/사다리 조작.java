@@ -9,7 +9,7 @@ public class Main {
     static StringTokenizer st;
     static int n, m, h;
     static boolean[][] map;
-    static int answer = Integer.MAX_VALUE;
+    static int answer = 4;
 
     public static void main(String[] args) throws IOException {
 
@@ -24,25 +24,26 @@ public class Main {
             map[Integer.parseInt(st.nextToken())][Integer.parseInt(st.nextToken())] = true;
         }
 
-        addLadder(0);
+        for (int i = 0; i <= 3; i++) {
+            if (answer != 4) break;
+            addLadder(i, 0);
+        }
 
-        if (answer == Integer.MAX_VALUE) {
+        if (answer == 4) {
             System.out.println(-1);
         } else {
             System.out.println(answer);
         }
     }
 
-    private static void addLadder(int cnt) {
-        if (answer <= cnt) {
-            return;
-        }
+    private static void addLadder(int maxCnt, int cnt) {
+
         if (finish()) {
             answer = cnt;
             return;
         }
 
-        if (cnt == 3) {
+        if (cnt == maxCnt) {
             return;
         }
 
@@ -55,7 +56,7 @@ public class Main {
                 if (map[i][j - 1] || map[i][j + 1]) continue;
 
                 map[i][j] = true;
-                addLadder(cnt + 1);
+                addLadder(maxCnt, cnt + 1);
                 map[i][j] = false;
             }
         }
@@ -79,33 +80,5 @@ public class Main {
         }
 
         return true;
-
-//        for (int i = 1; i <= n; i++) {
-//            int dest = start(1, i);
-//            if (dest != i) {
-//                return false;
-//            }
-//        }
-//
-//        return true;
-    }
-    private static int start(int y, int x) {
-
-        if (y == h + 1) {
-            return x;
-        }
-
-        // 오른쪽으로 이동
-        if (map[y][x]) {
-            return start(y + 1, x + 1);
-        }
-        // 왼쪽으로 이동
-        else if (map[y][x - 1]) {
-            return start(y + 1, x - 1);
-        }
-        // 사다리 X, 아래로 이동
-        else {
-            return start(y + 1, x);
-        }
     }
 }
