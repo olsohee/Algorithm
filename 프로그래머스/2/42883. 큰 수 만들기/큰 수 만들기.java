@@ -1,43 +1,38 @@
 import java.util.*;
 
 class Solution {
+
     public String solution(String number, int k) {
-        
-        List<Integer> list = new ArrayList<>();
-        
-        int[] nums = Arrays.stream(number.split(""))
-            .mapToInt(string -> Integer.parseInt(string))
-            .toArray();
-        
+        int n = number.length();
+        int[] arr = Arrays.stream(number.split(""))
+                .mapToInt(str -> Integer.parseInt(str))
+                .toArray();
+
         String answer = "";
-        int startIdx = 0;
-        int len = number.length() - k;
-        while (answer.length() < len) {
+        int start = 0;
+        
+        while (answer.length() < n - k) {
+            
             if (k == 0) {
-                for (int i = startIdx; i < nums.length; i++) {
-                    answer += nums[i];
+                for (int i = start; i < n; i++) {
+                    answer += arr[i];
                 }
                 break;
             }
-            
-            int max = nums[startIdx];
-            int maxIdx = startIdx;
-            for (int i = startIdx; i <= startIdx + k; i++) {
-                if (nums[i] == 9) {
+
+            int max = arr[start];
+            int maxIdx = start;
+            for (int i = start; i <= start + k; i++) {
+                if (max < arr[i]) {
+                    max = arr[i];
                     maxIdx = i;
-                    break;
-                }
-                if (nums[i] > max) {
-                    max = nums[i];
-                    maxIdx = i;
+                    if (max == 9) break;
                 }
             }
-            
-            answer += nums[maxIdx];
-            k -= maxIdx - startIdx;
-            startIdx = maxIdx + 1;
+            answer += max;
+            k -= maxIdx - start;
+            start = maxIdx + 1;
         }
-        
         return answer;
     }
 }
