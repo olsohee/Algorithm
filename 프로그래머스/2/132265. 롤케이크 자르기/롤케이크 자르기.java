@@ -2,40 +2,24 @@ import java.util.*;
 
 class Solution {
     public int solution(int[] topping) {
-        Queue<Integer> que1 = new LinkedList<>();
-        Queue<Integer> que2 = new LinkedList<>();
-        Set<Integer> set1 = new HashSet<>();
-        Set<Integer> set2 = new HashSet<>();
-        int[] arr1 = new int[10001];
-        int[] arr2 = new int[10001];
         
-        for (int n : topping) {
-            que1.add(n);
-            set1.add(n);
-            arr1[n]++;
+        int answer = 0;
+        Map<Integer, Integer> map1 = new HashMap<>();
+        Map<Integer, Integer> map2 = new HashMap<>();
+        for (int num : topping) {
+            map2.put(num, map2.getOrDefault(num, 0) + 1);
         }
         
-        // 메인 로직 시작
-        int answer = 0;
-        int i = 0;
-        while (!que1.isEmpty()) {
-            
-            int num = que1.poll();
-            arr1[num]--;
-            if (arr1[num] == 0) {
-                set1.remove(num);
+        for (int num : topping) {
+            map2.put(num, map2.get(num) - 1);
+            if (map2.get(num) == 0) {
+                map2.remove((Object) num);
             }
+            map1.put(num, map1.getOrDefault(num, 0) + 1);
             
-            que2.add(num);
-            arr2[num]++;
-            if (arr2[num] == 1) {
-                set2.add(num);
-            }
-            
-            if (set1.size() == set2.size()) {
+            if (map1.size() == map2.size()) {
                 answer++;
-            }     
-            i++;
+            }
         }
         
         return answer;
