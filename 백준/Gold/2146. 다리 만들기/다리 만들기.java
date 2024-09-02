@@ -7,21 +7,18 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-
     static int n;
     static int[][] map;
-    static boolean[][] visited;
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
+    static Set<Node> edgeNodeSet = new HashSet<>();
+    static int[] dy = {1, -1, 0, 0};
+    static int[] dx = {0, 0, 1, -1};
     static int answer = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws IOException {
 
         n = Integer.parseInt(br.readLine());
         map = new int[n][n];
-        visited = new boolean[n][n];
 
-        // 0. map 초기화
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
@@ -29,127 +26,83 @@ public class Main {
             }
         }
 
-        // 1. 각각의 섬을 bfs하면서 숫자로 표시하기 (2, 3, ...)
-        int num = 2;
+        // 1. 각 섬 구분 짓기, 각 섬의 가장자리를 set에 담기
+        int islandNum = 1;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                if (map[i][j] != 0 && !visited[i][j]) {
-                    bfs(i, j, num++);
+                if (map[i][j] == 1) {
+                    bfs1(i, j, ++islandNum); // 섬 번호: 2, 3, 4, ...
                 }
             }
         }
 
-        for (boolean[] arr : visited) {
-            Arrays.fill(arr, false);
-        }
-
-        // 2. 다시 각각의 섬을 bfs하다가 가장자리이면, 바다 bfs하기
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (map[i][j] != 0 && !visited[i][j]) {
-                    bfs(i, j);
-                }
-            }
+        // 2. 각 가장자리에서 bfs 시작
+        for (Node edgeNode : edgeNodeSet) {
+            bfs2(edgeNode.y, edgeNode.x, map[edgeNode.y][edgeNode.x]);
         }
 
         System.out.println(answer);
     }
 
-    public static void seaBfs(int y, int x, int startNum) {
+    private static void bfs1(int y, int x, int islandNum) {
         Queue<Node> que = new LinkedList<>();
-        int[][] seaVisited = new int[n][n];
-        seaVisited[y][x] = 1;
         que.add(new Node(y, x));
+        map[y][x] = islandNum;
 
         while (!que.isEmpty()) {
             Node now = que.poll();
-
             for (int i = 0; i < 4; i++) {
-                int nx = dx[i] + now.x;
                 int ny = dy[i] + now.y;
-
-                if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-                if (seaVisited[ny][nx] != 0) continue;
-
-                // 다음 노드가 섬이면
-                if (map[ny][nx] != 0) {
-                    // 같은 섬이면 패스
-                    if (map[ny][nx] == startNum) {
-                        continue;
-                    }
-                    // 다른 섬이면 정답 갱신
-                    else {
-                        answer = Math.min(answer, seaVisited[now.y][now.x]);
-                        return;
-                    }
-                }
-
-                // 다음 노드가 바다이면 계속 진행
-                if (map[ny][nx] == 0) {
-                    seaVisited[ny][nx] = seaVisited[now.y][now.x] + 1;
-                    que.add(new Node(ny, nx));
-                }
-            }
-        }
-    }
-
-    public static void bfs(int y, int x) {
-        Queue<Node> que = new LinkedList<>();
-        visited[y][x] = true;
-        que.add(new Node(y, x));
-
-        while (!que.isEmpty()) {
-            Node now = que.poll();
-
-            for (int i = 0; i < 4; i++) {
                 int nx = dx[i] + now.x;
-                int ny = dy[i] + now.y;
-
-                if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-                if (visited[ny][nx]) continue;
-
-                // 다음 노드가 섬이면 계속 진행
+                if (ny < 0 || ny >= n || nx < 0 || nx >= n) continue;
+                // 같은 섬인 경우
                 if (map[ny][nx] == 1) {
-                    visited[ny][nx] = true;
+                    map[ny][nx] = islandNum;
                     que.add(new Node(ny, nx));
                 }
-
-                // 다음 노드가 바다이면 바다 bfs하기
+                // 바다인 경우 (= now가 섬의 가장자리)
                 if (map[ny][nx] == 0) {
-                    seaBfs(ny, nx, map[now.y][now.x]);
+                    edgeNodeSet.add(new Node(now.y, now.x));
                 }
             }
         }
     }
 
-    public static void bfs(int y, int x, int num) {
+    private static void bfs2(int y, int x, int startIslandNum) {
         Queue<Node> que = new LinkedList<>();
-        visited[y][x] = true;
-        map[y][x] = num;
         que.add(new Node(y, x));
+        int[][] visited = new int[n][n];
+        visited[y][x] = 1;
 
         while (!que.isEmpty()) {
             Node now = que.poll();
 
+            // 다른 섬인 경우 (도착!)
+            if (map[now.y][now.x] != 0 && map[now.y][now.x] != startIslandNum) {
+                answer = Math.min(answer, visited[now.y][now.x] - 2);
+                return;
+            }
+
             for (int i = 0; i < 4; i++) {
-                int nx = dx[i] + now.x;
                 int ny = dy[i] + now.y;
+                int nx = dx[i] + now.x;
+                if (ny < 0 || ny >= n || nx < 0 || nx >= n) continue;
 
-                if (nx < 0 || nx >= n || ny < 0 || ny >= n) continue;
-                if (visited[ny][nx]) continue;
+                // 같은 섬인 경우
+                if (map[ny][nx] == startIslandNum) continue;
 
-                // 다음 노드가 섬이면 계속 진행
-                if (map[ny][nx] == 1) {
-                    visited[ny][nx] = true;
-                    map[ny][nx] = num;
-                    que.add(new Node(ny, nx));
-                }
+                // 이미 방문한 경우
+                if (visited[ny][nx] != 0) continue;
+
+                // 바다이거나 다른 섬이면 이동
+                visited[ny][nx] = visited[now.y][now.x] + 1;
+                que.add(new Node(ny, nx));
+
             }
         }
     }
 
-
-    public static class Node {
+    private static class Node {
         int y, x;
 
         public Node(int y, int x) {
