@@ -18,23 +18,19 @@ public class Main {
         for (int i = 0; i < n; i++) {
             coins[i] = Integer.parseInt(br.readLine());
         }
+        Arrays.sort(coins);
 
-        int[] dp = new int[k + 1];
+        int[] dp = new int[10001];
+        Arrays.fill(dp, Integer.MAX_VALUE);
         dp[0] = 0;
 
-        for (int i = 1; i <= k; i++) {
-            int min = Integer.MAX_VALUE;
-            for (int coin : coins) {
-                if (coin > i || dp[i - coin] == Integer.MAX_VALUE) {
-                    continue;
-                }
-                min = Math.min(min, dp[i - coin] + 1);
+        for (int coin : coins) {
+            for (int i = coin; i <= k; i++) {
+                if (dp[i - coin] == Integer.MAX_VALUE) continue;
+                dp[i] = Math.min(dp[i], dp[i - coin] + 1);
             }
-
-            dp[i] = min;
         }
 
-        int answer = (dp[k] == Integer.MAX_VALUE) ? -1 : dp[k];
-        System.out.println(answer);
+        System.out.println((dp[k] == Integer.MAX_VALUE) ? -1 : dp[k]);
     }
 }
