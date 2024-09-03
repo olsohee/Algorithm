@@ -9,6 +9,7 @@ public class Main {
     static StringTokenizer st;
     static int n;
     static int[][] map;
+    static int[][][] dp;
     static int answer = 0;
 
     public static void main(String[] args) throws IOException {
@@ -22,72 +23,31 @@ public class Main {
             }
         }
 
-        // dfs
-        dfs(1, 2, 1);
+        dp = new int[3][n + 1][n + 1]; // dp[k][i][j] : k 방향으로 (i, j)에 파이프를 놓는 방법의 수
 
-        System.out.println(answer);
-    }
+        //dp
+        // dir: 0(가로), 1(세로), 2(대각선)
+        dp[0][1][2] = 1;
 
-    private static void dfs(int y, int x, int dir) {
-
-        if (y == n && x == n) {
-            answer++;
-            return;
-        }
-
-        if (dir == 1) {
-            // 오른쪽 이동
-            if (x + 1 <= n) {
-                if (map[y][x + 1] == 0) {
-                    dfs(y, x + 1, 1);
+        for (int i = 1; i <= n; i++) {
+            for (int j = 2; j <= n; j++) {
+                // 가로
+                if (map[i][j] == 0) {
+                    dp[0][i][j] += dp[0][i][j - 1] + dp[2][i][j - 1];
                 }
-            }
 
-            // 대각선 이동
-            if (y + 1 <= n && x + 1 <= n) {
-                if (map[y + 1][x] == 0 && map[y + 1][x + 1] == 0 && map[y][x + 1] == 0) {
-                    dfs(y + 1, x + 1, 3);
+                // 세로
+                if (map[i][j] == 0) {
+                    dp[1][i][j] += dp[1][i - 1][j] + dp[2][i - 1][j];
+                }
+
+                // 대각선
+                if (map[i][j] == 0 && map[i - 1][j] == 0 && map[i][j - 1] == 0) {
+                    dp[2][i][j] += dp[0][i - 1][j - 1] + dp[1][i - 1][j - 1] + dp[2][i - 1][j - 1];
                 }
             }
         }
 
-        if (dir == 2) {
-            // 아래 이동
-            if (y + 1 <= n) {
-                if (map[y + 1][x] == 0) {
-                    dfs(y + 1, x, 2);
-                }
-            }
-
-            // 대각선 이동
-            if (y + 1 <= n && x + 1 <= n) {
-                if (map[y + 1][x] == 0 && map[y + 1][x + 1] == 0 && map[y][x + 1] == 0) {
-                    dfs(y + 1, x + 1, 3);
-                }
-            }
-        }
-
-        if (dir == 3) {
-            // 오른쪽 이동
-            if (x + 1 <= n) {
-                if (map[y][x + 1] == 0) {
-                    dfs(y, x + 1, 1);
-                }
-            }
-
-            // 아래 이동
-            if (y + 1 <= n) {
-                if (map[y + 1][x] == 0) {
-                    dfs(y + 1, x, 2);
-                }
-            }
-
-            // 대각선 이동
-            if (y + 1 <= n && x + 1 <= n) {
-                if (map[y + 1][x] == 0 && map[y + 1][x + 1] == 0 && map[y][x + 1] == 0) {
-                    dfs(y + 1, x + 1, 3);
-                }
-            }
-        }
+        System.out.println(dp[0][n][n] + dp[1][n][n] + dp[2][n][n]);
     }
 }
