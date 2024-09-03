@@ -22,8 +22,9 @@ public class Main {
         }
 
         // bfs
+
         Queue<Node> que = new LinkedList<>();
-        que.add(new Node(1, 1, 1, 2, 1));
+        que.add(new Node(1, 2, 1));
         int answer = 0;
 
         if (map[n][n] == 1) {
@@ -31,29 +32,27 @@ public class Main {
             return;
         }
 
+
         while (!que.isEmpty()) {
             Node now = que.poll();
 
-            if (now.y2 == n && now.x2 == n) {
+            if (now.y == n && now.x == n) {
                 answer++;
             }
 
             // 가로로 놓인 경우
             if (now.flag == 1) {
                 // 오른쪽 이동
-                if (now.x2 + 1 <= n) {
-                    int movedX = now.x2 + 1;
-                    if (map[now.y2][movedX] == 0) {
-                        que.add(new Node(now.y1, movedX - 1, now.y2, movedX, 1));
+                if (now.x + 1 <= n) {
+                    if (map[now.y][now.x + 1] == 0) {
+                        que.add(new Node(now.y, now.x + 1, 1));
                     }
                 }
 
                 // 대각선 이동
-                if (now.y2 + 1 <= n && now.x2 + 1 <= n) {
-                    int movedY = now.y2 + 1;
-                    int movedX = now.x2 + 1;
-                    if (map[movedY][movedX] == 0 && map[movedY - 1][movedX] == 0 && map[movedY][movedX - 1] == 0) {
-                        que.add(new Node(movedY - 1, movedX - 1, movedY, movedX, 3));
+                if (now.y + 1 <= n && now.x + 1 <= n) {
+                    if (map[now.y + 1][now.x] == 0 && map[now.y + 1][now.x + 1] == 0 && map[now.y][now.x + 1] == 0) {
+                        que.add(new Node(now.y + 1, now.x + 1, 3));
                     }
                 }
             }
@@ -61,19 +60,16 @@ public class Main {
             // 세로로 놓인 경우
             if (now.flag == 2) {
                 // 아래 이동
-                if (now.y2 + 1 <= n) {
-                    int movedY = now.y2 + 1;
-                    if (map[movedY][now.x2] == 0) {
-                        que.add(new Node(movedY - 1, now.x1, movedY, now.x2, 2));
+                if (now.y + 1 <= n) {
+                    if (map[now.y + 1][now.x] == 0) {
+                        que.add(new Node(now.y + 1, now.x, 2));
                     }
                 }
 
                 // 대각선 이동
-                if (now.y2 + 1 <= n && now.x2 + 1 <= n) {
-                    int movedY = now.y2 + 1;
-                    int movedX = now.x2 + 1;
-                    if (map[movedY][movedX] == 0 && map[movedY - 1][movedX] == 0 && map[movedY][movedX - 1] == 0) {
-                        que.add(new Node(movedY - 1, movedX - 1, movedY, movedX, 3));
+                if (now.y + 1 <= n && now.x + 1 <= n) {
+                    if (map[now.y + 1][now.x] == 0 && map[now.y + 1][now.x + 1] == 0 && map[now.y][now.x + 1] == 0) {
+                        que.add(new Node(now.y + 1, now.x + 1, 3));
                     }
                 }
             }
@@ -81,27 +77,23 @@ public class Main {
             // 대각선으로 놓인 경우
             if (now.flag == 3) {
                 // 오른쪽 이동
-                if (now.x2 + 1 <= n) {
-                    int movedX = now.x2 + 1;
-                    if (map[now.y2][movedX] == 0) {
-                        que.add(new Node(now.y1, movedX - 1, now.y2, movedX, 1));
+                if (now.x + 1 <= n) {
+                    if (map[now.y][now.x + 1] == 0) {
+                        que.add(new Node(now.y, now.x + 1, 1));
                     }
                 }
 
                 // 아래 이동
-                if (now.y2 + 1 <= n) {
-                    int movedY = now.y2 + 1;
-                    if (map[movedY][now.x2] == 0) {
-                        que.add(new Node(movedY - 1, now.x1, movedY, now.x2, 2));
+                if (now.y + 1 <= n) {
+                    if (map[now.y + 1][now.x] == 0) {
+                        que.add(new Node(now.y + 1, now.x, 2));
                     }
                 }
 
                 // 대각선 이동
-                if (now.y2 + 1 <= n && now.x2 + 1 <= n) {
-                    int movedY = now.y2 + 1;
-                    int movedX = now.x2 + 1;
-                    if (map[movedY][movedX] == 0 && map[movedY - 1][movedX] == 0 && map[movedY][movedX - 1] == 0) {
-                        que.add(new Node(movedY - 1, movedX - 1, movedY, movedX, 3));
+                if (now.y + 1 <= n && now.x + 1 <= n) {
+                    if (map[now.y + 1][now.x] == 0 && map[now.y + 1][now.x + 1] == 0 && map[now.y][now.x + 1] == 0) {
+                        que.add(new Node(now.y + 1, now.x + 1, 3));
                     }
                 }
             }
@@ -110,15 +102,12 @@ public class Main {
     }
 
     private static class Node {
-        int y1, x1;
-        int y2, x2;
+        int y, x;
         int flag;
 
-        public Node(int y1, int x1, int y2, int x2, int flag) {
-            this.y1 = y1;
-            this.x1 = x1;
-            this.y2 = y2;
-            this.x2 = x2;
+        public Node(int y, int x, int flag) {
+            this.y = y;
+            this.x = x;
             this.flag = flag;
         }
     }
