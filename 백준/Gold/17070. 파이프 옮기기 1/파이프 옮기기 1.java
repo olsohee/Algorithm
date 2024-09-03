@@ -9,6 +9,7 @@ public class Main {
     static StringTokenizer st;
     static int n;
     static int[][] map;
+    static int answer = 0;
 
     public static void main(String[] args) throws IOException {
 
@@ -21,94 +22,72 @@ public class Main {
             }
         }
 
-        // bfs
+        // dfs
+        dfs(1, 2, 1);
 
-        Queue<Node> que = new LinkedList<>();
-        que.add(new Node(1, 2, 1));
-        int answer = 0;
-
-        if (map[n][n] == 1) {
-            System.out.println(0);
-            return;
-        }
-
-
-        while (!que.isEmpty()) {
-            Node now = que.poll();
-
-            if (now.y == n && now.x == n) {
-                answer++;
-            }
-
-            // 가로로 놓인 경우
-            if (now.flag == 1) {
-                // 오른쪽 이동
-                if (now.x + 1 <= n) {
-                    if (map[now.y][now.x + 1] == 0) {
-                        que.add(new Node(now.y, now.x + 1, 1));
-                    }
-                }
-
-                // 대각선 이동
-                if (now.y + 1 <= n && now.x + 1 <= n) {
-                    if (map[now.y + 1][now.x] == 0 && map[now.y + 1][now.x + 1] == 0 && map[now.y][now.x + 1] == 0) {
-                        que.add(new Node(now.y + 1, now.x + 1, 3));
-                    }
-                }
-            }
-
-            // 세로로 놓인 경우
-            if (now.flag == 2) {
-                // 아래 이동
-                if (now.y + 1 <= n) {
-                    if (map[now.y + 1][now.x] == 0) {
-                        que.add(new Node(now.y + 1, now.x, 2));
-                    }
-                }
-
-                // 대각선 이동
-                if (now.y + 1 <= n && now.x + 1 <= n) {
-                    if (map[now.y + 1][now.x] == 0 && map[now.y + 1][now.x + 1] == 0 && map[now.y][now.x + 1] == 0) {
-                        que.add(new Node(now.y + 1, now.x + 1, 3));
-                    }
-                }
-            }
-
-            // 대각선으로 놓인 경우
-            if (now.flag == 3) {
-                // 오른쪽 이동
-                if (now.x + 1 <= n) {
-                    if (map[now.y][now.x + 1] == 0) {
-                        que.add(new Node(now.y, now.x + 1, 1));
-                    }
-                }
-
-                // 아래 이동
-                if (now.y + 1 <= n) {
-                    if (map[now.y + 1][now.x] == 0) {
-                        que.add(new Node(now.y + 1, now.x, 2));
-                    }
-                }
-
-                // 대각선 이동
-                if (now.y + 1 <= n && now.x + 1 <= n) {
-                    if (map[now.y + 1][now.x] == 0 && map[now.y + 1][now.x + 1] == 0 && map[now.y][now.x + 1] == 0) {
-                        que.add(new Node(now.y + 1, now.x + 1, 3));
-                    }
-                }
-            }
-        }
         System.out.println(answer);
     }
 
-    private static class Node {
-        int y, x;
-        int flag;
+    private static void dfs(int y, int x, int dir) {
 
-        public Node(int y, int x, int flag) {
-            this.y = y;
-            this.x = x;
-            this.flag = flag;
+        if (y == n && x == n) {
+            answer++;
+            return;
+        }
+
+        if (dir == 1) {
+            // 오른쪽 이동
+            if (x + 1 <= n) {
+                if (map[y][x + 1] == 0) {
+                    dfs(y, x + 1, 1);
+                }
+            }
+
+            // 대각선 이동
+            if (y + 1 <= n && x + 1 <= n) {
+                if (map[y + 1][x] == 0 && map[y + 1][x + 1] == 0 && map[y][x + 1] == 0) {
+                    dfs(y + 1, x + 1, 3);
+                }
+            }
+        }
+
+        if (dir == 2) {
+            // 아래 이동
+            if (y + 1 <= n) {
+                if (map[y + 1][x] == 0) {
+                    dfs(y + 1, x, 2);
+                }
+            }
+
+            // 대각선 이동
+            if (y + 1 <= n && x + 1 <= n) {
+                if (map[y + 1][x] == 0 && map[y + 1][x + 1] == 0 && map[y][x + 1] == 0) {
+                    dfs(y + 1, x + 1, 3);
+                }
+            }
+        }
+
+        if (dir == 3) {
+            // 오른쪽 이동
+            if (x + 1 <= n) {
+                if (map[y][x + 1] == 0) {
+                    dfs(y, x + 1, 1);
+                }
+            }
+
+            // 아래 이동
+            if (y + 1 <= n) {
+                if (map[y + 1][x] == 0) {
+                    dfs(y + 1, x, 2);
+                }
+            }
+
+            // 대각선 이동
+            if (y + 1 <= n && x + 1 <= n) {
+                if (map[y + 1][x] == 0 && map[y + 1][x + 1] == 0 && map[y][x + 1] == 0) {
+                    dfs(y + 1, x + 1, 3);
+                }
+            }
         }
     }
 }
