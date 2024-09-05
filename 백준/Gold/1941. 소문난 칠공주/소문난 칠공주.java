@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,130 +5,85 @@ import java.util.*;
 
 public class Main {
 
-    /**
-     * 1. 아이디어
-     * - 7명의 조합 -> 백트래킹
-     * - 7명이 인접해있는지 -> bfs
-     *
-     * 2. 시간 복잡도
-     * - 중복 허용 X: N!
-     *
-     * 3. 자료구조
-     * - 입력 값 저장할 char[][] map
-     * - 방문 체크 boolean[][] visited
-     * - 7공주를 저장할 char[] result
-     */
-
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
     static char[][] map = new char[5][5];
-    static boolean[][] visited = new boolean[5][5];
-    static int resultCount = 0;
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
+    static int answer = 0;
+    static int[] choiced = new int[7];
+    static int[] dy = {1, -1, 0, 0};
+    static int[] dx = {0, 0, 1, -1};
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        // 입력
-        for(int i = 0; i < 5; i++) {
-            String s = br.readLine();
-            for(int j = 0; j < 5; j++) {
-                map[i][j] = s.charAt(j);
-            }
+        for (int i = 0; i < 5; i++) {
+            map[i] = br.readLine().toCharArray();
         }
 
-        func(0, 0);
-        System.out.println(resultCount);
+        // 1. 25개 중 7개 고르기 (조합 만들기)
+        dfs(0, 0, 0);
+
+        System.out.println(answer);
     }
 
-    public static void func(int count, int start) {
-
-        // 종료 조건
-        if(count == 7) {
-            if(validate()) {
-                resultCount++;
-            }
+    private static void dfs(int depth, int start, int yCnt) {
+        if (yCnt == 4) {
             return;
         }
 
-        // 백트래킹
-        for(int i = start; i < 25; i++) {
-            visited[i / 5][i % 5] = true;
-            func(count + 1, i + 1);
-            visited[i / 5][i % 5] = false;
+        if (depth == 7) {
+            if (canAnswer()) answer++;
+            return;
         }
-//
-//        for(int i = 0; i < 5; i++) {
-//            for(int j = 0; j < 5; j++) {
-//                if(!visited[i][j]) {
-//                    visited[i][j] = true;
-//                    func(count + 1);
-//                    visited[i][j] = false;
-//                }
-//            }
-//        }
+
+        for (int i = start; i < 25; i++) {
+            choiced[depth] = i;
+            if (map[i / 5][i % 5] == 'Y') {
+                dfs(depth + 1, i + 1, yCnt + 1);
+            } else {
+                dfs(depth + 1, i + 1, yCnt);
+            }
+        }
     }
 
-    public static boolean validate() {
+    private static boolean canAnswer() {
+        int y = choiced[0] / 5;
+        int x = choiced[0] % 5;
+        boolean[] visited = new boolean[7];
+        visited[0] = true;
+        Queue<Node> que = new LinkedList<>();
+        que.add(new Node(y, x));
 
-        boolean[][] visitedCpy = new boolean[5][5];
-        for(int i = 0; i < 5; i++) {
-            visitedCpy[i] = visited[i].clone();
-        }
+        int cnt = 0;
 
-        Queue<Point> que = new LinkedList<>();
-        int x =0;
-        int y = 0;
-        int sCount = 0;
-        int count = 0;
+        while (!que.isEmpty()) {
+            Node now = que.poll();
+            cnt++;
 
-        // bfs
-        for(int i = 0; i < 5; i++) {
-            for(int j = 0; j < 5; j++) {
-                if(visitedCpy[i][j]) {
-                    x = j;
-                    y = i;
+            for (int i = 0; i < 4; i++) {
+                int ny = now.y + dy[i];
+                int nx = now.x + dx[i];
+                if (ny < 0 || ny >= 5 || nx < 0 || nx >= 5) continue;
+
+                for (int j = 0; j < choiced.length; j++) {
+                    if (visited[j]) continue;
+                    if (choiced[j] / 5 == ny && choiced[j] % 5 == nx) {
+                        visited[j] = true;
+                        que.add(new Node(ny, nx));
+                        break;
+                    }
                 }
             }
         }
 
-        que.offer(new Point(x, y));
-        visitedCpy[y][x] = false;
-
-        while(!que.isEmpty()) {
-            Point p = que.poll();
-            count++;
-            if(map[p.y][p.x] == 'S') {
-                sCount++;
-            }
-
-            for(int i = 0; i < 4; i++) {
-                int nx = p.x + dx[i];
-                int ny = p.y + dy[i];
-
-                if(nx < 0 || nx >= 5 || ny < 0 || ny >= 5 || !visitedCpy[ny][nx]) {
-                    continue;
-                }
-
-                que.offer(new Point(nx, ny));
-                visitedCpy[ny][nx] = false;
-            }
-        }
-
-        if(count == 7 && sCount >= 4) {
-            return true;
-        } else {
-            return false;
-        }
+        return cnt == 7;
     }
 
-    static class Point {
+    private static class Node {
+        int y, x;
 
-        int x, y;
-
-        public Point(int x, int y) {
-            this.x = x;
+        public Node(int y, int x) {
             this.y = y;
+            this.x = x;
         }
     }
 }
