@@ -10,9 +10,11 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
 
+        int n, m;
         st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int m = Integer.parseInt(st.nextToken());
+        n = Integer.parseInt(st.nextToken());
+        m = Integer.parseInt(st.nextToken());
+
         int[][] arr = new int[n][m];
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
@@ -20,34 +22,35 @@ public class Main {
                 arr[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-        
+
         for (int i = 0; i < n; i++) {
             Arrays.sort(arr[i]);
         }
 
-        int answer = Integer.MAX_VALUE;
-
         int[] idxArr = new int[n];
+
+        int minIdx = 0;
+        int diff = Integer.MAX_VALUE;
+
         while (true) {
-            int minIdx = -1;
-            int min = Integer.MAX_VALUE;
-            int max = 0;
+            // 차이의 최댓값 구하기
+            int minNum = Integer.MAX_VALUE;
+            int maxNum = 0;
             for (int i = 0; i < n; i++) {
-                if (min > arr[i][idxArr[i]]) {
-                    min = arr[i][idxArr[i]];
+                if (minNum > arr[i][idxArr[i]]) {
+                    minNum = arr[i][idxArr[i]];
                     minIdx = i;
                 }
-                max = Math.max(max, arr[i][idxArr[i]]);
+                maxNum = Math.max(maxNum, arr[i][idxArr[i]]);
             }
 
-            answer = Math.min(answer, max - min);
+            diff = Math.min(diff, maxNum - minNum);
+
+            // 최소값의 idx 증가시키기
             idxArr[minIdx]++;
-            if (idxArr[minIdx] == m) {
-                break;
-            }
+            if (idxArr[minIdx] == m) break;
         }
 
-        // 능력치의 최대/최소 차이의 최솟값
-        System.out.println(answer);
+        System.out.println(diff);
     }
 }
