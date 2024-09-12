@@ -1,64 +1,63 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간 복잡도 = O(N^2 * logN)
 public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
     static int n;
-    static int[] arr;
+    static int[] nums;
     static List<Integer> list = new ArrayList<>();
-    static int answer = 0;
 
     public static void main(String[] args) throws IOException {
 
         n = Integer.parseInt(br.readLine());
-        arr = new int[n];
+        nums = new int[n];
         for (int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(br.readLine());
+            nums[i] = Integer.parseInt(br.readLine());
         }
-        Arrays.sort(arr);
 
-        // 이중 반복문으로 a + b의 집합 만들기
+        Arrays.sort(nums);
+
+        // a = c - b인 경우를 찾기
+        int answer = 0;
+
         for (int i = 0; i < n; i++) {
             for (int j = i; j < n; j++) {
-                list.add(arr[i] + arr[j]);
+                list.add(nums[i] + nums[j]);
             }
         }
         Collections.sort(list);
 
-        // 이분 탐색으로 x - c를 찾고, a + b 집합에 있는지 확인하기
+        // 이분탐색
         for (int i = 0; i < n; i++) {
             for (int j = i; j < n; j++) {
-//                Collections.binarySearch() 메소드를 사용하는 경우
-//                if (Collections.binarySearch(list, arr[j] - arr[i]) >= 0) {
-//                    answer = Math.max(answer, arr[j]);
-//                }
-                binarySearch(arr[j], arr[i]);
+                // nums[j] - nums[i]가 list에 있는지 확인
+                if (binarySearch(nums[j] - nums[i])) {
+                    answer = Math.max(answer, nums[j]);
+                }
             }
         }
 
         System.out.println(answer);
     }
 
-    private static void binarySearch(int max, int min) {
-        int diff = max - min;
+    private static boolean binarySearch(int searchNum) {
         int start = 0;
         int end = list.size() - 1;
         while (start <= end) {
             int mid = (start + end) / 2;
-            // 있는 경우
-            if (list.get(mid) == diff) {
-                answer = Math.max(answer, max);
-                return;
-            }
-            if (list.get(mid) > diff) {
+            if (list.get(mid) == searchNum) return true;
+            if (list.get(mid) > searchNum) {
                 end = mid - 1;
             } else {
                 start = mid + 1;
             }
         }
+
+        return false;
     }
 }
