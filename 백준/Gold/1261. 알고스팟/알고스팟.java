@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,60 +8,58 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    static int m; // 가로
-    static int n; // 세로
-    static int[][] map;
-    static boolean[][] visited;
-    static int[] dx = {1, -1, 0, 0};
-    static int[] dy = {0, 0, 1, -1};
-    static int answer;
 
     public static void main(String[] args) throws IOException {
 
-        // 입력
         st = new StringTokenizer(br.readLine());
-        m = Integer.parseInt(st.nextToken());
-        n = Integer.parseInt(st.nextToken());
-        map = new int[n][m];
-        visited = new boolean[n][m];
+        int m = Integer.parseInt(st.nextToken()); // 가로
+        int n = Integer.parseInt(st.nextToken()); // 세로
 
+        int[][] map = new int[n][m];
         for (int i = 0; i < n; i++) {
-            String[] str = br.readLine().split("");
+            char[] input = br.readLine().toCharArray();
             for (int j = 0; j < m; j++) {
-                map[i][j] = Integer.parseInt(str[j]);
+                map[i][j] = input[j] - '0';
             }
         }
 
-        // 1. 0,0을 시작으로 bfs
-        Queue<Node> que = new PriorityQueue<>();
-        visited[0][0] = true;
-        que.add(new Node(0, 0, 0));
+        int[][] cost = new int[n][m]; // cost[i][j]: i, j 위치까지 벽을 부스는 최소 개수
+        for (int i = 0; i < n; i++) {
+            Arrays.fill(cost[i], Integer.MAX_VALUE);
+        }
+        cost[0][0] = 0;
+        Queue<Node> que = new LinkedList<>();
+        que.add(new Node(0, 0));
+        int[] dy = {1, -1, 0, 0};
+        int[] dx = {0, 0, 1, -1};
+        int answer = Integer.MAX_VALUE;
 
         while (!que.isEmpty()) {
+//            print(cost);
             Node now = que.poll();
-
-            // 도착점에 도착한 경우, 해당 경로에서 벽을 부순 카운트를 answer에 갱신
-            if (now.x == m - 1 && now.y == n - 1) {
-                answer = now.breakCnt;
-                break;
+            if (now.y == n - 1 && now.x == m - 1) {
+                answer = Math.min(answer, cost[n - 1][m - 1]);
+//                break;
             }
 
             for (int i = 0; i < 4; i++) {
-                int nx = dx[i] + now.x;
                 int ny = dy[i] + now.y;
+                int nx = dx[i] + now.x;
+                if (ny < 0 || ny >= n || nx < 0 || nx >= m ) continue;
 
-                if (nx < 0 || nx >= m || ny < 0 || ny >= n) continue;
-                if (visited[ny][nx]) continue;
-
-                // 다음 노드가 0이라면 그대로 이동
+                // 길인 경우
                 if (map[ny][nx] == 0) {
-                    visited[ny][nx] = true;
-                    que.add(new Node(ny, nx, now.breakCnt));
+                    if(cost[now.y][now.x] < cost[ny][nx]) {
+                        cost[ny][nx] = cost[now.y][now.x];
+                        que.add(new Node(ny, nx));
+                    }
                 }
-                // 다음 노드가 1(벽)이라면 부수고 이동 (breakCnt++, 0으로 만들지 않음, 방문 처리)
-                if (map[ny][nx] == 1) {
-                    visited[ny][nx] = true;
-                    que.add(new Node(ny, nx, now.breakCnt + 1));
+                // 벽인 경우
+                else {
+                    if(cost[now.y][now.x] + 1 < cost[ny][nx]) {
+                        cost[ny][nx] = cost[now.y][now.x] + 1;
+                        que.add(new Node(ny, nx));
+                    }
                 }
             }
         }
@@ -68,18 +67,23 @@ public class Main {
         System.out.println(answer);
     }
 
-    public static class Node implements Comparable<Node> {
+    private static class Node {
         int y, x;
-        int breakCnt;
-        public Node (int y, int x, int breakCnt) {
+
+        public Node(int y, int x) {
             this.y = y;
             this.x = x;
-            this.breakCnt = breakCnt;
         }
+    }
 
-        @Override
-        public int compareTo(Node o) {
-            return this.breakCnt - o.breakCnt;
+    private static void print(int[][] cost) {
+        System.out.println();
+        System.out.println();
+        for (int[] ints : cost) {
+            for (int anInt : ints) {
+                System.out.print(anInt + " ");
+            }
+            System.out.println();
         }
     }
 }
