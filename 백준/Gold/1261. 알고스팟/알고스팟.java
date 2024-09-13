@@ -22,44 +22,38 @@ public class Main {
                 map[i][j] = input[j] - '0';
             }
         }
-
-        int[][] cost = new int[n][m]; // cost[i][j]: i, j 위치까지 벽을 부스는 최소 개수
-        for (int i = 0; i < n; i++) {
-            Arrays.fill(cost[i], Integer.MAX_VALUE);
-        }
-        cost[0][0] = 0;
-        Queue<Node> que = new LinkedList<>();
-        que.add(new Node(0, 0));
+        
+        boolean[][] visited = new boolean[n][m]; 
+        visited[0][0] = true;
+        Queue<Node> que = new PriorityQueue<>((o1, o2) -> o1.cnt - o2.cnt); // 적게 부슨 경우를 우선으로
+        que.add(new Node(0, 0, 0));
         int[] dy = {1, -1, 0, 0};
         int[] dx = {0, 0, 1, -1};
-        int answer = Integer.MAX_VALUE;
+        int answer = 0;
 
         while (!que.isEmpty()) {
-//            print(cost);
             Node now = que.poll();
             if (now.y == n - 1 && now.x == m - 1) {
-                answer = Math.min(answer, cost[n - 1][m - 1]);
-//                break;
+                answer = now.cnt;
+                break; // 도착점으로 오는 여러 경우 중 벽을 가장 적게 부슨 경우를 제일 먼저 만나게 됨
             }
 
             for (int i = 0; i < 4; i++) {
                 int ny = dy[i] + now.y;
                 int nx = dx[i] + now.x;
                 if (ny < 0 || ny >= n || nx < 0 || nx >= m ) continue;
+                
+                if (visited[ny][nx]) continue;
 
                 // 길인 경우
                 if (map[ny][nx] == 0) {
-                    if(cost[now.y][now.x] < cost[ny][nx]) {
-                        cost[ny][nx] = cost[now.y][now.x];
-                        que.add(new Node(ny, nx));
-                    }
+                    visited[ny][nx] = true;
+                    que.add(new Node(ny, nx, now.cnt));
                 }
                 // 벽인 경우
                 else {
-                    if(cost[now.y][now.x] + 1 < cost[ny][nx]) {
-                        cost[ny][nx] = cost[now.y][now.x] + 1;
-                        que.add(new Node(ny, nx));
-                    }
+                    visited[ny][nx] = true;
+                    que.add(new Node(ny, nx, now.cnt + 1));
                 }
             }
         }
@@ -69,21 +63,12 @@ public class Main {
 
     private static class Node {
         int y, x;
+        int cnt;
 
-        public Node(int y, int x) {
+        public Node(int y, int x, int cnt) {
             this.y = y;
             this.x = x;
-        }
-    }
-
-    private static void print(int[][] cost) {
-        System.out.println();
-        System.out.println();
-        for (int[] ints : cost) {
-            for (int anInt : ints) {
-                System.out.print(anInt + " ");
-            }
-            System.out.println();
+            this.cnt = cnt;
         }
     }
 }
