@@ -1,48 +1,41 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간 복잡도 = O(N * logN)
 public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static int k;
-    static int n;
-    static int[] arr;
+    static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
-
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        k = Integer.parseInt(st.nextToken());
-        n = Integer.parseInt(st.nextToken());
-        arr = new int[k];
-        long end = 0;
+        st = new StringTokenizer(br.readLine());
+        int k = Integer.parseInt(st.nextToken());
+        int n = Integer.parseInt(st.nextToken());
+        int[] lines = new int[k];
         for (int i = 0; i < k; i++) {
-            arr[i] = Integer.parseInt(br.readLine());
-            end = Math.max(end, arr[i]);
+            lines[i] = Integer.parseInt(br.readLine());
         }
 
-        // 이분 탐색
-        long start = 0;
-        end++;
+        Arrays.sort(lines);
+        long start = 1;
+        long end = lines[lines.length - 1];
 
-        while (start < end) { // start와 end가 같아질 때까지
+        while (start <= end) {
             long mid = (start + end) / 2;
-            long count = 0;
-            for (int i = 0; i < k; i++) {
-                count += arr[i] / mid;
+            long cnt = 0;
+            for (int line : lines) {
+                cnt += line / mid;
             }
 
-            // 더 짧게 자르기
-            if (count < n) {
-                end = mid;
+            if (cnt < n) {
+                end = mid - 1;
             } else {
-                // 더 길게 자르기 (같은 경우에도 더 길게)
                 start = mid + 1;
             }
         }
-        System.out.println(start - 1); // upper bound를 구했으므로
+
+        System.out.println(end);
     }
 }
+
