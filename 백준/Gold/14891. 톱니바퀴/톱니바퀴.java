@@ -4,93 +4,107 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간 복잡도
 public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    static int[][] arr = new int[4][8];
-    static int k;
-    static int[] rotateArr = new int[4]; // 0: 회전 X, 1: 시계 방향 회전, -1: 반시계 방향 회전
+    static StringTokenizer st;
+    static int[][] gears;
 
     public static void main(String[] args) throws IOException {
 
+        gears = new int[4][8];
         for (int i = 0; i < 4; i++) {
-            String[] input = br.readLine().split("");
+            char[] input = br.readLine().toCharArray();
             for (int j = 0; j < 8; j++) {
-                arr[i][j] = Integer.parseInt(input[j]);
+                gears[i][j] = input[j] - '0';
             }
         }
 
-        k = Integer.parseInt(br.readLine());
+        int k = Integer.parseInt(br.readLine());
         for (int i = 0; i < k; i++) {
+//            System.out.println("====================");
+//            for (int[] gear : gears) {
+//                System.out.println(
+//                );
+//                for (int i1 : gear) {
+//                    System.out.print(i1 + " ");
+//                }
+//                System.out.println();
+//            }
 
-            StringTokenizer st = new StringTokenizer(br.readLine());
-            int point = Integer.parseInt(st.nextToken()) - 1;
-            int direction = Integer.parseInt(st.nextToken());
 
-            // 회전할 톱니 판단하기
-            Arrays.fill(rotateArr, 0);
-            rotateArr[point] = direction;
-            checkRotate(point);
+            st = new StringTokenizer(br.readLine());
+            int gearNum = Integer.parseInt(st.nextToken());
+            int dir = Integer.parseInt(st.nextToken());
 
-            // 회전해야 하는 톱니 회전
-            for (int j = 0; j < 4; j++) {
-                if (rotateArr[j] == 1) {
-                    rotateRight(arr[j]);
+            int[] turnDir = getTurnGear(gearNum - 1, dir);
+            turn(turnDir);
+        }
+
+//        System.out.println("====================");
+//        for (int[] gear : gears) {
+//            System.out.println(
+//            );
+//            for (int i1 : gear) {
+//                System.out.print(i1 + " ");
+//            }
+//            System.out.println();
+//        }
+        // 최종 점수 출력
+        int answer = 0;
+        answer += gears[0][0] == 0 ? 0 : 1;
+        answer += gears[1][0] == 0 ? 0 : 2;
+        answer += gears[2][0] == 0 ? 0 : 4;
+        answer += gears[3][0] == 0 ? 0 : 8;
+        System.out.println(answer);
+    }
+
+    private static void turn(int[] turnDir) {
+        for (int i = 0; i < 4; i++) {
+            if (turnDir[i] == 0) continue;
+
+            if (turnDir[i] == 1) {
+                int temp = gears[i][7];
+                for (int j = 7; j >= 1; j--) {
+                    gears[i][j] = gears[i][j - 1];
                 }
-                if (rotateArr[j] == -1) {
-                    rotateLeft(arr[j]);
+                gears[i][0] = temp;
+            }
+
+            if (turnDir[i] == -1) {
+                int temp = gears[i][0];
+                for (int j = 0; j <= 6; j++) {
+                    gears[i][j] = gears[i][j + 1];
                 }
+                gears[i][7] = temp;
             }
         }
-
-        System.out.println(calculateScore());
     }
 
-    private static void checkRotate(int point) {
-        // 오른쪽에 있는 톱니 판단
-        for (int i = point; i < 3; i++) {
-            if (arr[i][2] != arr[i + 1][6]) {
-                rotateArr[i + 1] = -1 * rotateArr[i];
-            } else {
+    private static int[] getTurnGear(int gearIdx, int dir) {
+        int[] turnDir = new int[4];
+        turnDir[gearIdx] = dir;
+
+        // 왼쪽 톱니바퀴
+        for (int i = gearIdx - 1; i >= 0; i--) {
+            if (gears[i + 1][6] == gears[i][2]) {
                 break;
-            }
-        }
-
-        // 왼쪽에 있는 톱니 판단
-        for (int i = point; i > 0; i--) {
-            if (arr[i][6] != arr[i - 1][2]) {
-                rotateArr[i - 1] = -1 * rotateArr[i];
             } else {
-                break;
+                turnDir[i] = turnDir[i + 1] * -1;
             }
         }
-    }
 
-    // 시계 방향 회전
-    private static void rotateRight(int[] target) {
-        int temp = target[7];
-        for (int i = 7; i >= 1; i--) {
-            target[i] = target[i - 1];
+        // 오른쪽 톱니바퀴
+        for (int i = gearIdx + 1; i <= 3; i++) {
+            if (gears[i - 1][2] == gears[i][6]) {
+                break;
+            } else {
+                turnDir[i] = turnDir[i - 1] * -1;
+            }
         }
-        target[0] = temp;
-    }
 
-    // 반시계 방향 회전
-    private static void rotateLeft(int[] target) {
-        int temp = target[0];
-        for (int i = 0; i <= 6; i++) {
-            target[i] = target[i + 1];
-        }
-        target[7] = temp;
-    }
-
-    private static int calculateScore() {
-        int score = 0;
-        if (arr[0][0] == 1) score += 1;
-        if (arr[1][0] == 1) score += 2;
-        if (arr[2][0] == 1) score += 4;
-        if (arr[3][0] == 1) score += 8;
-        return score;
+        return turnDir;
     }
 }
+
+
