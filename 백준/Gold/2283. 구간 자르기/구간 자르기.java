@@ -31,16 +31,22 @@ public class Main {
 
         // 투포인터로 구간 찾기
         int start = 0;
-        int end = 0;
+        int end = 1;
         int sum = pSum[0];
-        while (end < 1000000) {
+        while (start <= end && end <= 1000000) {
+            if (start == end) {
+                sum = pSum[start];
+                end++;
+                continue;
+            }
+
             if (sum == k) {
-                System.out.println(start + " " + (end + 1));
+                System.out.println(start + " " + end);
                 return;
             }
             if (sum < k) {
-                end++;
                 sum += pSum[end];
+                end++;
             }
             if (sum > k) {
                 sum -= pSum[start];
