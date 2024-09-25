@@ -15,50 +15,39 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
         int k = Integer.parseInt(st.nextToken());
 
-        int[] count = new int[1000001];
-
-        // 0~10 위치의 선분 = count[0]~count[9]에 값이 채워짐
-        int max = 0;
-        int min = Integer.MAX_VALUE;
+        int[] pSum = new int[1000001];
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             int start = Integer.parseInt(st.nextToken());
             int end = Integer.parseInt(st.nextToken());
-            count[start]++;
-            count[end]--;
-            max = Math.max(max, end);
-            min = Math.min(min, start);
+            pSum[start]++;
+            pSum[end]--;
         }
 
-        for (int i = 1; i <= max; i++) {
-            count[i] += count[i - 1];
+        // 누적합 더하기
+        for (int i = 1; i <= 1000000; i++) {
+            pSum[i] += pSum[i - 1];
         }
 
-        // 투포인터로 s, e 찾기
-        int start = min;
-        int end = min;
-        int sum = count[start];
-        while (end < max) {
-//            System.out.println(start + "~" + end + "= " + sum);
-            if (sum < k) {
-                end++;
-                sum += count[end];
-            }
-
-            else if (sum > k) {
-                sum -= count[start];
-                start++;
-            }
-
-            else if (sum == k) {
-                if (start == min) {
-                    start = 0;
-                }
+        // 투포인터로 구간 찾기
+        int start = 0;
+        int end = 0;
+        int sum = pSum[0];
+        while (end < 1000000) {
+            if (sum == k) {
                 System.out.println(start + " " + (end + 1));
                 return;
             }
+            if (sum < k) {
+                end++;
+                sum += pSum[end];
+            }
+            if (sum > k) {
+                sum -= pSum[start];
+                start++;
+            }
         }
-        
+
         System.out.println("0 0");
     }
 }
