@@ -1,13 +1,14 @@
+import java.util.*;
+
 class Solution {
     
     int n;
     int[][] wires;
-    int answer = Integer.MAX_VALUE;
     boolean[] visited;
     boolean[][] map;
+    int answer = Integer.MAX_VALUE;
     
     public int solution(int n, int[][] wires) {
-        
         this.n = n;
         this.wires = wires;
         
@@ -17,20 +18,21 @@ class Solution {
             
             for (int j = 0; j < n - 1; j++) {
                 if (i == j) continue;
-                map[wires[j][0]][wires[j][1]] = true;
-                map[wires[j][1]][wires[j][0]] = true;
+                map[wires[j][0]][wires[j][1]] = map[wires[j][1]][wires[j][0]] = true;
             }
             
-            int result1 = dfs(wires[i][0]);
-            int result2 = n - result1;
-            answer = Math.min(answer, Math.abs(result1 - result2));
+            int result = dfs(1);
+            int diff = Math.abs(result - (n - result));
+            answer = Math.min(answer, diff);
         }
+        
         return answer;
     }
     
-    public int dfs(int start) {
-        visited[start] = true;
+    private int dfs(int start) {
+        
         int sum = 1;
+        visited[start] = true;
         
         for (int i = 1; i <= n; i++) {
             if (map[start][i] && !visited[i]) {
