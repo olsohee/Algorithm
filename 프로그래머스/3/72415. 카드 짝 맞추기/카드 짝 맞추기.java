@@ -1,191 +1,214 @@
 import java.util.*;
-
 class Solution {
 
     int[][] board;
-    int r, c;
-    List<List<Integer>> combinationList = new ArrayList<>();
-    int nowY, nowX;
+    Map<Integer, List<Node>> cardMap = new HashMap<>();
+    List<Integer> cardList = new ArrayList<>();
+    List<Node[]> combinations = new ArrayList<>();
+    int answer = Integer.MAX_VALUE;
+    int y, x; // 현재 위치
+    int[] dy = {-1, 1, 0, 0};
+    int[] dx = {0, 0, -1, 1};
 
     public int solution(int[][] board, int r, int c) {
         this.board = board;
-        this.r = r;
-        this.c = c;
 
-        // 1. 카드 뽑는 순서의 조합 만들기
-        Set<Integer> set = new HashSet<>();
+        // 1. Map 채우기 (key: 카드 번호, value: 해당 카드가 위치한 두 개의 노드)
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                if (board[i][j] != 0) {
-                    set.add(board[i][j]);
+                if (board[i][j] == 0) continue;
+                int card = board[i][j];
+                if (cardMap.containsKey(card)) {
+                    cardMap.get(card).add(new Node(i, j));
+                } else {
+                    cardMap.put(card, new ArrayList<>());
+                    cardMap.get(card).add(new Node(i, j));
                 }
             }
         }
+//
+//        for (Integer card : cardMap.keySet()) {
+//            System.out.println("card번호 = " + card);
+//            List<Node> nodes = cardMap.get(card);
+//            for (Node node : nodes) {
+//                System.out.println(node.y + ", " + node.x);
+//            }
+//        }
+//        System.out.println();
+//        System.out.println();
 
-        List<Integer> list = new ArrayList<>();
-        for (Integer integer : set) {
-            list.add(integer);
+        // 2. 카드 뽑는 순서 생성
+        for (Integer card : cardMap.keySet()) {
+            cardList.add(card);
         }
+        dfs(new boolean[cardList.size()], 0, new Node[cardList.size() * 2]);
 
-        dfs(list, new ArrayList<>(), new boolean[list.size()]);
-
-
-        // 2. 각 조합마다 키 조작 횟수 구하기
-        int answer = Integer.MAX_VALUE;
-        for (List<Integer> combination : combinationList) {
-//            System.out.println("======조합======");
-//            for (Integer integer : combination) {
-//                System.out.print(integer + " ");
+        // 3. 각 조합별 계산
+        for (Node[] combination : combinations) {
+            int[][] copyBoard = new int[4][4];
+            for (int i = 0; i < 4; i++) {
+                copyBoard[i] = board[i].clone();
+            }
+//            System.out.println("---------------------");
+//            for (Node node : combination) {
+//                System.out.print("(" + node.y + ", " + node.x + ")" + " , ");
 //            }
 //            System.out.println();
 
-            nowY = r;
-            nowX = c;
-            int[][] copyMap = new int[4][4];
-            for (int i = 0; i < 4; i++) {
-                for (int j = 0; j < 4; j++) {
-                    copyMap[i][j] = board[i][j];
-                }
-            }
-            int cntSum = 0;
-            for (int i = 0; i < combination.size(); i++) {
-//                System.out.println("찾는 번호: " + combination.get(i));
-                int result = bfs(combination.get(i), copyMap);
-                int result2 = bfs(combination.get(i), copyMap);
+            y = r;
+            x = c;
+            int cnt = 0;
+            for (Node node : combination) {
+                int result = bfs(copyBoard, node.y, node.x);
 //                System.out.println(result);
-//                System.out.println(result2);
-                cntSum += result;
-                cntSum += result2;
+                cnt+= result;
             }
-            cntSum += combination.size() * 2; // 엔터
-//            System.out.println("cntSum = " + cntSum);
-            answer = Math.min(answer, cntSum);
+//            System.out.println("엔터 제외 횟수 = "  + cnt);
+
+            cnt += combination.length; // 엔터 누른 횟수 더하기
+
+
+            answer = Math.min(answer, cnt);
         }
 
         return answer;
     }
 
-    private int bfs(int num, int[][] copyMap) {
-        int[] dy = {1, -1, 0, 0};
-        int[] dx = {0, 0, 1, -1};
+    private int bfs(int[][] board, int destinationY, int destinationX) {
+//        System.out.println("bfs 시작, 목표 = " + destinationY + ", " + destinationX);
+        // 현재 위치에서 목표 위치로 가기
         boolean[][] visited = new boolean[4][4];
+        Queue<MoveNode> que = new LinkedList<>();;
 
-        Queue<Node> que = new LinkedList<>();
-        que.add(new Node(nowY, nowX, 0));
-        visited[nowY][nowX] = true;
+        visited[y][x] = true;
+        que.add(new MoveNode(y, x, 0));
 
         while (!que.isEmpty()) {
-            Node now = que.poll();
+            MoveNode now = que.poll();
+//            System.out.println("poll = " + now.y + ", "  + now.x);
 
-            // num을 찾은 경우
-            if (copyMap[now.y][now.x] == num) {
-                copyMap[now.y][now.x] = 0;
-                nowY = now.y;
-                nowX = now.x;
+            // 도착
+            if (now.y == destinationY && now.x == destinationX) {
+                y = destinationY;
+                x = destinationX;
+                board[y][x] = 0;
                 return now.cnt;
             }
 
-            // 방향키
+            // 계속 이동 - 한 칸 이동
             for (int i = 0; i < 4; i++) {
-                int ny = dy[i] + now.y;
-                int nx = dx[i] + now.x;
-                if (ny < 0 || ny >= 4 || nx < 0 || nx >= 4) continue;
+                int ny = now.y + dy[i];
+                int nx = now.x + dx[i];
+                if (ny < 0 || nx < 0 || ny >= 4 || nx >= 4) continue;
                 if (visited[ny][nx]) continue;
 
                 visited[ny][nx] = true;
-                que.add(new Node(ny, nx, now.cnt + 1));
+                que.add(new MoveNode(ny, nx, now.cnt + 1));
             }
 
-            // ctrl + 방향키
-            for (int i = 0; i < 4; i++) {
-                int ny = now.y;
-                int nx = now.x;
-                switch (i) {
-                    case 0: // 오른쪽
-                        while (true) {
-                            nx++;
-                            if (nx == 4) {
-                                nx = 3;
-                                break;
-                            }
-                            if (copyMap[ny][nx] != 0) {
-                                break;
-                            }
-                        }
-                        break;
-                    case 1: // 왼쪽
-                        while (true) {
-                            nx--;
-                            if (nx == -1) {
-                                nx = 0;
-                                break;
-                            }
-                            if (copyMap[ny][nx] != 0) {
-                                break;
-                            }
-                        }
-                        break;
-                    case 2: // 위쪽
-                        while (true) {
-                            ny--;
-                            if (ny == -1) {
-                                ny = 0;
-                                break;
-                            }
-                            if (copyMap[ny][nx] != 0) {
-                                break;
-                            }
-                        }
-                        break;
-                    case 3: // 아래쪽
-                        while (true) {
-                            ny++;
-                            if (ny == 4) {
-                                ny = 3;
-                                break;
-                            }
-                            if (copyMap[ny][nx] != 0) {
-                                break;
-                            }
-                        }
-                }
-                if (visited[ny][nx]) continue;
-                visited[ny][nx] = true;
-                que.add(new Node(ny, nx, now.cnt + 1));
+            // 계속 이동 - 컨트롤 이동
+            // 위
+            int ny =  now.y;
+            while (--ny >= 0) {
+                if (board[ny][now.x] != 0) break;
+            }
+            if (ny == -1) ny = 0;
+            if (!visited[ny][now.x]) {
+                visited[ny][now.x] = true;
+                que.add(new MoveNode(ny, now.x, now.cnt + 1));
+//                System.out.println(ny + ", " + now.x);
+            }
+            // 아래
+            ny =  now.y;
+            while (++ny < 4) {
+                if (board[ny][now.x] != 0) break;
+            }
+            if (ny == 4) ny = 3;
+            if (!visited[ny][now.x]) {
+                visited[ny][now.x] = true;
+                que.add(new MoveNode(ny, now.x, now.cnt + 1));
+//                System.out.println(ny + ", " + now.x);
+
+            }
+
+            // 오른쪽
+            int nx = now.x;
+            while (++nx < 4) {
+                if (board[now.y][nx] != 0) break;
+            }
+            if (nx == 4) nx = 3;
+            if (!visited[now.y][nx]) {
+                visited[now.y][nx] = true;
+                que.add(new MoveNode(now.y, nx, now.cnt + 1));
+//                System.out.println(now.y + ", " + nx);
+
+            }
+
+            // 왼쪽
+            nx = now.x;
+            while (--nx >= 0) {
+                if (board[now.y][nx] != 0) break;
+            }
+            if (nx == -1) nx = 0;
+            if (!visited[now.y][nx]) {
+                visited[now.y][nx] = true;
+                que.add(new MoveNode(now.y, nx, now.cnt + 1));
+//                System.out.println(now.y + ", " + nx);
+
             }
         }
 
-        System.out.println("오류");
-        return -1;
+        return 0;
     }
 
-    private void dfs(List<Integer> list, List<Integer> combination, boolean[] visited) {
+    private void dfs(boolean[] visited, int depth, Node[] result) {
+        if (depth == cardList.size()) {
 
-        if (combination.size() == list.size()) {
-            List<Integer> combi = new ArrayList<>();
-            for (Integer integer : combination) {
-                combi.add(integer);
+//            System.out.println("!!!");
+//            for (Node node : result) {
+//                System.out.print("(" + node.y + ", " + node.x + ")" + " , ");
+//            }
+
+            Node[] copyResult = new Node[result.length];
+            for (int i = 0; i < result.length; i++) {
+                copyResult[i] = new Node(result[i].y, result[i].x);
             }
-            combinationList.add(combi);
+            combinations.add(copyResult);
             return;
         }
 
-        for (int i = 0; i < list.size(); i++) {
-            if (visited[i]) continue;
-            visited[i] = true;
-            combination.add(list.get(i));
-            dfs(list, combination, visited);
+        for (int i = 0; i < cardList.size(); i++) {
+            int cardNum = cardList.get(i);
+            if (!visited[i]) {
 
-            combination.remove((Object)list.get(i));
-            visited[i] = false;
+                visited[i] = true;
+
+                result[depth * 2] = cardMap.get(cardNum).get(0);
+                result[depth * 2 + 1] = cardMap.get(cardNum).get(1);
+                dfs(visited, depth + 1, result);
+
+                result[depth * 2] = cardMap.get(cardNum).get(1);
+                result[depth * 2 + 1] = cardMap.get(cardNum).get(0);
+                dfs(visited, depth + 1, result);
+
+                visited[i] = false;
+            }
         }
     }
 
     private class Node {
         int y, x;
-        int cnt;
 
-        public Node(int y, int x, int cnt) {
+        public Node(int y, int x) {
+            this.y = y;
+            this.x = x;
+        }
+    }
+
+    private class MoveNode {
+        int y, x, cnt;
+
+        public MoveNode(int y, int x, int cnt) {
             this.y = y;
             this.x = x;
             this.cnt = cnt;
