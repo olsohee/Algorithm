@@ -1,62 +1,51 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
 
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
     static int n;
-    static int from;
-    static int to;
-    static int[][] map;
-    static int[] visited;
+    static boolean[][] map;
+    static boolean[] visited;
+    static int start, end;
+    static int answer;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         n = Integer.parseInt(br.readLine());
-        map = new int[n + 1][n + 1];
-        visited = new int[n + 1];
+        st = new StringTokenizer(br.readLine());
+        start = Integer.parseInt(st.nextToken());
+        end = Integer.parseInt(st.nextToken());
 
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        from = Integer.parseInt(st.nextToken());
-        to = Integer.parseInt(st.nextToken());
+        map = new boolean[n + 1][n + 1];
+        visited = new boolean[n + 1];
 
-        int m = Integer.parseInt(br.readLine()); // 부모-자식 관계 수
-
-        for(int i = 0; i < m; i++) {
+        int m = Integer.parseInt(br.readLine());
+        for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
             int n1 = Integer.parseInt(st.nextToken());
             int n2 = Integer.parseInt(st.nextToken());
-            map[n1][n2] = 1;
-            map[n2][n1] = 1;
+            map[n1][n2] = map[n2][n1] = true;
         }
 
-        bfs(from, to);
+        dfs(start, 0);
 
-        if(visited[to] == 0) {
-            System.out.println(-1);
-        } else {
-            System.out.println(visited[to]);
-        }
+        System.out.println((answer == 0) ? -1 : answer);
     }
 
-    static void bfs(int start, int end) {
-        Queue<Integer> que = new LinkedList<>();
-        que.add(start);
+    private static void dfs(int now, int depth) {
+        if (now == end) {
+            answer = depth;
+            return;
+        }
 
-        while(!que.isEmpty()) {
-            int q = que.poll();
-            if(q == end) {
-                break;
-            }
-            for(int i = 1; i <= n; i++) {
-                if(visited[i] == 0 && map[q][i] == 1) {
-                    visited[i] = visited[q] + 1;
-                    que.add(i);
-                }
+        for (int i = 1; i <= n; i++) {
+            if (map[now][i] && !visited[i]) {
+                visited[i] = true;
+                dfs(i, depth + 1);
+                visited[i] = false;
             }
         }
     }
