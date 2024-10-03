@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,80 +8,117 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    static int n;
-    static int k;
-    static int l;
-    static int[][] map;
-    static int time;
-    static Map<Integer, String> turnMap = new HashMap<>();
-    static Queue<Position> que = new LinkedList<>();
-    static int[] dx = {1, 0, -1, 0}; // dir: 0(오), 1(아래), 2(왼), 3(위)
+    static List<Node> snake = new LinkedList<>();
+    static List<Time> timeList = new ArrayList<>();
     static int[] dy = {0, 1, 0, -1};
+    static int[] dx = {1, 0, -1, 0};
+    static int direction = 0; // 0:오, 1:아래, 2:왼, 3:위
+    static int gameTime = 0;
+    static int timeIdx = 0;
 
     public static void main(String[] args) throws IOException {
 
-        n = Integer.parseInt(br.readLine());
-        map = new int[n + 1][n + 1];
-        k = Integer.parseInt(br.readLine());
+        int n = Integer.parseInt(br.readLine());
+        int[][] map = new int[n + 1][n + 1];
+        int k = Integer.parseInt(br.readLine());
         for (int i = 0; i < k; i++) {
             st = new StringTokenizer(br.readLine());
-            map[Integer.parseInt(st.nextToken())][Integer.parseInt(st.nextToken())] = 1;
+            int y = Integer.parseInt(st.nextToken());
+            int x = Integer.parseInt(st.nextToken());
+            map[y][x] = 1; // 사과가 있는 위치 = 1
         }
 
-        l = Integer.parseInt(br.readLine());
+        int l = Integer.parseInt(br.readLine());
         for (int i = 0; i < l; i++) {
             st = new StringTokenizer(br.readLine());
-            turnMap.put(Integer.parseInt(st.nextToken()), st.nextToken());
+            int time = Integer.parseInt(st.nextToken());
+            String direction = st.nextToken();
+            timeList.add(new Time(time, direction));
         }
 
-        que.add(new Position(1, 1));
-        time = 0;
-        int dir = 0;
-        int headY = 1;
-        int headX = 1;
-        while (true) {
-            int nx = headX + dx[dir];
-            int ny = headY + dy[dir];
+        Collections.sort(timeList, (o1, o2) -> o1.time - o2.time);
 
-            // 이동 가능한지 검증
-            if (nx <= 0 || nx > n || ny <= 0 || ny > n || map[ny][nx] == -1) {
+        // 뱀 이동 시작
+        snake.add(new Node(1, 1));
+
+        while (true) {
+
+            int ny = snake.get(0).y + dy[direction];
+            int nx = snake.get(0).x + dx[direction];
+
+            // 벽에 닿거나, 자기 자신에 닿으면 -> 끝내기
+            if (ny <= 0 || nx <= 0 || ny > n || nx > n || isTouchSnake(ny, nx)) {
+                gameTime++;
                 break;
             }
 
-            // 이동
-            if (map[ny][nx] == 0) { // 사과가 없으면 하나 빼기
-                Position p = que.poll();
-                map[p.y][p.x] = 0;
+            // 사괴이면 머리 넣기
+            if (map[ny][nx] == 1) {
+                snake.add(0, new Node(ny, nx));
+                map[ny][nx] = 0;
             }
-            que.add(new Position(ny, nx)); // 하나 추가
-            map[ny][nx] = -1;
-            headY = ny;
-            headX = nx;
 
-            // 시간 추가
-            time++;
+            // 빈 공간이면 머리 넣기 + 꼬리 빼기
+            else {
+                snake.add(0, new Node(ny, nx));
+                snake.remove(snake.size() - 1);
+            }
 
-            // 방향 회전 O/X
-            if (turnMap.containsKey(time)) {
-                if (turnMap.get(time).equals("L")) {
-                    dir -= 1;
-                    if (dir == -1) dir = 3;
-                } else {
-                    dir += 1;
-                    if (dir == 4) dir = 0;
+            gameTime++;
+            if (timeIdx < timeList.size()) {
+                if (timeList.get(timeIdx).time == gameTime) {
+                    turn();
                 }
             }
         }
 
-        System.out.println(time + 1);
+        System.out.println(gameTime);
     }
 
-    static class Position {
+    private static boolean isTouchSnake(int ny, int nx) {
+
+        for (Node snakeLocation : snake) {
+            if (snakeLocation.y == ny && snakeLocation.x == nx) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void turn() {
+        // 왼쪽으로 회전
+        if (timeList.get(timeIdx).direction.equals("L")) {
+            direction--;
+            if (direction == -1) direction = 3;
+        }
+
+        // 오른쪽으로 회전
+        if (timeList.get(timeIdx).direction.equals("D")) {
+            direction++;
+            if (direction == 4) direction = 0;
+        }
+
+        timeIdx++;
+    }
+
+    private static class Node {
+
         int y, x;
 
-        public Position(int y, int x) {
+        public Node(int y, int x) {
             this.y = y;
             this.x = x;
+        }
+    }
+
+    private static class Time {
+
+        int time;
+        String direction;
+
+        public Time(int time, String direction) {
+            this.time = time;
+            this.direction = direction;
         }
     }
 }
