@@ -1,109 +1,113 @@
 import java.util.*;
-class Solution {
 
+class Solution {
+    
     int n;
     int[][] paths;
     int[] gates;
     int[] summits;
     List<List<Node>> list = new ArrayList<>();
-    int[] dist;
-
+    
     public int[] solution(int n, int[][] paths, int[] gates, int[] summits) {
         this.n = n;
         this.paths = paths;
         this.gates = gates;
         this.summits = summits;
+        
         for (int i = 0; i <= n; i++) {
             list.add(new ArrayList<>());
         }
-
-        // 출입구 -> 정상으로의 최소 비용만 구하면 된다.
+        
         for (int[] path : paths) {
-            int v1 = path[0];
-            int v2 = path[1];
+            int n1 = path[0];
+            int n2 = path[1];
             int intensity = path[2];
-            // 단방향
-            if (isGate(v1) || isSummit(v2)) {
-                list.get(v1).add(new Node(v2, intensity));
-            } else if (isSummit(v1) || isGate(v2)) {
-                list.get(v2).add(new Node(v1, intensity));
+            // n1 -> n2
+            if (isGate(n1) || isSummit(n2)) {
+                list.get(n1).add(new Node(n2, intensity));
             }
+            
+            // n2 -> n1
+            else if (isGate(n2) || isSummit(n1)) {
+                list.get(n2).add(new Node(n1, intensity));
+            }
+            
             // 양방향
             else {
-                list.get(v1).add(new Node(v2, intensity));
-                list.get(v2).add(new Node(v1, intensity));
+                list.get(n1).add(new Node(n2, intensity));
+                list.get(n2).add(new Node(n1, intensity));
             }
         }
         
-        dijkstra(); // 다익스트라
-
-        Arrays.sort(summits); // 산봉우리 번호가 낮은 순서대로 정렬
-        int minIntensity = Integer.MAX_VALUE;
-        int summitNum = 0;
-        for (int summit : summits) {
-            if (dist[summit] < minIntensity) {
-                minIntensity = dist[summit];
-                summitNum = summit;
-            }
-        }
-
-        return new int[]{summitNum, minIntensity};
-    }
-
-    private void dijkstra() {
-        PriorityQueue<Node> que = new PriorityQueue<>();
-        dist = new int[n + 1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
+        // 1. 출입구 -> 산봉우리로 이동 (다익스트라)
+        Queue<Node> que = new PriorityQueue<>((o1, o2) -> o1.intensity - o2.intensity); //???
         boolean[] visited = new boolean[n + 1];
-
+        int[] intensity = new int[n + 1]; // intensity[i] = 출입구에서 i번 노드까지 가는데 걸린 최대 intensity
+        Arrays.fill(intensity, Integer.MAX_VALUE);
+        
         for (int gate : gates) {
-            dist[gate] = 0;
+            intensity[gate] = 0;
             que.add(new Node(gate, 0));
         }
-
+        
         while (!que.isEmpty()) {
             Node now = que.poll();
-            if (now.intensity > dist[now.end]) continue;
             if (visited[now.end]) continue;
             visited[now.end] = true;
-            for (Node node : list.get(now.end)) {
-                if (dist[node.end] > Math.max(dist[now.end], node.intensity)) {
-                    dist[node.end] = Math.max(dist[now.end], node.intensity);
-                    que.add(new Node(node.end, dist[node.end]));
+            
+            // now -> next로 이동, intensity가 더 짧으면 갱신 (intensity가 가장 짧은 경로를 찾는 것임)
+            for (Node next : list.get(now.end)) {
+                if (intensity[next.end] > Math.max(now.intensity, next.intensity)) {
+                    intensity[next.end]  = Math.max(now.intensity, next.intensity);
+                    que.add(new Node(next.end, intensity[next.end]));
                 }
             }
         }
-    }
-
-    private boolean isSummit(int v) {
+        
+        // 2. intensity가 가장 작은 산봉우리와 intensity 구하기
+        int minIntensity = Integer.MAX_VALUE;
+        int answerSummit = 0;
+        Arrays.sort(summits);
         for (int summit : summits) {
-            if (summit == v) {
-                return true;
+            if (minIntensity > intensity[summit]) {
+                minIntensity = intensity[summit];
+                answerSummit = summit;
             }
+        }
+        
+//         for (int i = 1; i < intensity.length; i++) {
+//             if (isSummit(i)) {
+//                 if (minIntensity > intensity[i]) {
+//                     minIntensity = intensity[i];
+//                     answerSummit = i;
+//                 }
+//             }
+            
+//         }
+        
+        return new int[]{answerSummit, minIntensity};
+    }
+    
+    private boolean isGate(int num) {
+        for (int n : gates) {
+            if (num == n) return true;
         }
         return false;
     }
-
-    private boolean isGate(int v) {
-        for (int gate : gates) {
-            if (gate == v) {
-                return true;
-            }
+    
+    private boolean isSummit(int num) {
+        for (int n : summits) {
+            if (num == n) return true;
         }
         return false;
     }
-
-    class Node implements Comparable<Node> {
+    
+    private class Node {
         int end, intensity;
-
-        public Node(int end, int intensity) {
+        
+        public Node (int end, int intensity) {
             this.end = end;
             this.intensity = intensity;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return intensity - o.intensity;
         }
     }
 }
