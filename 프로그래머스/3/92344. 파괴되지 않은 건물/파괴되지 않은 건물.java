@@ -1,85 +1,71 @@
-import java.util.*;
-
 class Solution {
-    
-    int n, m;
-    int[][] skillMap;
-    int[][] sumMap;
-    int[][] board;
-    
     public int solution(int[][] board, int[][] skill) {
-        n = board.length;
-        m = board[0].length;
-        this.board = board;
-        skillMap = new int[n][m];
-        sumMap = new int[n][m];
+        int n = board.length; // 세로
+        int m = board[0].length; // 가로
         
-        // 1. 스킬 반영(배열의 끝 점들에만 반영)
-        for (int[] s : skill) {
+        // 1. 공격을 누적합 준비 배열에 반영
+        int[][] pSum = new int[n][m];
+        for (int i = 0; i < skill.length; i++) {
+            int type = skill[i][0];
+            int y1 = skill[i][1];
+            int x1 = skill[i][2];
+            int y2 = skill[i][3];
+            int x2 = skill[i][4];
+            int degree = skill[i][5];
+            
             // 공격
-            if (s[0] == 1) {
-                attack(s[1], s[2], s[3], s[4], s[5]);
+            if (type == 1) {
+                pSum[y1][x1] -= degree;
+                if (x2 + 1 < m) {
+                    pSum[y1][x2 + 1] += degree;
+                }
+                if (y2 + 1 < n) {
+                    pSum[y2 + 1][x1] += degree;
+                }
+                if (y2 + 1 < n && x2 + 1 < m) {
+                    pSum[y2 + 1][x2 + 1] -= degree;
+                }
             }
             
-            // 방어
-            if (s[0] == 2) {
-                defend(s[1], s[2], s[3], s[4], s[5]);
+            // 회복
+            if (type == 2) {
+                pSum[y1][x1] += degree;
+                if (x2 + 1 < m) {
+                    pSum[y1][x2 + 1] -= degree;
+                }
+                if (y2 + 1 < n) {
+                    pSum[y2 + 1][x1] -= degree;
+                }
+                if (y2 + 1 < n && x2 + 1 < m) {
+                    pSum[y2 + 1][x2 + 1] += degree;
+                }
             }
         }
         
-        // 2. 스킬들 누적합 구하기
+        // 2. 누적합 준비 배열을 누적합하기
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
                 if (i == 0 && j == 0) {
-                     sumMap[i][j] = skillMap[i][j]; 
+                    continue;
                 } else if (i == 0) {
-                     sumMap[i][j] = sumMap[i][j - 1] + skillMap[i][j]; 
+                    pSum[i][j] += pSum[i][j - 1];
                 } else if (j == 0) {
-                     sumMap[i][j] = sumMap[i - 1][j] + skillMap[i][j]; 
+                    pSum[i][j] += pSum[i - 1][j];
                 } else {
-                   sumMap[i][j] = sumMap[i - 1][j] + sumMap[i][j - 1] - sumMap[i - 1][j - 1] + skillMap[i][j]; 
+                    pSum[i][j] = pSum[i - 1][j] + pSum[i][j - 1] - pSum[i - 1][j - 1] + pSum[i][j];
                 }
-                
             }
         }
         
-        // 3. 누적합을 게임 맵에 반영 후 답 구하기
+        // 3. 누적합 결과를 원본 배열에 반영, 파괴되지 않은 건물 개수 세기
         int answer = 0;
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < m; j++) {
-                board[i][j] += sumMap[i][j];
-                if (board[i][j] > 0) {
-                    answer++;
-                }
+                board[i][j] += pSum[i][j];
+                if (board[i][j] > 0) answer++;
             }
         }
         
         return answer;
-    }
-    
-    private void attack(int r1, int c1, int r2, int c2, int degree) {
-        skillMap[r1][c1] -= degree;
-        if (r2 + 1 < n) {
-            skillMap[r2 + 1][c1] += degree;
-        }
-        if (c2 + 1 < m) {
-            skillMap[r1][c2 + 1] += degree;
-        }
-        if (r2 + 1 < n && c2 + 1 < m) {
-            skillMap[r2 + 1][c2 + 1] -= degree;
-        }
-    }
-    
-    private void defend(int r1, int c1, int r2, int c2, int degree) {
-        skillMap[r1][c1] += degree;
-        if (r2 + 1 < n) {
-            skillMap[r2 + 1][c1] -= degree;
-        }
-        if (c2 + 1 < m) {
-            skillMap[r1][c2 + 1] -= degree;
-        }
-        if (r2 + 1 < n && c2 + 1 < m) {
-            skillMap[r2 + 1][c2 + 1] += degree;
-        }
     }
 }
