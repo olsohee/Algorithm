@@ -11,6 +11,12 @@ public class Main {
     static List<Long> list = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
+        /*
+        재귀
+        - 시작: 0~9
+        - 현재 숫자보다 작은 수가 이어서 나오게 재귀 진행
+         */
+        
         int n = Integer.parseInt(br.readLine());
 
         if (n < 10) {
@@ -20,19 +26,8 @@ public class Main {
                 func(i);
             }
             Collections.sort(list);
-            if (n >= list.size()) {
-                System.out.println(-1);
-            } else {
-                System.out.println(list.get(n));
-            }
+            System.out.println((n >= list.size()) ? -1 : list.get(n));
         }
-
-        /*
-        재귀
-        - 시작: 0~9
-        - 현재 숫자보다 작은 수가 이어서 나오게 재귀 진행
-
-         */
     }
 
     private static void func(long num) {
