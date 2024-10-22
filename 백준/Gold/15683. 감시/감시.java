@@ -1,189 +1,231 @@
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
 
-    static class Point{
-        int x;
-        int y;
-        int cctvNum;
-        Point(int x, int y, int cctvNum) {
-            this.x = x;
-            this.y = y;
-            this.cctvNum = cctvNum;
-        }
-    }
-    static int N, M;
-    static int min = Integer.MAX_VALUE;
-    static int[][] dist = {{}, {0, 1, 2, 3}, {}, {}, {}, {}};
-    public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+    static int[][] map;
+    static int y;
+    static int x;
+    static List<Cctv> cctvList = new ArrayList<>();
+    static int answer = Integer.MAX_VALUE;
 
-        N = Integer.parseInt(st.nextToken());
-        M = Integer.parseInt(st.nextToken());
-        int[][] map = new int[N][M];
-        ArrayList<Point> cctv = new ArrayList<>();
+    public static void main(String[] args) throws IOException {
 
-        for(int i=0; i<N; i++) {
+        st = new StringTokenizer(br.readLine());
+        y = Integer.parseInt(st.nextToken());
+        x = Integer.parseInt(st.nextToken());
+        map = new int[y][x];
+        for (int i = 0; i < y; i++) {
             st = new StringTokenizer(br.readLine());
-            for(int j=0; j<M; j++) {
+            for (int j = 0; j < x; j++) {
                 map[i][j] = Integer.parseInt(st.nextToken());
-                //벽이나 빈 곳이 아닐 때 = cctv인 경우
-                if(map[i][j] != 0 && map[i][j] != 6) {
-                    cctv.add(new Point(i, j, map[i][j]));
+                if (map[i][j] >= 1 && map[i][j] <= 5) {
+                    cctvList.add(new Cctv(i, j, map[i][j]));
                 }
             }
         }
 
-        dfs(0, map, cctv);
-        System.out.println(min);
+        // 1. cctv 방향 조합
+        getCombination(0, map);
+
+        System.out.println(answer);
     }
 
-    public static void dfs(int cnt, int[][] map, ArrayList<Point> cctv) {
-        if(cnt == cctv.size()) {
-            min = Math.min(min, getZeroCnt(map));
+    private static void getCombination(int depth, int[][] map) {
+        if (depth == cctvList.size()) {
+            // 2. 각 조합마다 사각지대 구하기
+            int cnt = getResult(map);
+            answer = Math.min(answer, cnt);
             return;
         }
 
-        int cctvNum = cctv.get(cnt).cctvNum;
-        int x = cctv.get(cnt).x;
-        int y = cctv.get(cnt).y;
-        int[][] tmp;
-        if(cctvNum == 1) {
-            tmp = copyMap(map);
-            checkLeft(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+        int[][] newMap;
 
-            tmp = copyMap(map);
-            checkRight(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+        switch (cctvList.get(depth).num) {
+            case 1:
+                newMap = copyMap(map);
+                right(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkDown(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                down(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkUp(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
-        } else if (cctvNum == 2) {
-            tmp = copyMap(map);
-            checkLeft(tmp, x, y);
-            checkRight(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                left(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkUp(tmp, x, y);
-            checkDown(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
-        } else if (cctvNum == 3) {
-            tmp = copyMap(map);
-            checkLeft(tmp, x, y);
-            checkUp(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                up(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
+                break;
+            case 2:
+                newMap = copyMap(map);
+                right(newMap, cctvList.get(depth));
+                left(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkUp(tmp, x, y);
-            checkRight(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                down(newMap, cctvList.get(depth));
+                up(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
+                break;
+            case 3:
+                newMap = copyMap(map);
+                up(newMap, cctvList.get(depth));
+                right(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkRight(tmp, x, y);
-            checkDown(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                right(newMap, cctvList.get(depth));
+                down(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkDown(tmp, x, y);
-            checkLeft(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
-        } else if(cctvNum == 4) {
-            tmp = copyMap(map);
-            checkLeft(tmp, x, y);
-            checkUp(tmp, x, y);
-            checkRight(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                down(newMap, cctvList.get(depth));
+                left(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkUp(tmp, x, y);
-            checkRight(tmp, x, y);
-            checkDown(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                left(newMap, cctvList.get(depth));
+                up(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
+                break;
+            case 4:
+                newMap = copyMap(map);
+                left(newMap, cctvList.get(depth));
+                up(newMap, cctvList.get(depth));
+                right(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkRight(tmp, x, y);
-            checkDown(tmp, x, y);
-            checkLeft(tmp ,x , y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                up(newMap, cctvList.get(depth));
+                right(newMap, cctvList.get(depth));
+                down(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
 
-            tmp = copyMap(map);
-            checkDown(tmp, x, y);
-            checkLeft(tmp ,x , y);
-            checkUp(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
-        } else if(cctvNum == 5) {
-            tmp = copyMap(map);
-            checkRight(tmp, x, y);
-            checkDown(tmp, x, y);
-            checkLeft(tmp ,x , y);
-            checkUp(tmp, x, y);
-            dfs(cnt+1, tmp, cctv);
+                newMap = copyMap(map);
+                right(newMap, cctvList.get(depth));
+                down(newMap, cctvList.get(depth));
+                left(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
+
+                newMap = copyMap(map);
+                down(newMap, cctvList.get(depth));
+                left(newMap, cctvList.get(depth));
+                up(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
+                break;
+            case 5:
+                newMap = copyMap(map);
+                down(newMap, cctvList.get(depth));
+                left(newMap, cctvList.get(depth));
+                up(newMap, cctvList.get(depth));
+                right(newMap, cctvList.get(depth));
+                getCombination(depth + 1, newMap);
         }
     }
 
-    public static void checkLeft(int[][] map, int x, int y) {
-        for(int i=y-1; i>=0; i--) {
-            if(map[x][i] == 6) return;
-            if(map[x][i] != 0) continue;
-            map[x][i] = -1;
-        }
-    }
-
-    public static void checkRight(int[][] map, int x, int y) {
-        for(int i=y+1; i<M; i++) {
-            if(map[x][i] == 6) return;
-            if(map[x][i] != 0) continue;
-            map[x][i] = -1;
-        }
-    }
-
-    public static void checkUp(int[][] map, int x, int y) {
-        for(int i=x-1; i>=0; i--) {
-            if(map[i][y] == 6) return;
-            if(map[i][y] != 0) continue;
-            map[i][y] = -1;
-        }
-    }
-
-    public static void checkDown(int[][] map, int x, int y) {
-        for(int i=x+1; i<N; i++) {
-            if(map[i][y] == 6) return;
-            if(map[i][y] != 0) continue;
-            map[i][y] = -1;
-        }
-    }
-
-    public static int getZeroCnt(int[][] map) {
-        int zerCnt = 0;
-        for(int i=0; i<N; i++) {
-            for(int j=0; j<M; j++) {
-                if(map[i][j] == 0) zerCnt++;
+    private static int getResult(int[][] map) {
+        int cnt = 0;
+        for (int i = 0; i < y; i++) {
+            for (int j = 0; j < x; j++) {
+                // 감시 대상이거나, 씨씨티비이거나, 벽이면, 패스
+                if (map[i][j] == -1 || (map[i][j] >= 1 && map[i][j] <= 5) || map[i][j] == 6) {
+                    continue;
+                }
+                cnt++;
             }
         }
-        return zerCnt;
+        return cnt;
     }
 
-    public static int[][] copyMap(int[][] map) {
-        int[][]tmp = new int[N][M];
-        for(int i=0; i<N; i++) {
-            for(int j=0; j<M; j++) {
-                tmp[i][j] = map[i][j];
+    private static void right(int[][] map, Cctv cctv) {
+        int x = cctv.x;
+        int y = cctv.y;
+        for (int i = x; i < Main.x; i++) {
+            // 벽인 경우, 끝내기
+            if (map[y][i] == 6) {
+                break;
+            }
+            // 다른 씨씨티비인 경우, 패스
+            if (map[y][i] != 0) {
+                continue;
+            }
+            map[y][i] = -1;
+        }
+    }
+    private static void left(int[][] map, Cctv cctv) {
+        int x = cctv.x;
+        int y = cctv.y;
+        for (int i = x; i >= 0; i--) {
+            // 벽인 경우, 끝내기
+            if (map[y][i] == 6) {
+                break;
+            }
+            // 다른 씨씨티비인 경우, 패스
+            if (map[y][i] != 0) {
+                continue;
+            }
+            map[y][i] = -1;
+        }
+    }
+
+    private static void up(int[][] map, Cctv cctv) {
+        int x = cctv.x;
+        int y = cctv.y;
+        for (int i = y; i >= 0; i--) {
+            // 벽인 경우, 끝내기
+            if (map[i][x] == 6) {
+                break;
+            }
+            // 다른 씨씨티비인 경우, 패스
+            if (map[i][x] != 0) {
+                continue;
+            }
+            map[i][x] = -1;
+        }
+    }
+
+    private static void down(int[][] map, Cctv cctv) {
+        int x = cctv.x;
+        int y = cctv.y;
+        for (int i = y; i < Main.y; i++) {
+            // 벽인 경우, 끝내기
+            if (map[i][x] == 6) {
+                break;
+            }
+            // 다른 씨씨티비인 경우, 패스
+            if (map[i][x] != 0) {
+                continue;
+            }
+            map[i][x] = -1;
+        }
+    }
+
+    private static int[][] copyMap(int[][] map) {
+        int[][] newMap = new int[map.length][map[0].length];
+        for (int i = 0; i < map.length; i++) {
+            for (int j = 0; j < map[0].length; j++) {
+                newMap[i][j] = map[i][j];
             }
         }
-        return tmp;
+        return newMap;
     }
 
-    public static boolean isIn(int x, int y) {
-        return 0<=x && x<N && 0<=y && y<M;
+    private static class Cctv {
+
+        int y, x;
+        int num;
+
+        public Cctv(int y, int x, int num) {
+            this.y = y;
+            this.x = x;
+            this.num = num;
+        }
     }
 }
