@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,27 +22,30 @@ public class Main {
         Collections.sort(list, (o1, o2) -> o1.start - o2.start);
 
         int last = -1; // 널빤지의 마지막 위치
-        int answer = 0;
+        int cnt = 0;
         for (Puddle puddle : list) {
+        
             // 이전 널빤지로 커버가 다 되는 경우
             if (puddle.end - 1 <= last) {
                 continue;
             }
+            
+            // 이전 널빤지와 겹치는 경우
+            if (puddle.start <= last) {
+                puddle.start = last + 1;
+            }
 
-            int start = Math.max(last + 1, puddle.start);
-            int len = puddle.end - start; // 물웅덩이 길이
-
-            answer += len / l;
-            int remain = len % l;
+            cnt += (puddle.end - puddle.start) / l;
+            int remain = (puddle.end - puddle.start) % l;
             if (remain != 0) {
-                answer++;
+                cnt++;
                 last = puddle.end - 1 + (l - remain);
             } else {
                 last = puddle.end - 1;
             }
         }
 
-        System.out.println(answer);
+        System.out.println(cnt);
 
     }
 
