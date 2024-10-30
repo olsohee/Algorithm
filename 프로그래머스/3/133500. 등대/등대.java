@@ -2,52 +2,46 @@ import java.util.*;
 
 class Solution {
     
-    List<Integer>[] list;
+    List<Set<Integer>> route = new ArrayList<>();
     int n;
-    boolean[] visited;
-    int answer;
+    int[] visited; // 0: 방문 안함, 1: 등대 끔, 2: 등대 켬
     
     public int solution(int n, int[][] lighthouse) {
         this.n = n;
-        list = new List[n + 1];
-        visited = new boolean[n + 1];
+        visited = new int[n + 1];
         
         for (int i = 0; i <= n; i++) {
-            list[i] = new ArrayList<>();
+            route.add(new HashSet<>());
         }
         
         for (int[] light : lighthouse) {
-            list[light[0]].add(light[1]);
-            list[light[1]].add(light[0]);
+            route.get(light[0]).add(light[1]);
+            route.get(light[1]).add(light[0]);
         }
         
         // 1번 노드는 루트 노드라고 가정하고, dfs 시작
         dfs(1);
         
+        int answer = 0;
+        for (int i = 0; i <= n; i++) {
+            if (visited[i] == 2) {
+                answer++;
+            }
+        }
         return answer;
     }
     
-    private int dfs(int now) {
+    private void dfs(int now) {
         
-        visited[now] = true;
+        visited[now] = 1; // 기본으로 등대 끔
         
-        // 리프노드이면 끄기
-        if (list[now].size() == 1 && visited[list[now].get(0)]) {
-            return 1;
-        }
-        
-        int sum = 0;
-        
-        for (int next : list[now]) {
-            if (!visited[next]) {
-                sum += dfs(next);
+        for (int next : route.get(now)) {
+            if (visited[next] == 0) {
+                dfs(next);
+                if (visited[next] == 1) { // 루트 노드가 끄면, 현재 노드는 켜기
+                    visited[now] = 2;
+                }
             }
         }
-        
-        if (sum > 0) {
-            answer++;
-            return 0; // 켜기
-        }
-        else return 1; // 끄기
     }
 }

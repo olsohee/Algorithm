@@ -1,10 +1,10 @@
 # [level 3] 등대 - 133500 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/133500) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/133500?language=java) 
 
 ### 성능 요약
 
-메모리: 110 MB, 시간: 70.97 ms
+메모리: 148 MB, 시간: 121.48 ms
 
 ### 구분
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2024년 10월 30일 17:37:05
+2024년 10월 30일 17:51:38
 
 ### 문제 설명
 
