@@ -1,48 +1,46 @@
 import java.util.*;
 
 class Solution {
-
-    String[] enroll;
-    int[] answer;
+    
+    int n;
+    Map<String, Integer> nameMap = new HashMap<>();
     int[] parent;
-    Map<String, Integer> idxMapByName = new HashMap<>();
-
+    int[] answer;
+    
     public int[] solution(String[] enroll, String[] referral, String[] seller, int[] amount) {
-
-        this.enroll = enroll;
-        answer = new int[enroll.length];
-        parent = new int[enroll.length];
-
-        for (int i = 0; i < enroll.length; i++) {
-            idxMapByName.put(enroll[i], i);
+        n = enroll.length;
+        answer = new int[n];
+        parent = new int[n];
+        
+        for (int i = 0; i < n; i++) {
+            nameMap.put(enroll[i], i);
         }
-
-        for (int i = 0; i < referral.length; i++) {
-            parent[i] = (referral[i].equals("-")) ? -1 : idxMapByName.get(referral[i]);
+        
+        for (int i = 0; i < n; i++) {
+            if (referral[i].equals("-")) {
+                parent[i] = -1; // 자신이 최상단이면 -1
+            } else {
+                parent[i] = nameMap.get(referral[i]);   
+            }
         }
-
-        // 수익금 계산
+        
         for (int i = 0; i < seller.length; i++) {
-            dfs(idxMapByName.get(seller[i]), amount[i] * 100);
+            dfs(nameMap.get(seller[i]), amount[i] * 100);
         }
-
+        
         return answer;
     }
-
-    private void dfs(int idx, int money) {
-        int parentMoney = (int)(money * 0.1);
-
-       
-        if (parent[idx] == -1) {
-            answer[idx] += (parentMoney == 0) ? money : money - parentMoney;
-            return;
-        }
-
-        if (parentMoney == 0) {
-            answer[idx] += money;
+    
+    private void dfs(int now, int amount) {
+        int result = (int)(amount * 0.1);
+        if (result == 0) {
+            answer[now] += amount;
         } else {
-            answer[idx] += money - parentMoney;
-            dfs(parent[idx], parentMoney);
+            answer[now] += amount - result;
+            // 0.1프로를 부모 노드에게 전달
+            if (parent[now] != -1) {
+                dfs(parent[now], result);
+            }
         }
     }
 }
