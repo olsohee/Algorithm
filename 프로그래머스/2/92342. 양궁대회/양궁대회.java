@@ -1,68 +1,73 @@
 import java.util.*;
 
 class Solution {
-
+    
     int n;
     int[] info;
-    int max = 0;
+    int maxDiff;
     int[] answer;
-
+    
     public int[] solution(int n, int[] info) {
         this.n = n;
         this.info = info;
-
-        getCombination(0, n, new int[11]);
-
-        // 라이언이 우승할 수 없는 경우
-        if (max == 0) return new int[]{-1};
         
+        // 라이언이 화살을 쏜 결과 조합 생성 (11개 중 n발 고르기)
+        dfs(0, n, new int[11]);
+        
+        // 무조건 비기거나 지면 -1 반환
+        if (maxDiff == 0) return new int[]{-1};
+    
         return answer;
     }
-
-    private void getCombination(int idx, int remain, int[] score) {
-        if (remain == 0 || idx == 11) {
-            int result = getResult(score); // 라이언 점수 - 어피치 점수 계산
-            // 어피치가 이기는 경우
-            if (result <= 0) {
-                return;
-            }
-            // 라이언이 이기는 경우
-            if (result == max) {
-                for (int i = 10; i >= 0; i--) {
-                    if (answer[i] == score[i]) continue;
-                    else if (answer[i] > score[i]) break;
-                    else {
-                        answer = score.clone();
-                        break;
-                    }
-                }
-            }
-            if (result > max) {
-                max = result;
-                answer = score.clone();
+    
+    private void dfs(int idx, int remain, int[] result) {
+        // 다 쏜 경우
+        if (idx == 11) {
+            
+            if (remain == 0) {
+                getResult(result);
             }
             return;
         }
         
+        // 인덱스 idx 점수에 i발 쏘기
         for (int i = 0; i <= remain; i++) {
-            score[idx] = i;
-            getCombination(idx + 1, remain - i, score);
-            score[idx] = 0;
+            result[idx] = i;
+            dfs(idx + 1, remain - i, result);
         }
     }
-
-    private int getResult(int[] score) {
-        int totalScore1 = 0; // 어피치 총점
-        int totalScore2 = 0; // 라이언 총점
+    
+    private void getResult(int[] result) {
+        int apeach = 0;
+        int lion = 0;
         for (int i = 0; i <= 10; i++) {
-            if (info[i] == 0 && score[i] == 0) continue;
-            if (info[i] >= score[i]) {
-                totalScore1 += (10 - i);
+            if (info[i] == 0 && result[i] == 0) {
+                continue; // 둘 다 못 쏘면, 둘 다 점수 획득 불가
+            } 
+            if (info[i] >= result[i]) { // 쏜 횟수가 같으면 라이언이 점수 획득
+                apeach += 10 - i;
             } else {
-                totalScore2 += (10 - i);
+                lion += 10 - i;
             }
         }
-
-        return totalScore2 - totalScore1;
+        
+        if (lion > apeach) {
+            // 가장 큰 점수 차이인 경우가 여러개이면, 가장 낮은 점수를 더 많이 맞힌 경우를 반환
+            if (maxDiff == lion - apeach) {
+                for (int i = 10; i >= 0; i--) {
+                    if (answer[i] > result[i]) {
+                        break;
+                    } 
+                    if (result[i] > answer[i]) {
+                        answer = result.clone();
+                        break;
+                    }
+                }
+            }
+            if (maxDiff < lion - apeach) {
+                maxDiff = lion - apeach;
+                answer = result.clone();
+            }
+        }
     }
 }
