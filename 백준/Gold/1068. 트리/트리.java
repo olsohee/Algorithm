@@ -12,13 +12,15 @@ public class Main {
     static int answer;
 
     public static void main(String[] args) throws IOException {
-
         int n = Integer.parseInt(br.readLine());
         for (int i = 0; i < n; i++) {
             list.add(new ArrayList<>());
         }
+
         st = new StringTokenizer(br.readLine());
         int root = 0;
+
+        // 아래로 내려가며 탐색할거니까 단방향이어도 됨 (부모 -> 자식)
         for (int i = 0; i < n; i++) {
             int parent = Integer.parseInt(st.nextToken());
             if (parent == -1) {
@@ -31,31 +33,27 @@ public class Main {
         removeNode = Integer.parseInt(br.readLine());
 
         // 루트 노드부터 remove 시작해서 리프 노드 개수 세기
-        answer = findParentNode(root);
-
-        System.out.println(answer);
+        if (removeNode == root) {
+            System.out.println(0);
+        } else {
+            findParentNode(root);
+            System.out.println(answer);
+        }
     }
 
-    private static int findParentNode(int now) {
-        // 지워진 노드이면, 해당 노드와 그 자식 노드 탐색 X
-        if (now == removeNode) {
-            return 0;
-        }
+    private static void findParentNode(int now) {
 
-        // 루트노드인 경우
-        if (list.get(now).size() == 0) {
-            return 1;
-        }
+        int nodeCnt = 0; // 자식 노드의 수
 
-        int sum = 0;
         for (int next : list.get(now)) {
-            sum += findParentNode(next);
+            if (next != removeNode) {
+                findParentNode(next);
+                nodeCnt++;
+            }
         }
 
-        if (sum > 0) {
-            return sum; // 현재 노드의 자식 노드가 리프 노드
-        } else {
-            return 1; // 현재 노드가 리프 노드
+        if (nodeCnt == 0) {
+            answer++;
         }
     }
 }
