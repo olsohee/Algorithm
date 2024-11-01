@@ -8,7 +8,7 @@ public class Main {
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
     static List<List<Integer>> list = new ArrayList<>();
-    static boolean[] removed;
+    static int removeNode;
     static int answer;
 
     public static void main(String[] args) throws IOException {
@@ -17,8 +17,6 @@ public class Main {
         for (int i = 0; i < n; i++) {
             list.add(new ArrayList<>());
         }
-        removed = new boolean[n];
-
         st = new StringTokenizer(br.readLine());
         int root = 0;
         for (int i = 0; i < n; i++) {
@@ -30,8 +28,7 @@ public class Main {
             }
         }
 
-        int removeNode = Integer.parseInt(br.readLine());
-        remove(removeNode);
+        removeNode = Integer.parseInt(br.readLine());
 
         // 루트 노드부터 remove 시작해서 리프 노드 개수 세기
         answer = findParentNode(root);
@@ -39,16 +36,9 @@ public class Main {
         System.out.println(answer);
     }
 
-    private static void remove(int now) {
-        removed[now] = true;
-        for (int next : list.get(now)) {
-            remove(next);
-        }
-    }
-
     private static int findParentNode(int now) {
         // 지워진 노드이면, 해당 노드와 그 자식 노드 탐색 X
-        if (removed[now]) {
+        if (now == removeNode) {
             return 0;
         }
 
