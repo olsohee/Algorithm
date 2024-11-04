@@ -9,54 +9,57 @@ public class Main {
     static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
-
         int s = Integer.parseInt(br.readLine());
-
-        Queue<Node> que = new LinkedList<>();
-        que.add(new Node(1, 0, 0));
-        int answer = 0;
         boolean[][] visited = new boolean[1001][1001];
-        visited[0][1] = true;
+        Queue<Node> que = new LinkedList<>();
+        visited[1][0] = true;
+        que.add(new Node(1, 0, 0));
+
+        int answer = 0;
 
         while (!que.isEmpty()) {
             Node now = que.poll();
+
             if (now.screen == s) {
-                answer = now.cnt;
+                answer = now.time;
                 break;
             }
 
-            // 1. 복사
-            que.add(new Node(now.screen, now.screen, now.cnt + 1));
+            // 복사
+            if (!visited[now.screen][now.screen]) {
+                que.add(new Node(now.screen, now.screen, now.time + 1));
+                visited[now.screen][now.screen] = true;
+            }
 
-            // 2. 붙여넣기
-            if (now.clipboard != 0) {
-                if (now.screen + now.clipboard <= s && !visited[now.clipboard][now.screen + now.clipboard]) {
-                    visited[now.clipboard][now.screen + now.clipboard] = true;
-                    que.add(new Node(now.screen + now.clipboard, now.clipboard, now.cnt + 1));
+            // 붙여넣기
+            if (now.clipboardCnt != 0) {
+                if (now.screen + now.clipboardCnt <= s && !visited[now.screen + now.clipboardCnt][now.clipboardCnt]) {
+                    visited[now.screen + now.clipboardCnt][now.clipboardCnt] = true;
+                    que.add(new Node(now.screen + now.clipboardCnt, now.clipboardCnt, now.time + 1));
                 }
             }
 
-            // 3. 화면에 있는 이모티콘 중 하나를 삭제
-            if (now.screen > 0) {
-                if (now.screen - 1 >= 0 && !visited[now.clipboard][now.screen - 1]) {
-                    visited[now.clipboard][now.screen - 1] = true;
-                    que.add(new Node(now.screen - 1, now.clipboard, now.cnt + 1));
+            // 삭제
+            if (now.screen >= 1) {
+                if (!visited[now.screen - 1][now.clipboardCnt]) {
+                    visited[now.screen - 1][now.clipboardCnt] = true;
+                    que.add(new Node(now.screen - 1, now.clipboardCnt, now.time + 1));
+
                 }
             }
         }
-
         System.out.println(answer);
     }
 
-    private static class Node {
-        int screen; // 화면에 있는 이모티콘 갯수
-        int clipboard; // 클립보드에 있는 이모티콘 갯수
-        int cnt;
+    static class Node {
+        int screen;
+        int clipboardCnt;
+        int time;
 
-        public Node(int screen, int clipboard, int cnt) {
+        public Node(int screen, int clipboardCnt, int time) {
             this.screen = screen;
-            this.clipboard = clipboard;
-            this.cnt = cnt;
+            this.clipboardCnt = clipboardCnt;
+            this.time = time;
         }
     }
 }
