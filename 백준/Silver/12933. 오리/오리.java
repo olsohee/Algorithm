@@ -22,9 +22,10 @@ public class Main {
             for (int j = i; j < input.length; j++) {
                 if (wordIdx == 5) {
                     wordIdx = 0;
-                    list = new ArrayList<>();
                 }
-                if (visited[j]) continue;
+                if (visited[j]) {
+                    continue;
+                }
                 if (input[j] == word[wordIdx]) {
                     list.add(j);
                     visited[j] = true;
@@ -33,17 +34,16 @@ public class Main {
             }
 
             // quack을 만들다가 중간에 끝난 경우
-            if (wordIdx != 5) {
-                for (Integer idx : list) {
-                    visited[idx] = false;
-                }
+            if (list.size() % 5 != 0) {
+                System.out.println(-1);
+                return;
             }
 
             answer++;
         }
 
-        for (boolean b : visited) {
-            if (!b) {
+        for (boolean isVisited : visited) {
+            if (!isVisited) {
                 answer = -1;
             }
         }
