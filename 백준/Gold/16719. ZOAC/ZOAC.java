@@ -24,7 +24,7 @@ public class Main {
             return;
         }
 
-        // idx = start~end 사이의 문자중 가장 수가 적은 문자의 인덱스
+        // 1. start~end 범위에서 가장 작은 문자 선택
         int idx = start;
         for (int i = start; i <= end; i++) {
             if (input.charAt(idx) > input.charAt(i)) {
@@ -32,7 +32,7 @@ public class Main {
             }
         }
 
-        // 인덱스 idx의 문자 선택!
+        // 2. 선택 결과 출력
         visited[idx] = true;
 
         for (int i = 0; i < input.length(); i++) {
@@ -42,7 +42,10 @@ public class Main {
         }
         sb.append('\n');
 
+        // 3. 선택한 문자의 뒤범위에서 다음 문자 선택
         func(idx + 1, end);
+        
+        // 4. 선택한 문자의 앞범위에서 다음 문자 선택
         func(start, idx - 1);
     }
 }
