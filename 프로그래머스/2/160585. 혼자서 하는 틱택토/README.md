@@ -1,6 +1,6 @@
 # [level 2] 혼자서 하는 틱택토 - 160585 
 
-[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/160585#) 
+[문제 링크](https://school.programmers.co.kr/learn/courses/30/lessons/160585) 
 
 ### 성능 요약
 
@@ -16,7 +16,7 @@
 
 ### 제출 일자
 
-2024년 11월 06일 17:38:23
+2024년 11월 06일 17:38:45
 
 ### 문제 설명
 
