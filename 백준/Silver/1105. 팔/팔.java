@@ -12,18 +12,20 @@ public class Main {
         st = new StringTokenizer(br.readLine());
         String start = st.nextToken();
         String end = st.nextToken();
-
-        int cnt = 0;
-        if (start.length() == end.length()) {
+        if (start.length() != end.length()) {
+            System.out.println(0);
+        } else {
+            int answer = 0;
             for (int i = 0; i < start.length(); i++) {
                 if (start.charAt(i) == end.charAt(i)) {
-                    if (start.charAt(i) == '8') cnt++;
+                    if (start.charAt(i) == '8') {
+                        answer++;
+                    }
                 } else {
                     break;
                 }
             }
+            System.out.println(answer);
         }
-
-        System.out.println(cnt);
     }
 }
