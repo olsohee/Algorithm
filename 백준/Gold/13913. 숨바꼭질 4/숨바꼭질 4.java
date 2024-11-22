@@ -1,75 +1,73 @@
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
 
-    static int N;
-    static int K;
-    static int[] visited = new int[100001];
-    static int[] beforeIdx = new int[100001];
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
+        st = new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        int k = Integer.parseInt(st.nextToken());
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        N = Integer.parseInt(st.nextToken());
-        K = Integer.parseInt(st.nextToken());
+        int[] route = new int[100001]; // route[i] = i 노드로 오기 전에 거친 노드
+        Arrays.fill(route, -1);
 
-        bfs(N);
+        // bfs
+        Queue<Node> que = new LinkedList<>();
+        que.add(new Node(n, 0));
+        route[n] = n;
 
-        System.out.println(visited[K] - 1);
+        while (!que.isEmpty()) {
+            Node now = que.poll();
 
-        // 전에 위치로 순차적으로 돌아가며 위치 찾기
-        Stack<Integer> stack = new Stack<>();
-        stack.push(K);
-        int idx = K;
-        while(idx != N) {
-            stack.push(beforeIdx[idx]);
-            idx = beforeIdx[idx];
-        }
+            if (now.node == k) {
+                System.out.println(now.cnt);
 
-        while(!stack.isEmpty()) {
-            System.out.print(stack.pop() + " ");
+                Stack<Integer> stack = new Stack<>();
+                int node = now.node;
+                while (true) {
+                    if (node == n) {
+                        stack.add(node);
+                        break;
+                    }
+                    stack.add(node);
+                    node = route[node];
+                    
+                }
+                while (!stack.isEmpty()) {
+                    System.out.print(stack.pop() + " ");
+                }
+                break;
+            }
+
+
+            if (now.node - 1 >= 0 && route[now.node - 1] == -1) {
+                que.add(new Node(now.node - 1, now.cnt + 1));
+                route[now.node - 1] = now.node;
+            }
+            if (now.node + 1 <= 100000 && route[now.node + 1] == -1) {
+                que.add(new Node(now.node + 1, now.cnt + 1));
+                route[now.node + 1] = now.node;
+            }
+            if (now.node * 2 <= 100000 && route[now.node * 2] == -1) {
+                que.add(new Node(now.node * 2, now.cnt + 1));
+                route[now.node * 2] = now.node;
+            }
         }
     }
 
-    public static void bfs(int start) {
+    private static class Node {
 
-        Queue<Integer> que = new LinkedList<>();
+        int node;
+        int cnt;
 
-        visited[start] = 1;
-        que.add(start);
-
-
-        while(!que.isEmpty()) {
-            Integer idx = que.poll();
-
-            if(idx == K) {
-                return;
-            }
-
-
-            // 순간 이동
-            if((idx * 2 >= 0) && (idx  * 2 <= 100000) && (visited[idx * 2] == 0)) {
-                visited[idx * 2] = visited[idx] + 1;
-                beforeIdx[idx * 2] = idx;
-                que.offer(idx * 2);
-            }
-
-            // 뒤로 가기
-            if((idx - 1 >= 0) && (idx - 1 <= 100000) && (visited[idx - 1] == 0)) {
-                visited[idx - 1] = visited[idx] + 1;
-                beforeIdx[idx - 1] = idx;
-                que.offer(idx - 1);
-            }
-
-            // 앞으로 가기
-            if((idx + 1 >= 0) && (idx + 1 <= 100000) && (visited[idx + 1] == 0)) {
-                visited[idx + 1] = visited[idx] + 1;
-                beforeIdx[idx + 1] = idx;
-                que.offer(idx + 1);
-            }
+        public Node(int node, int cnt) {
+            this.node = node;
+            this.cnt = cnt;
         }
     }
 }
