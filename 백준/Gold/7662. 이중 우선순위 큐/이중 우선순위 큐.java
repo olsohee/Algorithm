@@ -15,7 +15,13 @@ public class Main {
         while (t-- > 0) {
             int k = Integer.parseInt(br.readLine());
 //            PriorityQueue<Integer> maxQue = new PriorityQueue<>((o1, o2) -> o2 - o1);
-            PriorityQueue<Integer> maxQue = new PriorityQueue<>(Collections.reverseOrder());
+//            PriorityQueue<Integer> maxQue = new PriorityQueue<>(Collections.reverseOrder());
+            PriorityQueue<Integer> maxQue = new PriorityQueue<>((o1, o2) ->
+            {
+                if (o1 > o2) {
+                    return -1;
+                } else return 1;
+            });
             PriorityQueue<Integer> minQue = new PriorityQueue<>();
             Map<Integer, Integer> map = new HashMap<>();
             int size = 0;
