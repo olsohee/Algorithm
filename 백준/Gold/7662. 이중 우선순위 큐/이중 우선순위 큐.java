@@ -24,7 +24,6 @@ public class Main {
             });
             PriorityQueue<Integer> minQue = new PriorityQueue<>();
             Map<Integer, Integer> map = new HashMap<>();
-            int size = 0;
 
             for (int i = 0; i < k; i++) {
                 st = new StringTokenizer(br.readLine());
@@ -36,27 +35,24 @@ public class Main {
                     maxQue.add(num);
                     minQue.add(num);
                     map.put(num, map.getOrDefault(num, 0) + 1);
-                    size++;
                 }
                 if (command.equals("D")) {
                     // 2. 최댓값 삭제
                     if (num == 1) {
-                        while (size > 0) {
+                        while (!maxQue.isEmpty()) {
                             Integer pollNum = maxQue.poll();
                             if (map.get(pollNum) > 0) {
                                 map.put(pollNum, map.get(pollNum) - 1);
-                                size--;
                                 break;
                             }
                         }
                     }
                     // 3. 최솟값 삭제
                     else {
-                        while (size > 0) {
+                        while (!minQue.isEmpty()) {
                             Integer pollNum = minQue.poll();
                             if (map.get(pollNum) > 0) {
                                 map.put(pollNum, map.get(pollNum) - 1);
-                                size--;
                                 break;
                             }
                         }
@@ -64,16 +60,16 @@ public class Main {
                 }
             }
 
-            // 결과 출력
-            if (size == 0) {
+            List<Integer> list = new LinkedList<>();
+            for (int num : map.keySet()) {
+                if (map.get(num) > 0) {
+                    list.add(num);
+                }
+            }
+
+            if (list.size() == 0) {
                 sb.append("EMPTY").append('\n');
             } else {
-                List<Integer> list = new LinkedList<>();
-                for (int num : map.keySet()) {
-                    if (map.get(num) > 0) {
-                        list.add(num);
-                    }
-                }
                 Collections.sort(list);
                 sb.append(list.get(list.size() - 1) + " " + list.get(0)).append('\n');
             }
