@@ -18,9 +18,9 @@ public class Main {
 //            PriorityQueue<Integer> maxQue = new PriorityQueue<>(Collections.reverseOrder());
             PriorityQueue<Integer> maxQue = new PriorityQueue<>((o1, o2) ->
             {
-                if (o1 > o2) {
-                    return -1;
-                } else return 1;
+                if (o1 == o2) return 0;
+                else if (o1 > o2) return -1;
+                else return 1;
             });
             PriorityQueue<Integer> minQue = new PriorityQueue<>();
             Map<Integer, Integer> map = new HashMap<>();
