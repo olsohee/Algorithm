@@ -29,27 +29,17 @@ public class Main {
         for (int i = 0; i < x; i++) {
             sum += arr[i];
         }
-
-        int start = 0;
-        int end = x - 1;
-        int answer = 0;
-        int cnt = 0;
-
-        while (true) {
-            if (sum >= answer) {
-                if (sum == answer) {
-                    cnt++;
-                } else {
-                    cnt = 1;
-                    answer = sum;
-                }
+        
+        int answer = sum;
+        int cnt = 1;
+        for (int i = x; i < n; i++) {
+            sum += (arr[i] - arr[i - x]);
+            if (sum == answer) {
+                cnt++;
+            } else if (sum > answer) {
+                answer = sum;
+                cnt = 1;
             }
-
-            if (end + 1 == n) {
-                break;
-            }
-            sum -= arr[start++];
-            sum += arr[++end];
         }
 
         System.out.println(answer);
