@@ -7,53 +7,53 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    static int n;
-    static int m;
-    static int k;
+    static int n, m;
     static int[][] map;
+    static int k;
     static int answer;
 
     public static void main(String[] args) throws IOException {
         st = new StringTokenizer(br.readLine());
         n = Integer.parseInt(st.nextToken());
         m = Integer.parseInt(st.nextToken());
+
         map = new int[n][m];
         for (int i = 0; i < n; i++) {
-            String[] arr = br.readLine().split("");
+            char[] input = br.readLine().toCharArray();
             for (int j = 0; j < m; j++) {
-                map[i][j] = Integer.parseInt(arr[j]);
+                map[i][j] = input[j] - '0';
             }
         }
 
         k = Integer.parseInt(br.readLine());
 
         for (int i = 0; i < n; i++) {
-            int zeroCnt = 0;
+            int lightOutCnt = 0;
             for (int j = 0; j < m; j++) {
                 if (map[i][j] == 0) {
-                    zeroCnt++;
+                    lightOutCnt++;
                 }
             }
 
-            // 하나의 행에서 0의 개수가 k개 초과이면 켜진 행이 될 수 없음
-            // k와 0의 개수가 홀/짝 맞아야 함
-            if (zeroCnt <= k && zeroCnt % 2 == k % 2) {
-                int sameCnt = 0;
+            if (lightOutCnt <= k && (k % 2 == lightOutCnt % 2)) {
+                int cnt = 0;
                 for (int j = 0; j < n; j++) {
-                    if (isSame(map[i], map[j])) {
-                        sameCnt++;
+                    if (isSame(i, j)) {
+                        cnt++;
                     }
                 }
-                answer = Math.max(answer, sameCnt);
+                answer = Math.max(answer, cnt);
             }
         }
 
         System.out.println(answer);
     }
 
-    private static boolean isSame(int[] arr1, int[] arr2) {
-        for (int i = 0; i < m; i++) {
-            if (arr1[i] != arr2[i]) return false;
+    private static boolean isSame(int i, int j) {
+        for (int idx = 0; idx < m; idx++) {
+            if (map[i][idx] != map[j][idx]) {
+                return false;
+            }
         }
         return true;
     }
