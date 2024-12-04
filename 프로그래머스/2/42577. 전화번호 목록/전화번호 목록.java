@@ -1,40 +1,23 @@
-// import java.util.*;
-
-// class Solution {
-//     public boolean solution(String[] phone_book) {
-        
-//         List<String> list = new ArrayList<>();
-//         for (String number : phone_book) {
-//             list.add(number);
-//         }
-        
-//         Collections.sort(list, (o1, o2) -> o2.length() - o1.length());
-        
-//         for (int i = 0; i < list.size(); i++) {
-//             for (int j = i + 1; j < list.size(); j++) {
-//                 if (list.get(i).startsWith(list.get(j))) {
-//                     return false;
-//                 }
-//             }
-//         }
-        
-//         return true;
-//     }
-// }
 import java.util.*;
 
 class Solution {
     public boolean solution(String[] phone_book) {
-        Set<String> numbers = new HashSet<>();
-        for (String number : phone_book) {
-            numbers.add(number);
-        }
         
-        for (String number : phone_book) {
-            for (int i = 1; i < number.length(); i++) {
-                String str = number.substring(0, i);
-                if (numbers.contains(str)) return false;
+        // 1. 정렬
+        Arrays.sort(phone_book);
+        
+        // 2. 현재 번호의 접두어가 있는지 확인
+        Set<String> set = new HashSet<>();
+        set.add(phone_book[0]);
+        for (int i = 1; i < phone_book.length; i++) {
+            String number = phone_book[i];
+            for (int j = 1; j <= number.length(); j++) {
+                String prefix = number.substring(0, j);
+                if (set.contains(prefix)) {
+                    return false;
+                }
             }
+            set.add(number);
         }
         
         return true;
