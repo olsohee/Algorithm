@@ -40,24 +40,16 @@ public class Main {
         }
         map[y][x] = num;
 
-        int turnCnt = 0;
-        while (turnCnt < 4) {
-            int ny = y + dy[dir];
-            int nx = x + dx[dir];
-            if (ny < 0 || ny >= r || nx < 0 || nx >= c || map[ny][nx] != 0) {
-                dir = (dir + 1) % 4;
-                /*
-                0 -> 1
-                1 -> 2
-                2 -> 3
-                3 -> 0
-                 */
-                turnCnt++;
-                continue;
-            }
-
-            dfs(num + 1, ny, nx, dir);
-            break;
+        int ny = y + dy[dir];
+        int nx = x + dx[dir];
+        
+        // 방향 전환이 필요한 경우
+        if (ny < 0 || ny >= r || nx < 0 || nx >= c || map[ny][nx] != 0) {
+            dir = (dir + 1) % 4;
+            ny = y + dy[dir];
+            nx = x + dx[dir];
         }
+
+        dfs(num + 1, ny, nx, dir);
     }
 }
