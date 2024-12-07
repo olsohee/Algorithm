@@ -9,46 +9,48 @@ public class Main {
     static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
-        long n = Integer.parseInt(br.readLine());
-        st = new StringTokenizer(br.readLine());
-        int[] nums = new int[6];
-        for (int i = 0; i < 6; i++) {
-            nums[i] = Integer.parseInt(st.nextToken());
-        }
+       long n = Integer.parseInt(br.readLine());
 
-        if (n == 1) {
-            int sum = 0;
-            Arrays.sort(nums);
-            for (int i = 0; i < 5; i++) {
-                sum += nums[i];
-            }
-            System.out.println(sum);
-            return;
-        }
+       long[] nums = new long[6];
+       st = new StringTokenizer(br.readLine());
+       for (int i = 0; i < 6; i++) {
+           nums[i] = Integer.parseInt(st.nextToken());
+       }
 
         long answer = 0;
 
-        // 3면이 보이는 경우
-        long sum = Math.min(nums[0], nums[5]) + Math.min(nums[2], nums[3]) +Math.min(nums[1], nums[4]);
-        answer += sum * 4;
+       if (n == 1) {
+           Arrays.sort(nums);
+           for (int i = 0; i < 5; i++) {
+               answer += nums[i];
+           }
+           System.out.println(answer);
+           return;
+       }
+       // 1개 면
+       long cnt = 5 * n * n  - 16 * n + 12;
+       long min = Long.MAX_VALUE;
+       for (int i = 0; i < 6; i++) {
+           min = Math.min(nums[i], min);
+       }
+       answer += min * cnt;
 
-        // 2면이 보이는 경우
-        long min = Long.MAX_VALUE;
+       // 2개 면
+        cnt = 8 * n - 12;
+        min = Long.MAX_VALUE;
         for (int i = 0; i < 6; i++) {
             for (int j = i + 1; j < 6; j++) {
-                if ((i + j) != 5) {
+                if (i + j != 5) {
                     min = Math.min(min, nums[i] + nums[j]);
                 }
             }
         }
-        answer += min * (8 * n - 12);
+        answer += min * cnt;
 
-        // 1면이 보이는 경우
-        min = Long.MAX_VALUE;
-        for (int i = 0; i < 6; i++) {
-            min = Math.min(min, nums[i]);
-        }
-        answer += min * (5 * n * n  - 16 * n + 12);
+        // 3개 면
+        cnt = 4;
+        min = Math.min(nums[0], nums[5]) + Math.min(nums[1], nums[4]) + Math.min(nums[2], nums[3]);
+        answer += min * cnt;
 
         System.out.println(answer);
     }
