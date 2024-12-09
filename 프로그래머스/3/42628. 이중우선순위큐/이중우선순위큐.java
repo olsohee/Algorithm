@@ -1,60 +1,73 @@
 import java.util.*;
 
 class Solution {
+    
+    Queue<Integer> maxQue = new PriorityQueue<>((o1, o2) -> o2 - o1);
+    Queue<Integer> minQue = new PriorityQueue<>();
+    Map<Integer, Integer> map = new HashMap<>();
+    
     public int[] solution(String[] operations) {
-        Set<Integer> set = new HashSet<>();
-        PriorityQueue<Integer> minQue = new PriorityQueue<>();
-        PriorityQueue<Integer> maxQue = new PriorityQueue<>((o1, o2) -> o2 - o1);
         
-        for (String s : operations) {
-            String op = s.split(" ")[0];
-            int num = Integer.parseInt(s.split(" ")[1]);
-            
-            if (op.equals("I")) {
-                set.add(num);
-                minQue.add(num);
+        for (String operation : operations) {
+            String[] arr = operation.split(" ");
+            String command = arr[0];
+            if (command.equals("I")) {
+                // maxQue, minQue, map에 넣기
+                int num = Integer.parseInt(arr[1]);
                 maxQue.add(num);
-            } 
-            if (op.equals("D") && num == 1) {
+                minQue.add(num);
+                map.put(num, map.getOrDefault(num, 0) + 1);
+            }
+            if (command.equals("D") && arr[1].equals("1")) {
+                // 최댓값 빼기
                 while (!maxQue.isEmpty()) {
-                    int poll = maxQue.poll();
-                    if (set.contains(poll)) {
-                        set.remove(poll);
+                    int num = maxQue.poll();
+                    if (map.get(num) > 0) {
+                        map.put(num, map.get(num) - 1);
                         break;
                     }
                 }
-            } 
-            if (op.equals("D") && num == -1) {
+            }
+            if (command.equals("D") && arr[1].equals("-1")) {
+                // 최솟값 빼기
                 while (!minQue.isEmpty()) {
-                    int poll = minQue.poll();
-                    if (set.contains(poll)) {
-                        set.remove(poll);
+                    int num = minQue.poll();
+                    if (map.get(num) > 0) {
+                        map.put(num, map.get(num) - 1);
                         break;
                     }
                 }
-            } 
+            }
+        }
+        List<Integer>  list = new ArrayList<>();
+        for (int key : map.keySet()) {
+            if (map.get(key) > 0) {
+                list.add(key);
+            }
         }
         
-        int[] answer = new int[2];
-        if (set.size() == 0) {
-            return answer;
+        if (list.size() == 0) {
+            return new int[]{0, 0};
         }
+        if (list.size() == 1) {
+            return new int[]{list.get(0), list.get(0)};
+        }
+        int max = 0;
         while (!maxQue.isEmpty()) {
-            int poll = maxQue.poll();
-            if (set.contains(poll)) {
-                answer[0] = poll;
+            int num = maxQue.poll();
+            if (map.get(num) > 0) {
+                max = num;
                 break;
             }
         }
+        int min = 0;
         while (!minQue.isEmpty()) {
-            int poll = minQue.poll();
-            if (set.contains(poll)) {
-                answer[1] = poll;
+            int num = minQue.poll();
+            if (map.get(num) > 0) {
+                min = num;
                 break;
             }
         }
-        
-        // 0, 0 또는 최댓값, 최솟값 반환
-        return answer;
+        return new int[]{max, min};
     }
 }
