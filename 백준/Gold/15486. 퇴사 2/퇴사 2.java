@@ -21,12 +21,10 @@ public class Main {
         int[] dp = new int[n];
         int max = 0; // 현재 날짜까지 최대로 받은 수익
         for (int i = 0 ; i < n; i++) {
-            if (i + time[i] > n) {
-                max = Math.max(max, dp[i]);
-                continue;
+            int endDay = i + time[i] - 1;
+            if (endDay < n) {
+                dp[endDay] = Math.max(dp[endDay], revenue[i] + max);
             }
-            int day = i + time[i] - 1;
-            dp[day] = Math.max(dp[day], revenue[i] + max);
             max = Math.max(max, dp[i]);
         }
 
