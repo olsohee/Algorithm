@@ -1,45 +1,41 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-// 시간 복잡도: O(N)
 public class Main {
 
-    static int n;
-    static int m;
-    static int[] arr;
-    static long answer = Long.MAX_VALUE; // 차이가 m보다 큰 것 중 가장 작은 수
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
-        m = Integer.parseInt(st.nextToken());
-        arr = new int[n];
+        st = new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        int m = Integer.parseInt(st.nextToken());
+        int[] nums = new int[n];
         for (int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(br.readLine());
+            nums[i] = Integer.parseInt(br.readLine());
         }
-        Arrays.sort(arr);
 
-        int left = 0;
+        Arrays.sort(nums);
+
         int right = 0;
+        int left = 0;
+        int minDiff = Integer.MAX_VALUE;
         while (right < n && left <= right) {
-            long diff = arr[right] - arr[left];
-            if (diff < m) {
+            int diff = nums[right] - nums[left];
+
+            if (diff >= m) {
+                minDiff = Math.min(minDiff, diff);
+            }
+
+            if (diff <= m) {
                 right++;
-            }
-            else if (diff == m) {
-                answer = m;
-                break;
-            }
-            else {
-                answer = Math.min(answer, diff);
+            } else {
                 left++;
             }
         }
-        System.out.println(answer);
+
+        System.out.println(minDiff);
     }
 }
