@@ -9,6 +9,8 @@ public class Main {
     static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
+        int[] cnt = new int[100001];
+
         st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int k = Integer.parseInt(st.nextToken());
@@ -23,18 +25,17 @@ public class Main {
         int right = 0;
         int maxLen = 1;
         int len = 1;
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(arr[0], 1);
+        cnt[arr[0]]++;
 
         while (right + 1 < n) {
             int next = arr[right + 1];
-            if (map.getOrDefault(next, 0) + 1 <= k) {
-                map.put(next, map.getOrDefault(next, 0) + 1);
+            if (cnt[next] + 1 <= k) {
+                cnt[next]++;
                 right++;
                 len++;
                 maxLen = Math.max(maxLen, len);
             } else {
-                map.put(arr[left], map.getOrDefault(arr[left], 0) - 1);
+                cnt[arr[left]]--;
                 left++;
                 len--;
             }
