@@ -12,7 +12,7 @@ public class Main {
         int n = Integer.parseInt(br.readLine());
         int m = Integer.parseInt(br.readLine());
         boolean[][] map = new boolean[n + 1][n + 1];
-        boolean[] visited = new boolean[n + 1];
+
         for (int i = 0; i < m; i++) {
             st = new StringTokenizer(br.readLine());
             int num1 = Integer.parseInt(st.nextToken());
@@ -20,38 +20,43 @@ public class Main {
             map[num1][num2] = map[num2][num1] = true;
         }
 
-        // 1번 노드부터 bfs 시작
+        // 1번 노드(상근이)에서 BFS 시작
         Queue<Node> que = new LinkedList<>();
         que.add(new Node(1, 0));
+        boolean[] visited = new boolean[n + 1];
         visited[1] = true;
 
         while (!que.isEmpty()) {
             Node now = que.poll();
-            if (now.cnt == 2) {
+
+            // 현재 노드까지 오는데 2만큼 걸렸다면, 더이상 이동할 수 없음
+            if (now.cost == 2) {
                 continue;
             }
+
             for (int i = 1; i <= n; i++) {
-                if (map[now.num][i] && !visited[i]) {
+                if (map[now.end][i] && !visited[i]) {
+                    que.add(new Node(i, now.cost + 1));
                     visited[i] = true;
-                    que.add(new Node(i, now.cnt + 1));
                 }
             }
         }
 
-        int answer = 0;
+        int cnt = 0;
         for (int i = 2; i <= n; i++) {
-            if (visited[i]) answer++;
+            if (visited[i]) cnt++;
         }
-        System.out.println(answer);
+        System.out.println(cnt);
     }
 
     private static class Node {
-        int num;
-        int cnt;
 
-        public Node(int num, int cnt) {
-            this.num = num;
-            this.cnt = cnt;
+        int end;
+        int cost;
+
+        public Node(int end, int cost) {
+            this.end = end;
+            this.cost = cost;
         }
     }
 }
