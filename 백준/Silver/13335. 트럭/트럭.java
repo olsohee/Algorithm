@@ -14,36 +14,34 @@ public class Main {
         int w = Integer.parseInt(st.nextToken());
         int l = Integer.parseInt(st.nextToken());
 
+        Queue<Integer> trucks = new LinkedList<>();
+
         st = new StringTokenizer(br.readLine());
-        int[] trucks = new int[n];
         for (int i = 0; i < n; i++) {
-            trucks[i] = Integer.parseInt(st.nextToken());
+            trucks.add(Integer.parseInt(st.nextToken()));
         }
 
-        Queue<Integer> que = new LinkedList<>();
+        Queue<Integer> bridge = new LinkedList<>();
         for (int i = 0; i < w; i++) {
-            que.add(0);
+            bridge.add(0);
         }
         int sum = 0;
-        int truckIdx = 0;
         int time = 0;
 
-        while (truckIdx < n) {
-            Integer pollTruck = que.poll();
-            sum -= pollTruck;
-            if (sum + trucks[truckIdx] <= l) {
-                que.add(trucks[truckIdx]);
-                sum += trucks[truckIdx];
-                truckIdx++;
+        while (!trucks.isEmpty()) {
+            sum -= bridge.poll();
+            Integer nextTruck = trucks.peek();
+            if (sum + nextTruck <= l) {
+                bridge.add(nextTruck);
+                sum += trucks.poll();
             } else {
-                que.add(0);
+                bridge.add(0);
             }
-
             time++;
         }
 
         // 마지막 트럭이 다리 위에 올라간 순간부터 내려가는데까지 걸리는 시간 계산
-        time += que.size();
+        time += bridge.size();
 
         System.out.println(time);
     }
