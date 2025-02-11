@@ -1,4 +1,3 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,50 +7,66 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    static int l;
-    static int c;
+    static int L, C;
     static char[] arr;
+    static boolean[] isContain;
+    static List<String> answerList = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
-
         st = new StringTokenizer(br.readLine());
-        l = Integer.parseInt(st.nextToken());
-        c = Integer.parseInt(st.nextToken());
+        L = Integer.parseInt(st.nextToken());
+        C = Integer.parseInt(st.nextToken());
 
-        arr = new char[c];
+        arr = new char[C];
+        isContain = new boolean[C];
         st = new StringTokenizer(br.readLine());
-        for (int i = 0; i < c; i++) {
+        for (int i = 0; i < C; i++) {
             arr[i] = st.nextToken().charAt(0);
         }
+
+        // 정렬
         Arrays.sort(arr);
 
-        dfs(0, "");
+        // 백트래킹으로 L개의 조합 생성
+        getCode(0, 0);
+
+        for (String answer : answerList) {
+            System.out.println(answer);
+        }
     }
 
-    private static void dfs(int start, String str) {
-        if (str.length() == l) {
-            if (canAnswer(str)) {
-                System.out.println(str);
+    private static void getCode(int start, int len) {
+        if (len == L) {
+            String code = "";
+            for (int i = 0; i < C; i++) {
+                if (isContain[i]) {
+                    code += arr[i];
+                }
+            }
+            if (isAnswer(code)) {
+                answerList.add(code);
             }
             return;
         }
 
-        for (int i = start; i < arr.length; i++) {
-            dfs(i + 1, str + arr[i]);
+        for (int i = start; i < C; i++) {
+            isContain[i] = true;
+            getCode(i + 1, len + 1);
+            isContain[i] = false;
         }
     }
 
-    private static boolean canAnswer(String str) {
-        int num1 = 0; // 모음 개수
-        int num2 = 0; // 자음 개수
-        for (char c : str.toCharArray()) {
+    private static boolean isAnswer(String code) {
+        int vowelCnt = 0;
+        int consonantCnt = 0;
+        for (int i = 0; i < L; i++) {
+            char c = code.charAt(i);
             if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u') {
-                num1++;
+                vowelCnt++;
             } else {
-                num2++;
+                consonantCnt++;
             }
         }
-
-        return num1 >= 1 && num2 >= 2;
+        return vowelCnt >= 1 && consonantCnt >= 2;
     }
 }
