@@ -26,9 +26,7 @@ public class Main {
         if (Arrays.stream(arr)
                 .anyMatch(num -> num == n)) {
             System.out.println(0);
-        } else if (arr[s - 1] <= n) {
-            System.out.println(0);
-        }
+        } 
         else {
             System.out.println(result());
         }
@@ -46,7 +44,6 @@ public class Main {
             start = 0;
             end = arr[0];
         }
-//        System.out.println(start + "~" + end);
 
         for (int i = 0; i < s - 1; i++) {
             if (arr[i] < n && arr[i + 1] > n) {
