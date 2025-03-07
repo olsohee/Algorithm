@@ -9,37 +9,41 @@ public class Main {
     static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
-
-        int answer = 0;
         st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
-        int[][] map = new int[n + 1][m + 1];
-        for (int i = 1; i <= n; i++) {
-            String[] arr = br.readLine().split("");
-            for (int j = 1; j <= m; j++) {
-                map[i][j] = Integer.parseInt(arr[j - 1]);
+        int[][] arr = new int[n][m];
+        int[][] dp = new int[n][m];
+        for (int i = 0; i < n; i++) {
+            String str = br.readLine();
+            for (int j = 0; j < m; j++) {
+                arr[i][j] = str.charAt(j) - '0';
             }
         }
 
-        // dp
-        int[][] dp = new int[n + 1][m + 1];
-
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= m; j++) {
-
-                if (map[i][j] == 0) {
-                    dp[i][j] = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (i == 0 || j == 0) {
+                    dp[i][j] = arr[i][j];
                     continue;
                 }
-                    
-                // 위, 오른쪽 옆, 오른쪽 위 대각선 3곳을 고려하기
-                dp[i][j] = Math.min(Math.min(dp[i - 1][j], dp[i][j - 1]), dp[i - 1][j - 1]) + 1;
-
-                answer = Math.max(answer, dp[i][j]);
+                if (arr[i][j] == 0) {
+                    dp[i][j] = 0;
+                } else {
+                    int min = Math.min(dp[i - 1][j - 1], Math.min(dp[i - 1][j], dp[i][j - 1]));
+                    dp[i][j] = min + 1;
+                }
             }
         }
 
+        int answer = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+               answer = Math.max(answer, dp[i][j]);
+//                System.out.print(dp[i][j]  + " ");
+            }
+//            System.out.println();
+        }
         System.out.println(answer * answer);
     }
 }
