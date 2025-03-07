@@ -12,30 +12,32 @@ public class Main {
         st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
-        int[] nums = new int[n];
+        int[] arr = new int[n];
         for (int i = 0; i < n; i++) {
-            nums[i] = Integer.parseInt(br.readLine());
+            arr[i] = Integer.parseInt(br.readLine());
         }
-
-        Arrays.sort(nums);
-
-        int right = 0;
+        Arrays.sort(arr);
         int left = 0;
-        int minDiff = Integer.MAX_VALUE;
-        while (right < n && left <= right) {
-            int diff = nums[right] - nums[left];
+        int right = 0;
+        int answer = arr[n - 1] - arr[0];
 
-            if (diff >= m) {
-                minDiff = Math.min(minDiff, diff);
-            }
-
-            if (diff <= m) {
+        while (right < n) {
+            if (left == right) {
                 right++;
-            } else {
+                continue;
+            }
+            int diff = arr[right] - arr[left];
+            if (diff == m) {
+                answer = m;
+                break;
+            } else if (diff > m) {
+                answer = Math.min(answer, diff);
                 left++;
+            } else {
+                right++;
             }
         }
 
-        System.out.println(minDiff);
+        System.out.println(answer);
     }
 }
