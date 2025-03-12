@@ -9,7 +9,6 @@ public class Main {
     static StringTokenizer st;
 
     public static void main(String[] args) throws IOException {
-
         int n = Integer.parseInt(br.readLine());
         int[] arr = new int[n];
         st = new StringTokenizer(br.readLine());
@@ -18,31 +17,34 @@ public class Main {
         }
         Arrays.sort(arr);
 
-        long minSum = Long.MAX_VALUE;
+        long minDiff = Long.MAX_VALUE;
         List<Integer> answer = new ArrayList<>();
-        for (int i = 0; i < arr.length - 2; i++) {
-            // 투포인터로 최대한 0에 가까운 mid, end 값 찾기
-            int start = i + 1;
-            int end = arr.length - 1;
 
-            while (start < end) {
-                long sum = (long)arr[i] + arr[start] + arr[end];
-                if (Math.abs(sum) < minSum) {
-                    minSum = Math.abs(sum);
-                    answer = List.of(arr[i], arr[start], arr[end]);
+        outer: for (int i = 0; i < n - 2; i++) {
+            // 투포인터로 sum이 0과 가장 가까운 조합 찾기
+            int left = i + 1;
+            int right = n - 1;
+            while (left < right) {
+                long sum = (long)(arr[i] + arr[left]) + arr[right];
+                if (minDiff > Math.abs(sum)) {
+                    minDiff = Math.abs(sum);
+                    answer = List.of(arr[i], arr[left], arr[right]);
                 }
 
+                if (sum > 0) {
+                    right--;
+                }
                 if (sum < 0) {
-                    start++;
-                } else {
-                    end--;
+                    left++;
+                }
+                if (sum == 0) {
+                    break outer;
                 }
             }
         }
 
-        // 3개 오름차순 출력
-        for (Integer i : answer) {
-            System.out.print(i + " ");
+        for (Integer integer : answer) {
+            System.out.print(integer + " ");
         }
     }
 }
