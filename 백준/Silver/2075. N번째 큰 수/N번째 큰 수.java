@@ -10,35 +10,17 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         int n = Integer.parseInt(br.readLine());
-        List<Queue<Integer>> queList = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            queList.add(new PriorityQueue<>((o1, o2) -> o2 - o1));
-        }
+        Queue<Integer> que = new PriorityQueue<>((o1, o2) -> o2 - o1);
         for (int i = 0; i < n; i++) {
             st = new StringTokenizer(br.readLine());
             for (int j = 0; j < n; j++) {
-                queList.get(j).add(Integer.parseInt(st.nextToken()));
+                que.add(Integer.parseInt(st.nextToken()));
             }
         }
 
-        // 큰 수를 우선으로 n번 추출
-        int answer = 0;
-        int count = n;
-        while (count-- > 0) {
-            int maxNum = Integer.MIN_VALUE;
-            int queIdx = -1;
-            for (int j = 0; j < n; j++) {
-                int num = queList.get(j).peek();
-                if (maxNum < num) {
-                    maxNum = num;
-                    queIdx = j;
-                }
-            }
-            int poll = queList.get(queIdx).poll();
-            if (count == 0) {
-                answer = poll;
-            }
+        for (int i = 0; i < n - 1; i++) {
+            que.poll();
         }
-        System.out.println(answer);
+        System.out.println(que.poll());
     }
 }
