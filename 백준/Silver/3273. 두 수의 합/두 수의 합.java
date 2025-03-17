@@ -1,31 +1,39 @@
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.HashSet;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
+
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
         int n = Integer.parseInt(br.readLine());
-        int[] arr = new int[n];
-        HashSet<Integer> set = new HashSet<>();
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        for(int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
-            set.add(arr[i]);
+        st = new StringTokenizer(br.readLine());
+        int[] nums = new int[n];
+        for (int i = 0; i < n; i++) {
+            nums[i] = Integer.parseInt(st.nextToken());
         }
-
         int x = Integer.parseInt(br.readLine());
-        int count = 0;
-        for(int i = 0; i < n; i++) {
-            if(set.contains(x - arr[i])) {
-                count++;
+        Arrays.sort(nums);
+
+        int start = 0;
+        int end = n - 1;
+        int answer = 0;
+
+        while (start < end) {
+            int sum = nums[start] + nums[end];
+            if (sum == x) {
+                answer++;
+                start++;
+            } else if (sum > x) {
+                end--;
+            } else {
+                start++;
             }
         }
 
-        System.out.println(count / 2);
+        System.out.println(answer);
     }
 }
