@@ -1,26 +1,23 @@
 import java.util.*;
+
 class Solution {
-
-    Map<String, ArrayList<Integer>> map = new HashMap<>();
     public int[] solution(String[] info, String[] query) {
-
-        List<Integer> answerList = new ArrayList<>();
-
-        // info를 보고 map에 저장 (키, 점수)
-        for (String i : info) {
-            String[] data = i.split(" ");
-            String[] languages = {data[0], "-"};
-            String[] jobs = {data[1], "-"};
-            String[] exps = {data[2], "-"};
-            String[] foods = {data[3], "-"};
+        
+        // 키: 필터 조건, 값: 점수 리스트
+        Map<String, List<Integer>> map = new HashMap<>();
+        for (String s : info) {
+            String[] data = s.split(" ");
+            String[] languages = new String[]{data[0], "-"}; 
+            String[] jobs = new String[]{data[1], "-"}; 
+            String[] exps = new String[]{data[2], "-"}; 
+            String[] foods = new String[]{data[3], "-"}; 
             int score = Integer.parseInt(data[4]);
             for (String language : languages) {
                 for (String job : jobs) {
                     for (String exp : exps) {
                         for (String food : foods) {
-                            String[] keyData = {language, job, exp, food};
-                            String key = String.join(" ", keyData);
-                            ArrayList<Integer> list = map.getOrDefault(key, new ArrayList<>());
+                            String key = language + job + exp + food;
+                            List<Integer> list = map.getOrDefault(key, new ArrayList<>());
                             list.add(score);
                             map.put(key, list);
                         }
@@ -28,47 +25,42 @@ class Solution {
                 }
             }
         }
-
-        // 이분탐색을 위해 각 value 값을 정렬
-        for(ArrayList<Integer> arr : map.values()) {
+        
+        for(List<Integer> arr : map.values()) {
             Collections.sort(arr);
         }
-
-
-        // 해당 key의 값 가져오기
-        for (String q : query) {
-            // key 만들기
-            String[] data = q.split(" and ");
-            String[] split = data[3].split(" ");
-            data[3] = split[0];
-            int score = Integer.parseInt(split[1]);
-
-            String key = String.join(" ", data);
-
-            if(map.containsKey(key)) {
-                ArrayList<Integer> list = map.get(key);
-                // 이진탐색으로 요구하는 점수보다 높은 애들만
-                int leftIdx = 0;
-                int rightIdx = list.size();
-                while (leftIdx < rightIdx) {
-                    int mid = (leftIdx + rightIdx) / 2;
-                    if(list.get(mid) >= score) {
-                        rightIdx = mid;
-                    } else {
-                        leftIdx = mid + 1;
-                    }
-                }
-                answerList.add(list.size() - leftIdx);
+        
+        // 결과 계산
+        int[] answer = new int[query.length];
+        for (int i = 0; i < query.length; i++) {
+            String[] data = query[i].split(" ");
+            String key = data[0] + data[2] + data[4] + data[6];
+            int score = Integer.parseInt(data[7]);
+            
+            if (map.containsKey(key)) {
+                List<Integer> scores = map.get(key); // 필터링된 사람들의 점수들
+                answer[i] = findCount(scores, score);
             } else {
-                answerList.add(0);
+                answer[i] = 0;
             }
-
+        
         }
-
-        int[] answer = new int[answerList.size()];
-        for(int i = 0; i < answerList.size(); i++) {
-            answer[i] = answerList.get(i);
+        
+        return answer; // 문의조건에 해당하는 사람들의 숫자 
+    }
+    
+    private int findCount(List<Integer> scores, int standard) {
+        // Collections.sort(scores);
+        int start = 0;
+        int end = scores.size() - 1;
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            if (scores.get(mid) >= standard) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
         }
-        return answer;
+        return scores.size() - start;
     }
 }
