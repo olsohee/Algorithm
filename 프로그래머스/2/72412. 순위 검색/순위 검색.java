@@ -26,10 +26,6 @@ class Solution {
             }
         }
         
-        for(List<Integer> arr : map.values()) {
-            Collections.sort(arr);
-        }
-        
         // 결과 계산
         int[] answer = new int[query.length];
         for (int i = 0; i < query.length; i++) {
@@ -50,7 +46,7 @@ class Solution {
     }
     
     private int findCount(List<Integer> scores, int standard) {
-        // Collections.sort(scores);
+        Collections.sort(scores);
         int start = 0;
         int end = scores.size() - 1;
         while (start <= end) {
