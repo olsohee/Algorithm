@@ -1,24 +1,27 @@
 import java.util.*;
 
 class Solution {
-    
-    int answer = 0;
-    
+
     public int solution(int[] people, int limit) {
-        
+        int answer = 0;
         Arrays.sort(people);
+        boolean[] visited = new boolean[people.length];
         
         int min = 0;
-        // 합이 limit 초과하면 answer++, min과 다른 짝 만들기 (max--)
-        for (int max = people.length - 1; max >= min; max--) {
-            if (people[min] + people[max] > limit) {
-                answer++;
-            } else {
+        for (int max = people.length - 1; max > min; max--) {
+            if (people[min] + people[max] <= limit) {
+                visited[min] = true;
+                visited[max] = true;
                 answer++;
                 min++;
             }
         }
         
-        return answer;
+        for (int i = 0; i < people.length; i++) {
+            if (!visited[i]) {
+                answer++;
+            }
+        }
+        return answer; // 구명보트 최소 개수
     }
 }
