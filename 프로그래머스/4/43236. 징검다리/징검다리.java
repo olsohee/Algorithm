@@ -4,41 +4,35 @@ class Solution {
     public int solution(int distance, int[] rocks, int n) {
         
         Arrays.sort(rocks);
-        int answer = 0;
-        int left = 0;
-        int right = distance;
+        int start = 1;
+        int end = distance;
         
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            
-            int cnt = 0; // 제거한 바위 개수
-            int prev = 0; // 바위 간 거리 파악을 위한 시작 점
-            for (int i = 0; i < rocks.length; i++) {
-                // mid보다 바위 간 거리가 작으면 바위 제거
-                if (rocks[i] - prev < mid) {
+        while (start <= end) {
+            int mid = (start + end) / 2;
+            int cnt = 0; // 각 거리가 mid 이상이 되도록 바위를 제거한 개수
+            int last = 0;
+            for (int rock : rocks) {
+                if (rock - last < mid) {
                     cnt++;
-                    if (cnt > n) {
-                        break;
-                    }
                 } else {
-                    prev = rocks[i];
+                    last = rock;
                 }
-            }
-            if (distance - prev < mid) {
-                cnt++;
+            } 
+            // 마지막 바위와 도착 지점 간 거리가 mid보다 작으면 마지막 바위도 제거
+            if (distance - last < mid) {
+                cnt++; 
             }
             
-            // 현재 mid가 답이 될 수 없는 경우(-> mid 줄이기)
+            System.out.println("mid = " + mid + ", 제거개수 = " + cnt); 
+            
             if (cnt > n) {
-                right = mid - 1;
-            } 
-            // 현재 mid가 답이 될 수 있는 경우(-> 최댓값을 구해야 하므로 mid 늘리기)
-            else {
-                answer = mid;
-                left = mid + 1;
+                end = mid - 1;
+            } else {
+                start = mid + 1;
             }
         }
-        
-        return answer;
+        System.out.println(end);
+        System.out.println(start);
+        return end;
     }
 }
