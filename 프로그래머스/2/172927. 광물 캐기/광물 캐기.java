@@ -1,78 +1,87 @@
 import java.util.*;
 
 class Solution {
-    
-    int[] picks;
-    String[] minerals;
-    Map<String, Integer> map = new HashMap<>();
-    int[][] tiredness = {
-        {1, 1, 1},
-        {5, 1, 1},
-        {25, 5, 1}
-    };
-    int answer = Integer.MAX_VALUE;
-    
     public int solution(int[] picks, String[] minerals) {
-        this.picks = picks;
-        this.minerals = minerals;
-        map.put("diamond", 0);
-        map.put("iron", 1);
-        map.put("stone", 2);
         
-        for (int i = 0; i < 3; i++) {
-            if (picks[i] > 0) {
-                picks[i]--;
-                dfs(1, i, 1, tiredness[i][map.get(minerals[0])]);
-                picks[i]++;
+        // 1. 광물들을 5개씩 나눠, 돌로 캤을 때의 피로도 계산
+        List<Group> list = new ArrayList<>();
+        int cnt = 0; // 곡괭이 개수
+        for (int p : picks) {
+            cnt += p;
+        }
+        
+        for (int i = 0; i < minerals.length; i += 5) {
+            
+            if (i != 0 && i / 5 == cnt) {
+                break;
             }
-        }
-       
-        return answer; // 피로도 최소
-    }
-    
-    // idx: 캘 광물의 인덱스
-    // 현재 사용 중인 곡괭이 (0: 다이아, 1: 철, 2: 돌)
-    // cnt: 현재 곡괭이로 캔 광물 수 
-    // sum: 피로도
-    private void dfs(int mineralIdx, int pickIdx, int cnt, int sum) {
-        
-        // System.out.println();
-        // System.out.println();
-        // System.out.println("곡괭이 = " + pickIdx + ", 캔 횟수 = " + cnt + ", 피로도 = " + sum);
-        // System.out.println("다음에 캘 미네랄 인덱스 = " + (mineralIdx));
-        
-        
-        // 모든 광물을 캔 경우
-        if (mineralIdx == minerals.length) {
-            answer = Math.min(answer, sum);
-            // System.out.println("다 캠, 누적 피로도 = " + sum);
-            return;
-        }
-        
-        // 현재 곡괭이로 5번 캤으면, 새로운 곡괭이 쓰기
-        if (cnt == 5) {
-            boolean isFinish = true;
-            for (int i = 0; i < 3; i++) {
-                if (picks[i] > 0) {
-                    isFinish = false;;
-                    picks[i]--;
-                    String mineral = minerals[mineralIdx];
-                    dfs(mineralIdx + 1, i, 1, sum + tiredness[i][map.get(mineral)]);
-                    picks[i]++;
+            int diaSum = 0;
+            int ironSum = 0;
+            int stoneSum = 0;
+            
+            for (int j = i; j < i + 5; j++) {
+                if (j == minerals.length) break;
+                if (minerals[j].equals("diamond")) {
+                    diaSum += 1;
+                    ironSum += 5;
+                    stoneSum += 25;
+                }
+                if (minerals[j].equals("iron")) {
+                    diaSum += 1;
+                    ironSum += 1;
+                    stoneSum += 5;
+                }
+                if (minerals[j].equals("stone")) {
+                    diaSum += 1;
+                    ironSum += 1;
+                    stoneSum += 1;
                 }
             }
-            // 더이상 곡괭이가 없는 경우
-            if (isFinish) {
-                answer = Math.min(answer, sum);
-                // System.out.println("곡괭이없음, 누적 피로도 = " + sum);
-                return;
-            }
+            System.out.println(diaSum + ", " + ironSum + ", " + stoneSum);
+            list.add(new Group(diaSum, ironSum, stoneSum));
+        }
+       
+        // 2. 피로도가 가장 높은 집합부터 캐기. 이때 "다이아->철->돌" 순위로 곡괭이 선택
+        Collections.sort(list);
+        int answer = 0;
+        
+        for (Group g : list) {
+            System.out.println(g.diaSum + ", " + g.ironSum + ", " + g.stoneSum);
+            if (picks[0] > 0) {
+                answer += g.diaSum;
+                System.out.println("다이아로!");
+                picks[0]--;
+            } else if (picks[1] > 0) {
+                answer += g.ironSum;
+                System.out.println("철로!");
+                
+                picks[1]--;
+            } else if (picks[2] > 0) {
+                answer += g.stoneSum;
+                System.out.println("돌로!");
+                
+                picks[2]--;
+            }  else {
+                System.out.println("못캠!");
+}
+        }
+        return answer;
+    }
+    
+    private class Group implements Comparable<Group> {
+        int diaSum;
+        int ironSum;
+        int stoneSum;
+        
+        public Group(int diaSUm, int ironSum, int stoneSum) {
+            this.diaSum = diaSUm;
+            this.ironSum = ironSum;
+            this.stoneSum = stoneSum;
         }
         
-        // 기존 곡괭이 쓰기
-        else {
-            String mineral = minerals[mineralIdx];
-            dfs(mineralIdx + 1, pickIdx, cnt + 1, sum + tiredness[pickIdx][map.get(mineral)]);
+        @Override
+        public int compareTo(Group o) {
+            return o.stoneSum - this.stoneSum; // 내림차순
         }
     }
 }
