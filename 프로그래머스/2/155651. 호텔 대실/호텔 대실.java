@@ -1,57 +1,57 @@
 import java.util.*;
 
-
 class Solution {
     public int solution(String[][] book_time) {
-
-        List<Time> list = new ArrayList<>();
+        
+        List<Book> list = new ArrayList<>();
         for (String[] time : book_time) {
-            list.add(new Time(convertTime(time[0]), convertTime(time[1]) + 10));
+            int start = convertToTime(time[0], false);
+            int end = convertToTime(time[1], true); 
+            // System.out.println(start + " ~ " + end); 
+            list.add(new Book(start, end));
         }
-
-        // 끝나는 시간이 이른 순으로 정렬
-//        Collections.sort(list, (o1, o2) -> {
-//            if (o1.end == o2.end) {
-//                return o1.start - o2.start;
-//            }
-//            return o1.end - o2.end;
-//        });
-
-        Collections.sort(list, (o1, o2) -> {
-            return o1.start - o2.start;
-        });
-
-        // 각 방의 끝나는 시간을 담는 큐(끝나는 시간이 이른 순으로)
-        Queue<Integer> que = new PriorityQueue<>();
-        for (int i = 0; i < list.size(); i++) {
+        Collections.sort(list);
+        
+        
+        Queue<Integer> que = new PriorityQueue<>((o1, o2) -> o1 - o2);
+        for (Book book : list) {
             if (que.isEmpty()) {
-                que.add(list.get(i).end);
+                que.add(book.end);
                 continue;
             }
-
-            if (que.peek() <= list.get(i).start) {
+            if (que.peek() <= book.start) {
                 que.poll();
-                que.add(list.get(i).end);
-            } else {
-                que.add(list.get(i).end);
+            } 
+            que.add(book.end);
+        }
+        
+        return que.size(); // 필요한 최소 객실 수
+    }
+    
+    private int convertToTime(String str, boolean endTime) { 
+        int hour = Integer.parseInt(str.split(":")[0]);
+        int minute = Integer.parseInt(str.split(":")[1]);
+        if (endTime) { // 종료시간이면 10분 추가하기(청소 시간 반영)
+            minute += 10; 
+            if (minute >= 60) {
+                minute -= 60;
+                hour++;
             }
         }
-
-        return que.size();
+        return hour*100 + minute;
     }
-
-    private int convertTime(String str) {
-        return Integer.parseInt(str.split(":")[0]) * 60 + Integer.parseInt(str.split(":")[1]);
-    }
-
-    private class Time {
-
+    
+    private class Book implements Comparable<Book> {
         int start;
         int end;
-
-        public Time(int start, int end) {
+        public Book(int start, int end) {
             this.start = start;
             this.end = end;
+        }
+        
+        @Override
+        public int compareTo(Book o) {
+            return this.start - o.start;
         }
     }
 }
