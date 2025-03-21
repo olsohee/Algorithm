@@ -1,91 +1,90 @@
 import java.util.*;
 
 class Solution {
-
+    
     int n;
-    int s;
-    int a;
-    int b;
     int[][] fares;
     List<List<Node>> list = new ArrayList<>();
-    int[] togetherFares;
-
+    
     public int solution(int n, int s, int a, int b, int[][] fares) {
-        int answer = Integer.MAX_VALUE;
         this.n = n;
-        this.s = s;
-        this.a = a;
-        this.b = b;
-        this.fares = fares;
-        for(int i = 0; i <= n; i++) {
+        for (int i = 0; i <= n; i++) {
             list.add(new ArrayList<>());
         }
-        togetherFares = new int[n + 1];
-        Arrays.fill(togetherFares, Integer.MAX_VALUE);
-
-        // Node 리스트에 담기 (그래프 구현)
-        for(int i = 0; i < fares.length; i++) {
-            int start = fares[i][0];
-            int end = fares[i][1];
-            int fare = fares[i][2];
-
-            list.get(start).add(new Node(end, fare));
-            list.get(end).add(new Node(start, fare));
-        }
-
-        // 시작 노드부터 각 노드까지의 최소 금액 구하기 (togetherFares)
-        dijkstra(s, togetherFares);
-
-        // a, b 노드에서 각 노드까지의 최소 금액 구하기
-        int[] aloneFares1 = new int[n + 1];
-        Arrays.fill(aloneFares1, Integer.MAX_VALUE);
-        dijkstra(a, aloneFares1);
-
-        int[] aloneFares2 = new int[n + 1];
-        Arrays.fill(aloneFares2, Integer.MAX_VALUE);
-        dijkstra(b, aloneFares2);
-
-        for(int i = 1; i <= n; i++) {
-            int sum = togetherFares[i] + aloneFares1[i] + aloneFares2[i];
-            answer = Math.min(answer, sum);
+        for (int[] fare : fares) {
+            int node1 = fare[0];
+            int node2 = fare[1];
+            int cost = fare[2];
+            list.get(node1).add(new Node(node2, cost));
+            list.get(node2).add(new Node(node1, cost));
         }
         
+        // s에서 각 노드로의 최소 비용
+        int[] sCost = getCost(s);
+        
+        // a에서 각 노드로의 최소 비용
+        int[] aCost = getCost(a);
+        
+        // b에서 각 노드로의 최소 비용
+        int[] bCost = getCost(b);
+        
+        int answer = Integer.MAX_VALUE;
+        for (int i = 1; i <= n; i++) { // s에서 i까지 합승
+            int cost = sCost[i] + aCost[i] + bCost[i];
+            answer = Math.min(answer, cost);
+        }
         return answer;
     }
+    
+    private int[] getCost(int start) {
+        // start에서 각 노드로 가는데 드는 최소 비용
+        int[] costs = new int[n + 1];
+        Arrays.fill(costs, Integer.MAX_VALUE);
+        costs[start] = 0;
+        
+        boolean[] visited = new boolean[n + 1];
+        visited[start] = true;
+        
+        Queue<Node> que = new PriorityQueue<>((o1, o2) -> o1.cost - o2.cost);
+        que.add(new Node(start, 0));
+        
+        while (!que.isEmpty()) {
+            Node now = que.poll();
+            // System.out.println();
+            // System.out.println(now.end +"에서 출발");
+            
+            // now.end에서 다음 노드로 이동
+            for (Node next : list.get(now.end)) {
+                // System.out.println(next.end +"로 가기");
+                // System.out.println(costs[next.end] + " vs " + (now.cost + next.cost));
 
-    private void dijkstra(int start, int[] fares) {
-        PriorityQueue<Node> que = new PriorityQueue<>();
-        fares[start] = 0;
-        Node node = new Node(start, 0);
-        que.add(node);
-
-        while(!que.isEmpty()) {
-            Node nowNode = que.poll();
-            int len = list.get(nowNode.end).size();
-
-            for(int i = 0; i < len; i++) {
-                Node newNode = list.get(nowNode.end).get(i);
-                int fare = fares[nowNode.end] + newNode.fare;
-                if(fares[newNode.end] > fare) {
-                    fares[newNode.end] = fare;
-                    que.offer(new Node(newNode.end, fare));
+                if (costs[next.end] > now.cost + next.cost) {
+                    costs[next.end] = now.cost + next.cost;
+                    visited[next.end] = true;
+                    que.add(new Node(next.end, costs[next.end]));
+                    // System.out.println("!" + costs[next.end]);
+                    
                 }
             }
         }
+        
+        // System.out.println(start +"부터 각 노드 간 비용");
+        // for (int n : costs) {
+        //     System.out.print(n + " ");
+        // }
+        // System.out.println();
+        
+        return costs;
     }
-
-    class Node implements Comparable<Node> {
+    
+    private class Node {
+        
         int end;
-        int fare;
-
-        public Node(int end, int fare) {
+        int cost; // end까지 가는데 드는 최소 비용
+        
+        public Node(int end, int cost) {
             this.end = end;
-            this.fare = fare;
-        }
-
-        @Override
-        public int compareTo(Node o) {
-            return this.fare - o.fare;
+            this.cost = cost;
         }
     }
 }
