@@ -4,18 +4,18 @@ class Solution {
     public long solution(int cap, int n, int[] deliveries, int[] pickups) {
         
         long answer = 0;
-        int d = 0;
-        int p = 0;
+        
+        int deliveryCnt = 0; // 배달할 개수
+        int pickupCnt = 0; // 수거할 개수
         
         for (int i = n - 1; i >= 0; i--) {
-            d -= deliveries[i];
-            p -= pickups[i];
+            deliveryCnt -= deliveries[i];
+            pickupCnt -= pickups[i];
             
-            // d와 p 둘 중 하나라도 음수이면 물류창고 다녀와야 함
             int cnt = 0;
-            while (d < 0 || p < 0) {
-                d += cap;
-                p += cap;
+            while (deliveryCnt < 0 || pickupCnt < 0) {
+                deliveryCnt += cap;
+                pickupCnt += cap;
                 cnt++;
             }
             
