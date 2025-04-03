@@ -7,78 +7,64 @@ public class Main {
 
     static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     static StringTokenizer st;
-    static int n, k;
-    static List<String> words = new ArrayList<>();
-    static int wordCnt = 0;
-    static boolean[] visited = new boolean[26]; // 0(a) ~ 25(z)
-    static int answer = 0;
+    static boolean[] contain = new boolean[26];
+    static List<String> wordList = new ArrayList<>();
+    static int k;
+    static int answer;
 
     public static void main(String[] args) throws IOException {
 
         st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());
+        int n = Integer.parseInt(st.nextToken());
         k = Integer.parseInt(st.nextToken());
 
         for (int i = 0; i < n; i++) {
-            words.add(br.readLine());
+            wordList.add(br.readLine());
         }
 
-        if (k < 5) {
+        if (k < 5) { // 모든 단어를 읽을 수 없음
             System.out.println(0);
-            return;
-        }
-
-        if (k == 26) {
-            System.out.println(n);
-            return;
-        }
-
-        visited['a' - 97] = true;
-        visited['n' - 97] = true;
-        visited['t' - 97] = true;
-        visited['i' - 97] = true;
-        visited['c' - 97] = true;
-        wordCnt = 5;
-
-        // 알파벳 조합
-        dfs(97);
-        System.out.println(answer);
-    }
-
-    private static void dfs(int start) {
-        if (wordCnt == k) {
-            getResult();
-            return;
-        }
-
-        for (int i = start; i <= 122; i++) {
-            if (!visited[i - 97]) {
-                visited[i - 97] = true;
-                wordCnt++;
-                dfs(i + 1);
-                visited[i - 97] = false;
-                wordCnt--;
-            }
+        } else {
+            // dfs로 k개의 알파벳 선택
+            contain['a' - 97] = true;
+            contain['n' - 97] = true;
+            contain['t' - 97] = true;
+            contain['i' - 97] = true;
+            contain['c' - 97] = true;
+            dfs(5, 0);
+            System.out.println(answer);
         }
     }
 
-    private static void getResult() {
+    private static void dfs(int cnt, int idx) {
+        if (cnt == k) {
+            answer = Math.max(answer, getResult());
+            return;
+        }
+
+        for (int i = idx; i < 26; i++) {
+            if (contain[i]) continue;
+            contain[i] = true;
+            dfs(cnt + 1, i + 1);
+            contain[i] = false;
+        }
+    }
+
+    private static int getResult() {
         int cnt = 0;
-
-        for (String word : words) {
-            boolean flag = true;
-            char[] arr = word.toCharArray();
-            for (int i = 0; i < arr.length; i++) {
-                if (!visited[arr[i] - 97]) {
-                    flag = false;
+        for (String word : wordList) {
+            boolean canRead = true;
+            for (int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                if (!contain[c - 97]) {
+                    canRead = false;
                     break;
                 }
             }
-            if (flag) {
+            if (canRead) {
                 cnt++;
             }
         }
-
-        answer = Math.max(answer, cnt);
+        return cnt;
     }
 }
