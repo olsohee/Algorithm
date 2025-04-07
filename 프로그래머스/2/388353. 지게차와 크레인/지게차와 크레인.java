@@ -2,68 +2,41 @@ import java.util.*;
 
 class Solution {
     
-    int y, x;
     char[][] map;
     boolean[][] visited;
+    int n, m;
     int[] dy = {1, -1, 0, 0};
     int[] dx = {0, 0, 1, -1};
-    List<int[]> outlines = new ArrayList<>();
     
     public int solution(String[] storage, String[] requests) {
-        y = storage.length + 2;
-        x = storage[0].length() + 2;
-        map = new char[y][x];
-        visited = new boolean[y][x];
+        n = storage.length;
+        m = storage[0].length();
+        map = new char[n + 2][m + 2];
+        visited = new boolean[n + 2][m + 2];
         
-        for (int i = 0; i < storage.length; i++) {
-            for (int j = 0; j < storage[i].length(); j++) {
-                map[i + 1][j + 1] = storage[i].charAt(j);
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                map[i][j] = storage[i - 1].charAt(j - 1);
             }
         }
         
-        // 컨테이너 꺼내기
         for (String request : requests) {
-            char container = request.charAt(0);
-            // 1. 지게차로 꺼내기
+            
+            // 지게차 사용
             if (request.length() == 1) {
-                // 가장자리 분류
-                outlines = new ArrayList<>();
-                for (int i = 0; i < y; i++) {
-                    for (int j = 0; j < x; j++) {
-                        if (i == 0 || i == y - 1 || j == 0 || j == x - 1) {
-                            bfs(i, j);
-                        } 
-                    }
-                }
-                
-                // 가장자리에서 접근
-                for (int[] outline : outlines) {
-                    for (int i = 0; i < 4; i++) {
-                        int ny = dy[i] + outline[0];
-                        int nx = dx[i] + outline[1];
-                        if (ny < 0 || ny >= y || nx < 0 || nx >= x) continue;
-                        if (map[ny][nx] == container && !visited[ny][nx]) {
-                            visited[ny][nx] = true;
-                        }
-                    }
-                }
+                useForkLift(request.charAt(0));
             }
             
-            // 2. 크레인으로 꺼내기
+            // 크레인 사용
             if (request.length() == 2) {
-                for (int i = 0; i < y; i++) {
-                    for (int j = 0; j < x; j++) {
-                        if (map[i][j] == container && !visited[i][j]) {
-                            visited[i][j] = true;
-                        }
-                    }
-                }
+                useCrain(request.charAt(0));
             }
         }
         
         int answer = 0;
-        for (int i = 1; i < y - 1; i++) {
-            for (int j = 1; j < x - 1; j++) {
+        
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
                 if (!visited[i][j]) answer++;
             }
         }
@@ -71,25 +44,75 @@ class Solution {
         return answer;
     }
     
-    private void bfs(int nowY, int nowX) {
-        Queue<int[]> que = new LinkedList<>();
-        boolean[][] bfsVisited = new boolean[y][x];
-        que.add(new int[]{nowY, nowX});
-        bfsVisited[nowY][nowX] = true;
-        outlines.add(new int[]{nowY, nowX});
+    private void useForkLift(char alp) {
+        
+        List<Node> deliveryList = new ArrayList<>();
+        Queue<Node> que = new LinkedList<>();
+        boolean[][] visitedForBfs = new boolean[n + 2][m + 2];
+        // 외부에서 bfs 시작
+        for (int i = 0; i <= n + 1; i++) {
+            que.add(new Node(i, 0));
+            que.add(new Node(i, m + 1));
+            visitedForBfs[i][0] = true;
+            visitedForBfs[i][m + 1] = true;
+        }
+        for (int i = 0; i <= m + 1; i++) {
+            que.add(new Node(0, i));
+            que.add(new Node(n + 1, i));
+            visitedForBfs[0][i] = true;
+            visitedForBfs[n + 1][i] = true;
+        }
         
         while (!que.isEmpty()) {
-            int[] now = que.poll();
+            Node now = que.poll();
+            
             for (int i = 0; i < 4; i++) {
-                int ny = dy[i] + now[0];
-                int nx = dx[i] + now[1];
-                if (ny < 0 || ny >= y || nx < 0 || nx >= x) continue;
-                if (visited[ny][nx] && !bfsVisited[ny][nx]) {
-                    bfsVisited[ny][nx] = true;
-                    que.add(new int[]{ny, nx});
-                    outlines.add(new int[]{ny, nx});
+                int ny = now.y + dy[i];
+                int nx = now.x + dx[i];
+                if (ny <= 0 || ny > n + 1 || nx <= 0 || nx > m + 1) {
+                    continue;
+                }
+                
+                if (visitedForBfs[ny][nx]) {
+                    continue;
+                }
+                
+                // 이미 출고한 컨테이너인 경우, 계속 탐색
+                if (visited[ny][nx]) { 
+                    que.add(new Node(ny, nx));
+                    visitedForBfs[ny][nx] = true;
+                }
+                
+                // 출고하지 않았으며 출고 가능한 컨테이너인 경우, 출고 표시
+                if (!visited[ny][nx] && map[ny][nx] == alp) { 
+                    deliveryList.add(new Node(ny, nx));
+                } 
+            }
+        }
+        
+        for (int i = 0; i < deliveryList.size(); i++) {
+            Node node = deliveryList.get(i);
+            visited[node.y][node.x] = true;
+        }
+    }
+    
+    private void useCrain(char alp) {
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= m; j++) {
+                if (!visited[i][j] && map[i][j] == alp) {
+                    visited[i][j] = true;
                 }
             }
+        }
+    }
+    
+    class Node {
+        
+        int y, x;
+        
+        public Node (int y, int x) {
+            this.y = y;
+            this.x = x;
         }
     }
 }
