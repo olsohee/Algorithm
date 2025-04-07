@@ -1,53 +1,41 @@
 import java.util.*;
 
 class Solution {
-        
     public int solution(int storey) {
-        
-        String[] strArr = String.valueOf(storey).split("");
-        int[] arr = new int[strArr.length];
-        for (int i = 0; i < strArr.length; i++) {
-            arr[i] = Integer.parseInt(strArr[i]);
+        String[] stringArr = String.valueOf(storey).split("");
+        int[] nums = new int[stringArr.length];
+        for (int i = 0; i < nums.length; i++) {
+            nums[i] = Integer.parseInt(stringArr[i]);
         }
         
         int answer = 0;
-        // 뒷자리부터 반올림하기
-        for (int i = arr.length - 1; i > 0; i--) {
-            // 1. 5인 경우
-            if (arr[i] == 5) {
-                if (arr[i - 1] >= 5) {
-                    answer += 10 - arr[i];
-                    arr[i - 1]++;
-                    arr[i] = 0;
+        
+        for (int i = nums.length - 1; i > 0; i--) {
+            if (nums[i] == 5) {
+                // 올림
+                if (nums[i - 1] >= 5) {
+                    nums[i - 1]++;
+                    answer += 10 - nums[i];
                 }
+                //내림
                 else {
-                    answer += arr[i];
-                    arr[i] = 0;
+                    answer += nums[i];
                 }
             }
-            
-            // 2. 올림
-            else if (arr[i] > 5) {
-                answer += 10 - arr[i];
-                arr[i - 1]++;
-                arr[i] = 0;
-            }
-            
-            // 3. 내림
-            else {
-                answer += arr[i];
-                arr[i] = 0;
+            else if (nums[i] < 5) { // 내림
+                answer += nums[i];
+            } else { // 올림
+                nums[i - 1]++;
+                answer += 10 - nums[i];
             }
         }
         
-        if (arr[0] > 5) { 
-            answer += 10 - arr[0];
-            answer++;
+        if (nums[0] <= 5) {
+            answer += nums[0];
         } else {
-             answer += arr[0];
+            answer += 10 - nums[0] + 1;
         }
-
-
+        
         return answer;
     }
 }
