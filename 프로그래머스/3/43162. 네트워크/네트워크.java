@@ -2,32 +2,30 @@ import java.util.*;
 
 class Solution {
     
-    int answer = 0;
     int n;
     int[][] computers;
     boolean[] visited;
+    int answer;
     
     public int solution(int n, int[][] computers) {
         this.n = n;
         this.computers = computers;
-        this.visited = new boolean[n];
+        visited = new boolean[n];
         
         for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                if (computers[i][j] == 1 && !visited[i]) {
-                    dfs(i);
-                    answer++;
-                }
+            if (!visited[i]) {
+                visited[i] = true;
+                dfs(i);
+                answer++;
             }
         }
-        
         return answer;
     }
     
-    public void dfs(int start) {
-        visited[start] = true;
+    private void dfs(int start) {
         for (int i = 0; i < n; i++) {
             if (computers[start][i] == 1 && !visited[i]) {
+                visited[i] = true;
                 dfs(i);
             }
         }
