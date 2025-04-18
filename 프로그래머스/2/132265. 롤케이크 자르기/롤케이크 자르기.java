@@ -3,21 +3,27 @@ import java.util.*;
 class Solution {
     public int solution(int[] topping) {
         
-        int answer = 0;
         Map<Integer, Integer> map1 = new HashMap<>();
         Map<Integer, Integer> map2 = new HashMap<>();
-        for (int num : topping) {
-            map2.put(num, map2.getOrDefault(num, 0) + 1);
+        
+        // 초기화
+        for (int t : topping) {
+            map2.put(t, map2.getOrDefault(t, 0) + 1);
         }
         
-        for (int num : topping) {
-            map2.put(num, map2.get(num) - 1);
-            if (map2.get(num) == 0) {
-                map2.remove((Object) num);
+        // 각 구간을 자르기
+        int answer = 0;
+        for (int i = 0; i < topping.length; i++) {
+            // 제거
+            map2.put(topping[i], map2.get(topping[i]) - 1);
+            if (map2.get(topping[i]) == 0) {
+                map2.remove(topping[i]);
             }
-            map1.put(num, map1.getOrDefault(num, 0) + 1);
             
-            if (map1.size() == map2.size()) {
+            // 추가
+            map1.put(topping[i], map1.getOrDefault(topping[i], 0) + 1);
+            
+            if (map1.keySet().size() == map2.keySet().size()) {
                 answer++;
             }
         }
