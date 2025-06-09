@@ -2,55 +2,50 @@ import java.util.*;
 
 class Solution {
     public int solution(String[] friends, String[] gifts) {
-        int n = friends.length;
-        int[] giftScore = new int[n];
-        int[][] record = new int[n][n];
-        Map<String, Integer> idxMap = new HashMap<>();
-        
-        for (int i = 0; i < n; i++) {
-            idxMap.put(friends[i], i);
+        Map<String, Integer> map = new HashMap<>(); // 이름 인덱스
+        for (int i = 0; i < friends.length; i++) {
+            map.put(friends[i], i);
         }
         
-        // 주고받은 개수 계산
-        for (String str : gifts) {
-            String giver = str.split(" ")[0];
-            String receiver = str.split(" ")[1];
-            record[idxMap.get(giver)][idxMap.get(receiver)]++;
-        }
+        int[][] chart = new int[friends.length][friends.length]; // 주고받은 내역
+        int[] score = new int[friends.length]; // 선물지수
         
-        // 선물지수 계산
-        for (int i = 0; i < n; i++) {
-            int giveCnt = 0;
-            int receiveCnt = 0;
-            for (int j = 0; j < n; j++) {
-                giveCnt += record[i][j];
-                receiveCnt += record[j][i];
+        for (String gift : gifts) {
+            String sender = gift.split(" ")[0];
+            String receiver = gift.split(" ")[1];
+            chart[map.get(sender)][map.get(receiver)]++;
+        }
+        for (int i = 0; i < friends.length; i++) {
+            int giveSum = 0;
+            int receiveSum = 0;
+            for (int j = 0; j < friends.length; j++) {
+                giveSum += chart[i][j];
+                receiveSum += chart[j][i];
             }
-            giftScore[i] = giveCnt - receiveCnt;
+            score[i] = giveSum - receiveSum;
         }
         
-        // 다음 달 계산
-        int[] result = new int[n];
-        for (int i = 0; i < n; i++) {
-            for (int j = i + 1; j < n; j++) {
-                if (record[i][j] == record[j][i]) {
-                    if (giftScore[i] > giftScore[j]) {
+        // 선물 계산
+        int[] result = new int[friends.length];
+        for (int i = 0; i < friends.length; i++) {
+            for (int j = i + 1; j < friends.length; j++) {
+                // i와 j 두 사람간 주고받을 선물 계산
+                if (chart[i][j] > chart[j][i]) {
+                    result[i]++;
+                } else if (chart[i][j] < chart[j][i]){
+                    result[j]++;
+                } else {
+                    if (score[i] > score[j]) {
                         result[i]++;
-                    } else if (giftScore[i] < giftScore[j]) {
+                    } else if (score[i] < score[j]) {
                         result[j]++;
                     }
-                } else if (record[i][j] > record[j][i]) {
-                    result[i]++;
-                } else if (record[i][j] < record[j][i]) {
-                    result[j]++;
-                } 
+                }
             }
         }
         
-        int answer = 0;
-        for (int i = 0; i < n; i++) {
-            answer = Math.max(answer, result[i]);
-        }
-        return answer;
+        Arrays.sort(result);
+    
+        return result[result.length - 1];
     }
 }
