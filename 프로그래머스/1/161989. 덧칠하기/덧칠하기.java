@@ -1,21 +1,17 @@
-import java.util.*;
-
 class Solution {
     public int solution(int n, int m, int[] section) {
-        boolean[] painted = new boolean[n + 1];
+        int start = section[0];
+        int end = section[0] + m - 1;
+        int answer = 1;
         
-        int answer = 0;
-        
-        for (int s : section) {
-            if (!painted[s]) {
-                answer++;
-                for (int i = s; i < s + m; i++) {
-                    if (i == n + 1) break;
-                    painted[i] = true;
-                }
+        for (int i = 1; i < section.length; i++) {
+            if (section[i] <= end) {
+                continue;
             }
+            start = section[i];
+            end = section[i] + m - 1;
+            answer++;
         }
-        
         return answer;
     }
 }
